@@ -1,0 +1,20 @@
+{
+  "name": "brisee-bake",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Aplicación web del proyecto BRISEE BAKE",
+  "scripts": {
+    "dev": "npm run dev --workspace=frontend",
+    "build": "npm run build --workspace=frontend && npm run build --workspace=backend",
+    "lint": "npm run lint --workspace=frontend && npm run lint --workspace=backend",
+    "test": "npm run test --workspace=backend"
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "engines": {
+    "node": "24.14.1",
+    "npm": "11.11.0"
+  }
+}
