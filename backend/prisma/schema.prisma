@@ -67,7 +67,7 @@ model Usuario {
   fechaNacimiento DateTime       @db.Date
   correo          String         @unique @db.VarChar(150)
   rol             Rol
-  contrasena      String         @db.VarChar(255)
+  password        String         @db.VarChar(255)
   celular         String         @db.VarChar(20)
   estado          EstadoUsuario
   fechaRegistro   DateTime

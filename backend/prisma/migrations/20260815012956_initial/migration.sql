@@ -30,7 +30,7 @@ CREATE TABLE "Usuario" (
     "fechaNacimiento" DATE NOT NULL,
     "correo" VARCHAR(150) NOT NULL,
     "rol" "Rol" NOT NULL,
-    "contraseña" VARCHAR(255) NOT NULL,
+    "password" VARCHAR(255) NOT NULL,
     "celular" VARCHAR(20) NOT NULL,
     "estado" "EstadoUsuario" NOT NULL,
     "fechaRegistro" TIMESTAMP(3) NOT NULL,
