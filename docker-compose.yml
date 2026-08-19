@@ -1,0 +1,60 @@
+services:
+
+  postgres:
+    image: postgres:18
+    container_name: brisee-bake-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: brisee
+      POSTGRES_PASSWORD: brisee_dev
+      POSTGRES_DB: brisee_bake
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U brisee -d brisee_bake"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: brisee-bake-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "${BACKEND_PORT}:3001"
+    volumes:
+      - ./backend:/app/backend
+      - backend_node_modules:/app/backend/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: npm run start:dev --workspace=backend
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: brisee-bake-frontend
+    restart: unless-stopped
+    env_file:
+      - .env
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app/frontend
+    depends_on:
+      backend:
+        condition: service_started
+    command: npm run dev --workspace=frontend
+
+volumes:
+  postgres_data:
+  backend_node_modules:
+  frontend_node_modules:
