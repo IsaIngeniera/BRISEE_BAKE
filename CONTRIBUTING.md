@@ -6,7 +6,7 @@ Este documento establece las reglas de desarrollo y colaboración del proyecto.
 El proyecto utiliza tres niveles de ramas:
 
 ```text
-dev/<nombre>
+feature/HU-XX-nombre-corto
       │
       │ Pull Request
       ▼
@@ -19,21 +19,21 @@ dev/<nombre>
 
 * **`main`**: contiene únicamente código estable.
 * **`develop`**: rama de integración y revisión del equipo.
-* **`dev/<nombre>`**: rama personal de cada desarrollador.
+* **`feature/HU-XX-nombre-corto`**: rama de trabajo asociada a una Historia de Usuario (HU) específica.
 
 No se permiten cambios directos sobre `main` ni `develop`.
-Cada desarrollador puede trabajar varias User Stories en su misma rama personal.
+Cada Historia de Usuario se trabaja en su propia rama; si más de un integrante participa en la misma HU, ambos trabajan sobre esa misma rama.
 
 ---
 
 ## 2. Inicio y sincronización
 
-Antes de comenzar a trabajar o crear un Pull Request, la rama personal debe estar actualizada con `develop`:
+Antes de comenzar a trabajar o crear un Pull Request, la rama de la HU debe estar actualizada con `develop`:
 
 ```bash
 git checkout develop
 git pull origin develop
-git checkout dev/<nombre>
+git checkout feature/HU-XX-nombre-corto
 git merge develop
 ```
 
@@ -44,12 +44,12 @@ Los conflictos deben resolverse antes de crear o actualizar el Pull Request.
 ## 3. User Stories e Issues
 
 Las User Stories están registradas como Issues en GitHub.
-Las Issues representan el trabajo, pero no generan ramas independientes.
+Cada Issue (HU) genera su propia rama independiente.
 
 ```text
 User Story / Issue
         ↓
-Rama personal
+Rama feature/HU-XX-nombre-corto
         ↓
 Commits
         ↓
@@ -118,6 +118,7 @@ prueba
 * No dejar código muerto.
 * No incluir credenciales o información sensible.
 
+
 ### Frontend
 
 ```text
@@ -169,7 +170,7 @@ Las credenciales, tokens y API keys deben permanecer fuera del repositorio.
 Todo cambio hacia `develop` debe realizarse mediante Pull Request:
 
 ```text
-dev/<nombre> → develop
+feature/HU-XX-nombre-corto → develop
 ```
 
 Una vez que `develop` sea estable:
@@ -178,7 +179,7 @@ Una vez que `develop` sea estable:
 develop → main
 ```
 
-No se permiten PR directos desde ramas personales hacia `main`.
+No se permiten PR directos desde ramas de HU hacia `main`.
 
 Cada PR debe incluir:
 
@@ -239,7 +240,7 @@ npm run test
 ```text
 1. Seleccionar User Story
         ↓
-2. Actualizar rama personal
+2. Crear o retomar rama feature/HU-XX-nombre-corto
         ↓
 3. Desarrollar y hacer commits
         ↓
