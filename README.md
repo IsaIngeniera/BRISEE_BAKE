@@ -3,7 +3,6 @@
 ## Introducción
 
 
-
 ## Descripción
 
 Este repositorio contiene el desarrollo de la aplicación web de la reposteria Brisee Bake.
