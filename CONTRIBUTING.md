@@ -1,4 +1,5 @@
 # Guía de Contribución
+
 Este documento establece las reglas de desarrollo y colaboración del proyecto.
 
 ## 1. Flujo de trabajo con Git
