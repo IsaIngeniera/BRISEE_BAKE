@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client"
-  output   = "./generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -56,6 +55,14 @@ enum EstadoCarrito {
   ABANDONADO
 }
 
+enum EtiquetaDietetica {
+  SIN_AZUCAR
+  SIN_GLUTEN
+  KETO
+  VEGANO
+  LIBRE_DE_LACTEOS
+}
+
 // ====================
 // MODELOS
 // ====================
@@ -92,6 +99,7 @@ model Producto {
   presentacion             String           @db.VarChar(50)
   existencias              Int
   estado                   EstadoProducto
+  etiquetas                EtiquetaDietetica[]
   fechaUltimaActualizacion DateTime
   fechaCreacion            DateTime
 
