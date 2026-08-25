@@ -6,9 +6,107 @@ datasource db {
   provider = "postgresql"
 }
 
-// ====================
-// ENUMS
-// ====================
+model Usuario {
+  id              Int           @id @default(autoincrement())
+  nombre          String        @db.VarChar(50)
+  apellido        String        @db.VarChar(50)
+  fechaNacimiento DateTime      @db.Date
+  correo          String        @unique @db.VarChar(150)
+  rol             Rol
+  password        String        @db.VarChar(255)
+  celular         String        @db.VarChar(20)
+  estado          EstadoUsuario
+  fechaRegistro   DateTime
+  carritos        Carrito[]
+  pedidos         Pedido[]
+}
+
+model Categoria {
+  id        Int        @id @default(autoincrement())
+  nombre    String     @db.VarChar(80)
+  productos Producto[]
+}
+
+model Producto {
+  id                       Int                 @id @default(autoincrement())
+  idCategoria              Int
+  nombre                   String              @db.VarChar(100)
+  descripcion              String
+  precio                   Decimal
+  presentacion             String              @db.VarChar(50)
+  existencias              Int
+  estado                   EstadoProducto
+  fechaUltimaActualizacion DateTime
+  fechaCreacion            DateTime
+  etiquetas                EtiquetaDietetica[]
+  imagenes                 ImagenProducto[]
+  itemsCarrito             ItemCarrito[]
+  pedidosProducto          PedidoProducto[]
+  categoria                Categoria           @relation(fields: [idCategoria], references: [id])
+}
+
+model Pedido {
+  id                   Int              @id @default(autoincrement())
+  idCliente            Int
+  estadoEntrega        EstadoEntrega
+  total                Decimal
+  fechaCreacion        DateTime
+  direccionEntrega     String
+  ciudad               String           @db.VarChar(80)
+  tipoEntrega          TipoEntrega
+  observacionesEntrega String           @db.VarChar(100)
+  pago                 Pago?
+  cliente              Usuario          @relation(fields: [idCliente], references: [id])
+  productos            PedidoProducto[]
+}
+
+model Pago {
+  id              Int        @id @default(autoincrement())
+  idPedido        Int        @unique
+  estado          EstadoPago
+  fecha           DateTime
+  metodo          MetodoPago
+  total           Decimal
+  referenciaWompi String?    @db.VarChar(150)
+  transaccionId   String?    @db.VarChar(150)
+  pedido          Pedido     @relation(fields: [idPedido], references: [id])
+}
+
+model Carrito {
+  id            Int           @id @default(autoincrement())
+  idUsuario     Int
+  fechaCreacion DateTime
+  estado        EstadoCarrito
+  usuario       Usuario       @relation(fields: [idUsuario], references: [id])
+  items         ItemCarrito[]
+}
+
+model ItemCarrito {
+  id         Int      @id @default(autoincrement())
+  idCarrito  Int
+  idProducto Int
+  cantidad   Int
+  carrito    Carrito  @relation(fields: [idCarrito], references: [id])
+  producto   Producto @relation(fields: [idProducto], references: [id])
+}
+
+model PedidoProducto {
+  id             Int      @id @default(autoincrement())
+  idProducto     Int
+  idPedido       Int
+  cantidad       Int
+  precioUnitario Decimal
+  pedido         Pedido   @relation(fields: [idPedido], references: [id])
+  producto       Producto @relation(fields: [idProducto], references: [id])
+}
+
+model ImagenProducto {
+  id         Int      @id @default(autoincrement())
+  idProducto Int
+  urlImagen  String   @db.VarChar(300)
+  nombre     String   @db.VarChar(30)
+  producto   Producto @relation(fields: [idProducto], references: [id])
+}
 
 enum Rol {
   CLIENTE
@@ -61,119 +159,4 @@ enum EtiquetaDietetica {
   KETO
   VEGANO
   LIBRE_DE_LACTEOS
-}
-
-// ====================
-// MODELOS
-// ====================
-
-model Usuario {
-  id              Int           @id @default(autoincrement())
-  nombre          String        @db.VarChar(50)
-  apellido        String        @db.VarChar(50)
-  fechaNacimiento DateTime      @db.Date
-  correo          String        @unique @db.VarChar(150)
-  rol             Rol
-  password        String        @db.VarChar(255)
-  celular         String        @db.VarChar(20)
-  estado          EstadoUsuario
-  fechaRegistro   DateTime
-
-  carritos Carrito[]
-  pedidos  Pedido[]
-}
-
-model Categoria {
-  id     Int    @id @default(autoincrement())
-  nombre String @db.VarChar(80)
-
-  productos Producto[]
-}
-
-model Producto {
-  id                       Int                 @id @default(autoincrement())
-  idCategoria              Int
-  nombre                   String              @db.VarChar(100)
-  descripcion              String
-  precio                   Decimal
-  presentacion             String              @db.VarChar(50)
-  existencias              Int
-  estado                   EstadoProducto
-  etiquetas                EtiquetaDietetica[]
-  fechaUltimaActualizacion DateTime
-  fechaCreacion            DateTime
-
-  categoria       Categoria        @relation(fields: [idCategoria], references: [id])
-  pedidosProducto PedidoProducto[]
-  imagenes        ImagenProducto[]
-  itemsCarrito    ItemCarrito[]
-}
-
-model Pedido {
-  id                   Int           @id @default(autoincrement())
-  idCliente            Int
-  estadoEntrega        EstadoEntrega
-  total                Decimal
-  fechaCreacion        DateTime
-  direccionEntrega     String
-  ciudad               String        @db.VarChar(80)
-  tipoEntrega          TipoEntrega
-  observacionesEntrega String        @db.VarChar(100)
-
-  cliente   Usuario          @relation(fields: [idCliente], references: [id])
-  pago      Pago?
-  productos PedidoProducto[]
-}
-
-model Pago {
-  id              Int        @id @default(autoincrement())
-  idPedido        Int        @unique
-  estado          EstadoPago
-  fecha           DateTime
-  metodo          MetodoPago
-  total           Decimal
-  referenciaWompi String?    @db.VarChar(150)
-  transaccionId   String?    @db.VarChar(150)
-
-  pedido Pedido @relation(fields: [idPedido], references: [id])
-}
-
-model Carrito {
-  id            Int           @id @default(autoincrement())
-  idUsuario     Int
-  fechaCreacion DateTime
-  estado        EstadoCarrito
-
-  usuario Usuario       @relation(fields: [idUsuario], references: [id])
-  items   ItemCarrito[]
-}
-
-model ItemCarrito {
-  id         Int @id @default(autoincrement())
-  idCarrito  Int
-  idProducto Int
-  cantidad   Int
-
-  carrito  Carrito  @relation(fields: [idCarrito], references: [id])
-  producto Producto @relation(fields: [idProducto], references: [id])
-}
-
-model PedidoProducto {
-  id             Int     @id @default(autoincrement())
-  idProducto     Int
-  idPedido       Int
-  cantidad       Int
-  precioUnitario Decimal
-
-  producto Producto @relation(fields: [idProducto], references: [id])
-  pedido   Pedido   @relation(fields: [idPedido], references: [id])
-}
-
-model ImagenProducto {
-  id         Int    @id @default(autoincrement())
-  idProducto Int
-  urlImagen  String @db.VarChar(300)
-  nombre     String @db.VarChar(30)
-
-  producto Producto @relation(fields: [idProducto], references: [id])
 }
