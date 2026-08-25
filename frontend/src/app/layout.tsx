@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import AdminBar from "../components/AdminBar";
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import Footer from "../components/layout/Footer";
 
 export const metadata: Metadata = {
   title: "Brisée Bake",
