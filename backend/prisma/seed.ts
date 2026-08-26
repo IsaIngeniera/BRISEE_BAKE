@@ -14,7 +14,6 @@ async function main() {
   console.log('Creando categorias...');
   const catGranolas = await prisma.categoria.create({ data: { nombre: 'Granolas' } });
   const catGalletas = await prisma.categoria.create({ data: { nombre: 'Galletas' } });
-  const catGalletasCongeladas = await prisma.categoria.create({ data: { nombre: 'Galletas congeladas' } });
   const catMacarons = await prisma.categoria.create({ data: { nombre: 'Macarons' } });
 
   console.log('Creando productos...');
@@ -43,17 +42,6 @@ async function main() {
       { idCategoria: catGalletas.id, nombre: 'Galleta zanahoria choco blanco y nueces', descripcion: descGalletasFit, precio: 13500, presentacion: '70g (Empaque por 2)', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
       { idCategoria: catGalletas.id, nombre: 'Galleta choco chips', descripcion: descGalletasFit, precio: 13500, presentacion: '70g (Empaque por 2)', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
       { idCategoria: catGalletas.id, nombre: 'Galleta doble chocolate', descripcion: descGalletasFit, precio: 14500, presentacion: '70g (Empaque por 2)', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
-    ]
-  });
-
-  // Galletas Congeladas (280g)
-  const descGalletasCongeladas = 'Masa congelada (Empaque por 8). Mini galletas de harina de almendra, endulzadas con alulosa y chocolate real sin azúcar.';
-  await prisma.producto.createMany({
-    data: [
-      { idCategoria: catGalletasCongeladas.id, nombre: 'Masa choco blanco y pistachos', descripcion: descGalletasCongeladas, precio: 55000, presentacion: '280g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
-      { idCategoria: catGalletasCongeladas.id, nombre: 'Masa zanahoria choco blanco y nueces', descripcion: descGalletasCongeladas, precio: 37000, presentacion: '280g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
-      { idCategoria: catGalletasCongeladas.id, nombre: 'Masa choco chips', descripcion: descGalletasCongeladas, precio: 44000, presentacion: '280g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
-      { idCategoria: catGalletasCongeladas.id, nombre: 'Masa doble chocolate', descripcion: descGalletasCongeladas, precio: 52000, presentacion: '280g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
     ]
   });
 
