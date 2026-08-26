@@ -113,6 +113,7 @@ export default function ProductForm(): ReactElement {
       return;
     }
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFormData((previousFormData) => ({
       ...previousFormData,
       idCategoria: selectedCategory.id.toString(),

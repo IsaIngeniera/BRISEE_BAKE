@@ -52,7 +52,7 @@ export default async function AdminProductosPage() {
 
   try {
     products = await getProducts();
-  } catch (error) {
+  } catch {
     errorOccurred = true;
   }
 
