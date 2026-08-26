@@ -8,6 +8,7 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('Borrando datos existentes para evitar duplicados...');
+  await prisma.imagenProducto.deleteMany();
   await prisma.producto.deleteMany();
   await prisma.categoria.deleteMany();
 
