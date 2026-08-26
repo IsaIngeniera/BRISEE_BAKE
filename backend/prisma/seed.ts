@@ -69,6 +69,22 @@ async function main() {
     ]
   });
 
+  console.log('Agregando imágenes de prueba a los productos...');
+  const todosLosProductos = await prisma.producto.findMany();
+  
+  const imagenesData = todosLosProductos.map((p) => {
+    const nombreLimpio = p.nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '-');
+    return {
+      idProducto: p.id,
+      urlImagen: `/images/productos/${nombreLimpio}.jpg`,
+      nombre: 'Principal'
+    };
+  });
+  
+  await prisma.imagenProducto.createMany({
+    data: imagenesData
+  });
+
   console.log('Seeder ejecutado con exito!');
 }
 
