@@ -27,7 +27,7 @@ async function main() {
           celular: '1234567890',
           estado: EstadoUsuario.ACTIVO,
           fechaNacimiento: new Date('1990-01-01'),
-          fechaRegistro: new Date()
+          createdAt: new Date()
         }
       });
       console.log("Admin created");

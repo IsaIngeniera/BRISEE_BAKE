@@ -10,19 +10,19 @@ import {
 import styles from "./Granolas.module.css";
 
 interface ProductImage {
-  id: number;
+  id: string;
   urlImagen: string;
   nombre: string;
 }
 
 interface ProductCategory {
-  id: number;
+  id: string;
   nombre: string;
 }
 
 interface Product {
-  id: number;
-  idCategoria: number;
+  id: string;
+  idCategoria: string;
   nombre: string;
   descripcion: string;
   precio: number | string;

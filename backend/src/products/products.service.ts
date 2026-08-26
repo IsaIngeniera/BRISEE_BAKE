@@ -7,19 +7,24 @@ export class ProductsService {
   constructor(private readonly prisma: PrismaService) {}
 
   private normalizeString(str: string) {
-    return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return str
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
   }
 
   async create(createProductDto: CreateProductDto) {
     // Verificación de duplicados (sin distinguir mayúsculas ni tildes)
     const normalizedNewName = this.normalizeString(createProductDto.nombre);
-    
+
     const allProducts = await this.prisma.producto.findMany({
-      select: { id: true, nombre: true }
+      select: { id: true, nombre: true },
     });
-    
-    const duplicate = allProducts.find(p => this.normalizeString(p.nombre) === normalizedNewName);
-    
+
+    const duplicate = allProducts.find(
+      (p) => this.normalizeString(p.nombre) === normalizedNewName,
+    );
+
     if (duplicate) {
       throw new BadRequestException('Ya existe un producto con este nombre');
     }
@@ -35,33 +40,35 @@ export class ProductsService {
           existencias: createProductDto.existencias,
           estado: createProductDto.estado,
           etiquetas: createProductDto.etiquetas || [],
-          fechaUltimaActualizacion: new Date(),
-          fechaCreacion: new Date(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       });
       return { message: 'Producto creado exitosamente', product: newProduct };
-    } catch (error) {
-      throw new BadRequestException('Error al crear el producto. Verifique los datos enviados.');
+    } catch {
+      throw new BadRequestException(
+        'Error al crear el producto. Verifique los datos enviados.',
+      );
     }
   }
 
   findAll() {
     return this.prisma.producto.findMany({
       include: {
-        categoria: true
-      }
+        categoria: true,
+      },
     });
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} product`;
   }
 
-  update(id: number, updateProductDto: any) {
+  update(id: string, _updateProductDto: any) {
     return `This action updates a #${id} product`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} product`;
   }
 }

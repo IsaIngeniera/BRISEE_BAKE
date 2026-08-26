@@ -7,13 +7,13 @@ import { Rol, EstadoUsuario } from '@prisma/client';
 export class AuthService {
   constructor(
     private prisma: PrismaService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
   async loginMockAdmin() {
     // 1. Check if mock admin exists
     let admin = await this.prisma.usuario.findUnique({
-      where: { correo: 'admin@briseebake.com' }
+      where: { correo: 'admin@briseebake.com' },
     });
 
     // 2. If not, create it
@@ -28,8 +28,8 @@ export class AuthService {
           celular: '1234567890',
           estado: EstadoUsuario.ACTIVO,
           fechaNacimiento: new Date('1990-01-01'),
-          fechaRegistro: new Date()
-        }
+          createdAt: new Date(),
+        },
       });
     }
 

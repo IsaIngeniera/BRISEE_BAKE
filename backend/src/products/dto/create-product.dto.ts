@@ -1,12 +1,22 @@
-import { IsInt, IsString, IsNumber, IsEnum, IsNotEmpty, MaxLength, Min, IsOptional, IsArray, ArrayMinSize } from 'class-validator';
+import {
+  IsInt,
+  IsString,
+  IsNumber,
+  IsEnum,
+  IsNotEmpty,
+  MaxLength,
+  Min,
+  IsOptional,
+  IsArray,
+} from 'class-validator';
 import { EstadoProducto, EtiquetaDietetica } from '@prisma/client';
 
 const missingDataMsg = 'Faltan datos por completar';
 
 export class CreateProductDto {
-  @IsInt({ message: missingDataMsg })
+  @IsString({ message: missingDataMsg })
   @IsNotEmpty({ message: missingDataMsg })
-  idCategoria: number;
+  idCategoria: string;
 
   @IsString({ message: missingDataMsg })
   @IsNotEmpty({ message: missingDataMsg })
@@ -17,9 +27,18 @@ export class CreateProductDto {
   @IsNotEmpty({ message: missingDataMsg })
   descripcion: string;
 
-  @IsNumber({ maxDecimalPlaces: 2 }, { message: 'Formato de moneda aceptado por el sistema (ej. COP, sin decimales negativos, máximo 2 decimales)' })
+  @IsNumber(
+    { maxDecimalPlaces: 2 },
+    {
+      message:
+        'Formato de moneda aceptado por el sistema (ej. COP, sin decimales negativos, máximo 2 decimales)',
+    },
+  )
   @IsNotEmpty({ message: missingDataMsg })
-  @Min(0, { message: 'Formato de moneda aceptado por el sistema (ej. COP, sin decimales negativos, máximo 2 decimales)' })
+  @Min(0, {
+    message:
+      'Formato de moneda aceptado por el sistema (ej. COP, sin decimales negativos, máximo 2 decimales)',
+  })
   precio: number;
 
   @IsString({ message: missingDataMsg })

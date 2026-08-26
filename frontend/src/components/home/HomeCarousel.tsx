@@ -12,7 +12,7 @@ import {
 import styles from "./HomeCarousel.module.css";
 
 export interface CarouselSlide {
-  id: number;
+  id: string;
   image: string;
   alt: string;
 }

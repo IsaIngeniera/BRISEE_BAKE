@@ -7,7 +7,7 @@ datasource db {
 }
 
 model Usuario {
-  id              Int           @id @default(autoincrement())
+  id              String        @id @default(uuid())
   nombre          String        @db.VarChar(50)
   apellido        String        @db.VarChar(50)
   fechaNacimiento DateTime      @db.Date
@@ -16,41 +16,49 @@ model Usuario {
   password        String        @db.VarChar(255)
   celular         String        @db.VarChar(20)
   estado          EstadoUsuario
-  fechaRegistro   DateTime
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
   carritos        Carrito[]
   pedidos         Pedido[]
+
+  @@map("usuarios")
 }
 
 model Categoria {
-  id        Int        @id @default(autoincrement())
+  id        String     @id @default(uuid())
   nombre    String     @db.VarChar(80)
   productos Producto[]
+
+  @@map("categorias")
 }
 
 model Producto {
-  id                       Int                 @id @default(autoincrement())
-  idCategoria              Int
-  nombre                   String              @db.VarChar(100)
-  descripcion              String
-  precio                   Decimal
-  presentacion             String              @db.VarChar(50)
-  existencias              Int
-  estado                   EstadoProducto
-  fechaUltimaActualizacion DateTime
-  fechaCreacion            DateTime
-  etiquetas                EtiquetaDietetica[]
-  imagenes                 ImagenProducto[]
-  itemsCarrito             ItemCarrito[]
-  pedidosProducto          PedidoProducto[]
-  categoria                Categoria           @relation(fields: [idCategoria], references: [id])
+  id              String              @id @default(uuid())
+  idCategoria     String
+  nombre          String              @db.VarChar(100)
+  descripcion     String
+  precio          Decimal
+  presentacion    String              @db.VarChar(50)
+  existencias     Int
+  estado          EstadoProducto
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  etiquetas       EtiquetaDietetica[]
+  imagenes        ImagenProducto[]
+  itemsCarrito    ItemCarrito[]
+  pedidosProducto PedidoProducto[]
+  categoria       Categoria           @relation(fields: [idCategoria], references: [id])
+
+  @@map("productos")
 }
 
 model Pedido {
-  id                   Int              @id @default(autoincrement())
-  idCliente            Int
+  id                   String           @id @default(uuid())
+  idCliente            String
   estadoEntrega        EstadoEntrega
   total                Decimal
-  fechaCreacion        DateTime
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
   direccionEntrega     String
   ciudad               String           @db.VarChar(80)
   tipoEntrega          TipoEntrega
@@ -58,54 +66,68 @@ model Pedido {
   pago                 Pago?
   cliente              Usuario          @relation(fields: [idCliente], references: [id])
   productos            PedidoProducto[]
+
+  @@map("pedidos")
 }
 
 model Pago {
-  id              Int        @id @default(autoincrement())
-  idPedido        Int        @unique
+  id              String     @id @default(uuid())
+  idPedido        String     @unique
   estado          EstadoPago
-  fecha           DateTime
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
   metodo          MetodoPago
   total           Decimal
   referenciaWompi String?    @db.VarChar(150)
   transaccionId   String?    @db.VarChar(150)
   pedido          Pedido     @relation(fields: [idPedido], references: [id])
+
+  @@map("pagos")
 }
 
 model Carrito {
-  id            Int           @id @default(autoincrement())
-  idUsuario     Int
-  fechaCreacion DateTime
-  estado        EstadoCarrito
-  usuario       Usuario       @relation(fields: [idUsuario], references: [id])
-  items         ItemCarrito[]
+  id        String        @id @default(uuid())
+  idUsuario String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  estado    EstadoCarrito
+  usuario   Usuario       @relation(fields: [idUsuario], references: [id])
+  items     ItemCarrito[]
+
+  @@map("carritos")
 }
 
 model ItemCarrito {
-  id         Int      @id @default(autoincrement())
-  idCarrito  Int
-  idProducto Int
+  id         String   @id @default(uuid())
+  idCarrito  String
+  idProducto String
   cantidad   Int
   carrito    Carrito  @relation(fields: [idCarrito], references: [id])
   producto   Producto @relation(fields: [idProducto], references: [id])
+
+  @@map("items_carrito")
 }
 
 model PedidoProducto {
-  id             Int      @id @default(autoincrement())
-  idProducto     Int
-  idPedido       Int
+  id             String   @id @default(uuid())
+  idProducto     String
+  idPedido       String
   cantidad       Int
   precioUnitario Decimal
   pedido         Pedido   @relation(fields: [idPedido], references: [id])
   producto       Producto @relation(fields: [idProducto], references: [id])
+
+  @@map("pedidos_producto")
 }
 
 model ImagenProducto {
-  id         Int      @id @default(autoincrement())
-  idProducto Int
+  id         String   @id @default(uuid())
+  idProducto String
   urlImagen  String   @db.VarChar(300)
   nombre     String   @db.VarChar(30)
   producto   Producto @relation(fields: [idProducto], references: [id])
+
+  @@map("imagenes_producto")
 }
 
 enum Rol {

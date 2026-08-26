@@ -1,7 +1,20 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Rol } from '@prisma/client';
 import { ROLES_KEY } from '../decorators/roles.decorator';
+
+import { Request } from 'express';
+
+interface AuthRequest extends Request {
+  user?: {
+    rol: Rol;
+  };
+}
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -12,20 +25,24 @@ export class RolesGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
-    
+
     if (!requiredRoles) {
       return true;
     }
-    
-    const { user } = context.switchToHttp().getRequest();
-    
+
+    const { user } = context.switchToHttp().getRequest<AuthRequest>();
+
     if (!user || !user.rol) {
-      throw new ForbiddenException('No tienes permisos para realizar esta acción');
+      throw new ForbiddenException(
+        'No tienes permisos para realizar esta acción',
+      );
     }
 
     const hasRole = requiredRoles.includes(user.rol);
     if (!hasRole) {
-      throw new ForbiddenException('SOLO EL administrador puede agregar archivos o realizar esta acción');
+      throw new ForbiddenException(
+        'SOLO EL administrador puede agregar archivos o realizar esta acción',
+      );
     }
 
     return true;
