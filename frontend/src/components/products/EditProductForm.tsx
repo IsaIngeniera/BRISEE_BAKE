@@ -126,6 +126,9 @@ export default function EditProductForm({
   const [selectedImageName, setSelectedImageName] =
     useState<string>('');
 
+  const [selectedImageFile, setSelectedImageFile] =
+    useState<File | null>(null);
+
   const [isLoading, setIsLoading] =
     useState<boolean>(true);
 
@@ -328,6 +331,7 @@ export default function EditProductForm({
     );
 
     setSelectedImageName(selectedFile.name);
+    setSelectedImageFile(selectedFile);
   }
 
   function handleRestoreImage(): void {
@@ -337,6 +341,7 @@ export default function EditProductForm({
 
     setPreviewImageUrl('');
     setSelectedImageName('');
+    setSelectedImageFile(null);
     clearMessages();
   }
 
@@ -369,37 +374,55 @@ export default function EditProductForm({
 
     setIsSaving(true);
 
-    /*
-     * Simulación exclusiva del frontend.
-     * Aquí se conectará posteriormente el PATCH del backend:
-     *
-     * await fetch(`${apiUrl}/products/${productId}`, {
-     *   method: 'PATCH',
-     *   headers: {
-     *     'Content-Type': 'application/json',
-     *   },
-     *   body: JSON.stringify(payload),
-     * });
-     */
+    try {
+      const formDataPayload = new FormData();
+      
+      formDataPayload.append('nombre', formData.nombre);
+      formDataPayload.append('descripcion', formData.descripcion);
+      formDataPayload.append('precio', formData.precio);
+      formDataPayload.append('presentacion', formData.presentacion);
+      formDataPayload.append('existencias', formData.existencias);
+      formDataPayload.append('idCategoria', formData.idCategoria);
+      formDataPayload.append('estado', formData.estado);
+      
+      formData.etiquetas.forEach(et => formDataPayload.append('etiquetas', et));
 
-    await new Promise<void>((resolve) => {
-      window.setTimeout(resolve, 500);
-    });
+      if (selectedImageFile) {
+        formDataPayload.append('imagen', selectedImageFile);
+      }
 
-    setSavedFormData({
-      ...formData,
-      etiquetas: [...formData.etiquetas],
-    });
+      const response = await fetch(`${apiUrl}/products/${productId}`, {
+        method: 'PATCH',
+        body: formDataPayload,
+      });
 
-    if (previewImageUrl) {
-      setCurrentImageUrl(previewImageUrl);
+      if (!response.ok) {
+        const errorResponse = await response.json().catch(() => ({}));
+        let errorMsg = 'Error al actualizar el producto';
+        if (errorResponse.message) {
+           errorMsg = Array.isArray(errorResponse.message) ? errorResponse.message[0] : errorResponse.message;
+        }
+        throw new Error(errorMsg);
+      }
+
+      setSavedFormData({
+        ...formData,
+        etiquetas: [...formData.etiquetas],
+      });
+
+      if (previewImageUrl) {
+        setCurrentImageUrl(previewImageUrl);
+      }
+
+      setSelectedImageName('');
+      setSelectedImageFile(null);
+      setSuccessMessage('Producto actualizado exitosamente');
+    } catch (caughtError: unknown) {
+      const message = caughtError instanceof Error ? caughtError.message : 'Error al actualizar el producto';
+      setErrorMessage(message);
+    } finally {
+      setIsSaving(false);
     }
-
-    setSelectedImageName('');
-    setSuccessMessage(
-      'Producto actualizado exitosamente',
-    );
-    setIsSaving(false);
   }
 
   if (isLoading) {
