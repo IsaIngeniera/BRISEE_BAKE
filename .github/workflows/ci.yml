@@ -39,7 +39,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.jsgit
         uses: actions/setup-node@v4
         with:
           node-version: 24.14.1
@@ -57,3 +57,4 @@ jobs:
 
       - name: Tests
         run: npm test --workspace=backend
+        
