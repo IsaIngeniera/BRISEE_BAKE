@@ -23,9 +23,9 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth()
     .build();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const document = SwaggerModule.createDocument(app as any, config);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   SwaggerModule.setup('api', app as any, document);
 
   await app.listen(process.env.PORT ?? 3001, '0.0.0.0');
