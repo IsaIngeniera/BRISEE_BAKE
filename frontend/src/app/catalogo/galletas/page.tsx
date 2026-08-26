@@ -1,34 +1,35 @@
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
 import {
   ArrowLeft,
   Pencil,
   Plus,
   ShoppingCart,
-} from "lucide-react";
+} from 'lucide-react';
 
-import styles from "./Galletas.module.css";
+import styles from './galletas.module.css';
 
 interface ProductImage {
-  id: string;
+  id: number;
   urlImagen: string;
   nombre: string;
 }
 
 interface ProductCategory {
-  id: string;
+  id: number;
   nombre: string;
 }
 
 interface Product {
-  id: string;
-  idCategoria: string;
+  id: number;
+  idCategoria: number;
   nombre: string;
   descripcion: string;
   precio: number | string;
   presentacion: string;
   existencias: number;
-  estado: "ACTIVO" | "INACTIVO";
+  estado: 'ACTIVO' | 'INACTIVO';
   etiquetas: string[];
   categoria?: ProductCategory;
   imagenes?: ProductImage[];
@@ -36,36 +37,34 @@ interface Product {
 
 function normalizeText(value: string): string {
   return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim();
 }
 
-function isGalletaProduct(product: Product): boolean {
+function isCookieProduct(product: Product): boolean {
   const productName = normalizeText(product.nombre);
-  const categoryName = normalizeText(
-    product.categoria?.nombre ?? "",
-  );
+  const categoryName = normalizeText(product.categoria?.nombre ?? '');
 
   return (
-    productName.includes("galleta") ||
-    categoryName.includes("galleta")
+    productName.includes('galleta') ||
+    categoryName.includes('galleta')
   );
 }
 
-async function getGalletasProducts(): Promise<Product[]> {
+async function getCookieProducts(): Promise<Product[]> {
   try {
     const apiUrl =
-      process.env.INTERNAL_API_URL || "http://backend:3001";
+      process.env.INTERNAL_API_URL ?? 'http://backend:3001';
 
     const response = await fetch(`${apiUrl}/products`, {
-      cache: "no-store",
+      cache: 'no-store',
     });
 
     if (!response.ok) {
       console.error(
-        `Error fetching products. Status: ${response.status}`,
+        `Error fetching cookie products. Status: ${response.status}`,
       );
 
       return [];
@@ -75,11 +74,11 @@ async function getGalletasProducts(): Promise<Product[]> {
 
     return products.filter(
       (product) =>
-        product.estado !== "INACTIVO" &&
-        isGalletaProduct(product),
+        product.estado !== 'INACTIVO' &&
+        isCookieProduct(product),
     );
   } catch (error) {
-    console.error("Error fetching galleta products:", error);
+    console.error('Error fetching cookie products:', error);
 
     return [];
   }
@@ -89,18 +88,18 @@ function formatPrice(price: number | string): string {
   const numericPrice = Number(price);
 
   if (Number.isNaN(numericPrice)) {
-    return "$ 0";
+    return '$ 0';
   }
 
-  return numericPrice.toLocaleString("es-CO", {
-    style: "currency",
-    currency: "COP",
+  return numericPrice.toLocaleString('es-CO', {
+    style: 'currency',
+    currency: 'COP',
     maximumFractionDigits: 0,
   });
 }
 
-export default async function GalletasPage() {
-  const products = await getGalletasProducts();
+export default async function CookiesPage() {
+  const products = await getCookieProducts();
 
   return (
     <div className={styles.page}>
@@ -122,7 +121,8 @@ export default async function GalletasPage() {
           <h1>Galletas</h1>
 
           <p className={styles.subtitle}>
-            Crujientes, suaves y llenas de sabor artesanal para disfrutar en cualquier momento.
+            Crujientes, suaves y llenas de sabor artesanal para
+            disfrutar en cualquier momento.
           </p>
 
           <div
@@ -139,12 +139,16 @@ export default async function GalletasPage() {
       {/* Products and add-product card */}
       <section
         className={styles.productGrid}
-        aria-label="Productos de macarrones"
+        aria-label="Productos de galletas"
       >
         {products.map((product) => {
-          const productImage =
-            product.imagenes?.[0]?.urlImagen ||
-            "/images/catalogo/galletas-placeholder.jpg";
+          const productImageUrl =
+            product.imagenes?.[0]?.urlImagen ??
+            '/images/catalogo/galletas-placeholder.jpg';
+
+          const productImageAlt =
+            product.imagenes?.[0]?.nombre ??
+            `Imagen de ${product.nombre}`;
 
           return (
             <article
@@ -163,13 +167,13 @@ export default async function GalletasPage() {
 
               {/* Product image */}
               <div className={styles.productImageContainer}>
-                <img
-                  src={productImage}
-                  alt={
-                    product.imagenes?.[0]?.nombre ||
-                    `Imagen de ${product.nombre}`
-                  }
+                <Image
+                  src={productImageUrl}
+                  alt={productImageAlt}
                   className={styles.productImage}
+                  fill
+                  sizes="(max-width: 680px) 100vw, (max-width: 1100px) 50vw, 33vw"
+                  unoptimized
                 />
               </div>
 
@@ -187,14 +191,14 @@ export default async function GalletasPage() {
                   {product.descripcion}
                 </p>
 
-                {product.etiquetas?.length > 0 && (
+                {product.etiquetas.length > 0 && (
                   <div
                     className={styles.labels}
                     aria-label="Etiquetas dietéticas"
                   >
                     {product.etiquetas.map((label) => (
                       <span key={label}>
-                        {label.replaceAll("_", " ")}
+                        {label.replaceAll('_', ' ')}
                       </span>
                     ))}
                   </div>
@@ -207,7 +211,7 @@ export default async function GalletasPage() {
                 <p className={styles.stock}>
                   {product.existencias > 0
                     ? `${product.existencias} disponibles`
-                    : "Producto agotado"}
+                    : 'Producto agotado'}
                 </p>
 
                 <Link
@@ -215,15 +219,15 @@ export default async function GalletasPage() {
                   className={`${styles.cartButton} ${
                     product.existencias <= 0
                       ? styles.disabledButton
-                      : ""
+                      : ''
                   }`}
                   aria-disabled={product.existencias <= 0}
                 >
                   <ShoppingCart aria-hidden="true" />
 
                   {product.existencias > 0
-                    ? "Añadir al carrito"
-                    : "Agotado"}
+                    ? 'Añadir al carrito'
+                    : 'Agotado'}
                 </Link>
               </div>
             </article>
@@ -235,7 +239,7 @@ export default async function GalletasPage() {
           <Link
             href="/admin/productos/crear?categoria=galletas"
             className={styles.addProductLink}
-            aria-label="Crear Galletas"
+            aria-label="Crear galleta"
           >
             <span className={styles.addIcon}>
               <Plus aria-hidden="true" />
@@ -255,7 +259,8 @@ export default async function GalletasPage() {
       {products.length === 0 && (
         <section className={styles.emptyMessage}>
           <p>
-            Aún no hay galletas registradas. Utiliza la tarjeta "Añadir producto" para crear la primera.
+            Aún no hay galletas registradas. Utiliza la tarjeta
+            &quot;Añadir producto&quot; para crear la primera.
           </p>
         </section>
       )}

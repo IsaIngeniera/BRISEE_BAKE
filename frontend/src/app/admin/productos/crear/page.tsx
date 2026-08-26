@@ -1,13 +1,41 @@
-import React, { Suspense } from 'react';
-import ProductFormModal from '../../../../components/products/ProductFormModal';
+import { Suspense, type ReactElement } from 'react';
 
-export default function CrearProductoPage() {
+import ProductForm from '../../../../components/products/ProductForm';
+
+export default function CreateProductPage(): ReactElement {
   return (
-    <div style={{ backgroundColor: '#fcebf2', minHeight: '100vh', padding: '40px 20px' }}>
-      <div style={{ maxWidth: '800px', margin: '0 auto', backgroundColor: '#fff', borderRadius: '12px', padding: '30px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
-        <h1 style={{ fontFamily: 'Georgia, serif', color: '#000', marginBottom: '20px', textAlign: 'center' }}>Crear Nuevo Producto</h1>
-        <Suspense fallback={<div>Cargando formulario...</div>}>
-          <ProductFormModal />
+    <div
+      style={{
+        minHeight: '100vh',
+        padding: '40px 20px',
+        backgroundColor: '#fcebf2',
+      }}
+    >
+      <div
+        style={{
+          maxWidth: '800px',
+          margin: '0 auto',
+          padding: '30px',
+          backgroundColor: '#ffffff',
+          borderRadius: '12px',
+          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)',
+        }}
+      >
+        <h1
+          style={{
+            marginBottom: '20px',
+            color: '#000000',
+            fontFamily: 'Georgia, serif',
+            textAlign: 'center',
+          }}
+        >
+          Crear nuevo producto
+        </h1>
+
+        <Suspense
+          fallback={<div>Cargando formulario...</div>}
+        >
+          <ProductForm />
         </Suspense>
       </div>
     </div>

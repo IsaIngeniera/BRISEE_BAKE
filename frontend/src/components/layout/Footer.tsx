@@ -1,20 +1,28 @@
-import Image from "next/image";
+import Image from 'next/image';
 
-import { Mail, MapPin, Phone } from "lucide-react";
+import type { ReactElement } from 'react';
+
+import {
+  Mail,
+  MapPin,
+  Phone,
+} from 'lucide-react';
 
 import {
   FaFacebookF,
   FaInstagram,
   FaTiktok,
   FaWhatsapp,
-} from "react-icons/fa6";
+} from 'react-icons/fa6';
 
-import styles from "./Footer.module.css";
+import styles from './footer.module.css';
 
 const GOOGLE_MAPS_URL =
-  "https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d1191.0777454138042!2d-75.58386195819763!3d6.171316331055563!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zNsKwMTAnMTUuNiJOIDc1wrAzNCc1OS4yIlc!5e0!3m2!1ses-419!2sco!4v1787681621293!5m2!1ses-419!2sco";
+  'https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d1191.0777454138042!2d-75.58386195819763!3d6.171316331055563!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zNsKwMTAnMTUuNiJOIDc1wrAzNCc1OS4yIlc!5e0!3m2!1ses-419!2sco!4v1787681621293!5m2!1ses-419!2sco';
 
-export default function Footer() {
+export default function Footer(): ReactElement {
+  const currentYear = new Date().getFullYear();
+
   return (
     <footer className={styles.footer}>
       <div className={styles.mainContent}>
@@ -42,8 +50,7 @@ export default function Footer() {
               aria-label="Contactar a Brisée Bake por WhatsApp"
             >
               <Phone aria-hidden="true" />
-
-              <span>+57 300 3685556</span>
+              <span>+57 300 368 5556</span>
             </a>
 
             <a
@@ -68,7 +75,6 @@ export default function Footer() {
               aria-label="Enviar correo a Brisée Bake"
             >
               <Mail aria-hidden="true" />
-
               <span>briseebake@gmail.com</span>
             </a>
           </address>
@@ -76,11 +82,15 @@ export default function Footer() {
 
         {/* Opening hours */}
         <section className={styles.section}>
-          <h2 className={styles.title}>Horario de atención</h2>
+          <h2 className={styles.title}>
+            Horario de atención
+          </h2>
 
           <dl className={styles.schedule}>
             <div className={styles.scheduleRow}>
-              <dt>Lunes,  Miercoles,  Jueves, Viernes </dt>
+              <dt>
+                Lunes, miércoles, jueves y viernes
+              </dt>
               <dd>8:00 AM - 4:00 PM</dd>
             </div>
 
@@ -148,10 +158,13 @@ export default function Footer() {
         </nav>
 
         <p className={styles.copyright}>
-          Copyright © {new Date().getFullYear()}
+          Copyright © {currentYear}
         </p>
 
-        <div className={styles.bottomSpacer} aria-hidden="true" />
+        <div
+          className={styles.bottomSpacer}
+          aria-hidden="true"
+        />
       </div>
     </footer>
   );

@@ -1,19 +1,23 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import type { Metadata } from 'next';
+import type { ReactElement, ReactNode } from 'react';
 
-import Header from "../components/layout/Header";
-import Footer from "../components/layout/Footer";
+import Footer from '../components/layout/Footer';
+import Header from '../components/layout/Header';
+
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "Brisée Bake",
-  description: "Pastelería Brisée Bake",
+  title: 'Brisée Bake',
+  description: 'Pastelería Brisée Bake',
 };
+
+interface RootLayoutProps {
+  readonly children: ReactNode;
+}
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: RootLayoutProps): ReactElement {
   return (
     <html lang="es">
       <body>

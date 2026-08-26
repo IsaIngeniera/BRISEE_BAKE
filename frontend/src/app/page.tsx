@@ -1,78 +1,95 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
+
+import type { ReactElement } from 'react';
+
 import {
   Heart,
   Leaf,
   Plus,
   Sparkles,
-} from "lucide-react";
+  type LucideIcon,
+} from 'lucide-react';
 
-import HomeCarousel from "@/components/home/HomeCarousel";
-import type { CarouselSlide } from "@/components/home/HomeCarousel";
+import HomeCarousel, {
+  type CarouselSlide,
+} from '@/components/home/HomeCarousel';
 
-import styles from "./page.module.css";
+import styles from './page.module.css';
+
+interface Benefit {
+  id: number;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  backgroundColor: string;
+  iconBackground: string;
+  color: string;
+  editPath: string;
+}
 
 const homeSlides: CarouselSlide[] = [
   {
     id: 1,
-    image: "/images/carousel/home/home-1.jpg",
-    alt: "Macarrones, cupcakes y tortas de Brisée Bake",
+    image: '/images/carousel/home/home-1.jpg',
+    alt: 'Macarons, cupcakes y tortas de Brisée Bake',
   },
   {
     id: 2,
-    image: "/images/carousel/home/home-2.jpg",
-    alt: "Productos artesanales de Brisée Bake",
+    image: '/images/carousel/home/home-2.jpg',
+    alt: 'Productos artesanales de Brisée Bake',
   },
   {
     id: 3,
-    image: "/images/carousel/home/home-3.jpg",
-    alt: "Repostería artesanal de Brisée Bake",
-  },
-];
-const benefits = [
-  {
-    id: 1,
-    title: "Excelente sabor",
-    description:
-      "Combinamos ingredientes de calidad con recetas cuidadosamente elaboradas para ofrecer un sabor delicioso.",
-    icon: Heart,
-    backgroundColor: "#fbe3f1",
-    iconBackground: "#f3b7d4",
-    color: "#d66098",
-    editPath: "/admin/inicio/beneficios/1",
-  },
-  {
-    id: 2,
-    title: "Ingredientes frescos",
-    description:
-      "Combinamos ingredientes de calidad con recetas cuidadosamente elaboradas para ofrecer un sabor delicioso.",
-    icon: Leaf,
-    backgroundColor: "#e5f1eb",
-    iconBackground: "#cce5bc",
-    color: "#6eaa61",
-    editPath: "/admin/inicio/beneficios/2",
-  },
-  {
-    id: 3,
-    title: "Calidad artesanal",
-    description:
-      "Elaboramos cada producto con dedicación y atención al detalle, cuidando desde la preparación hasta la presentación.",
-    icon: Sparkles,
-    backgroundColor: "#f9f2d2",
-    iconBackground: "#f5df9a",
-    color: "#d7a81f",
-    editPath: "/admin/inicio/beneficios/3",
+    image: '/images/carousel/home/home-3.jpg',
+    alt: 'Repostería artesanal de Brisée Bake',
   },
 ];
 
-export default function Home() {
+const benefits: Benefit[] = [
+  {
+    id: 1,
+    title: 'Excelente sabor',
+    description:
+      'Combinamos ingredientes de calidad con recetas cuidadosamente elaboradas para ofrecer un sabor delicioso.',
+    icon: Heart,
+    backgroundColor: '#fbe3f1',
+    iconBackground: '#f3b7d4',
+    color: '#d66098',
+    editPath: '/admin/inicio/beneficios/1',
+  },
+  {
+    id: 2,
+    title: 'Ingredientes frescos',
+    description:
+      'Combinamos ingredientes de calidad con recetas cuidadosamente elaboradas para ofrecer un sabor delicioso.',
+    icon: Leaf,
+    backgroundColor: '#e5f1eb',
+    iconBackground: '#cce5bc',
+    color: '#6eaa61',
+    editPath: '/admin/inicio/beneficios/2',
+  },
+  {
+    id: 3,
+    title: 'Calidad artesanal',
+    description:
+      'Elaboramos cada producto con dedicación y atención al detalle, cuidando desde la preparación hasta la presentación.',
+    icon: Sparkles,
+    backgroundColor: '#f9f2d2',
+    iconBackground: '#f5df9a',
+    color: '#d7a81f',
+    editPath: '/admin/inicio/beneficios/3',
+  },
+];
+
+export default function HomePage(): ReactElement {
   return (
     <div className={styles.homePage}>
       {/* Functional carousel */}
       <HomeCarousel
-  slides={homeSlides}
-  editHref="/admin/inicio/carrusel"
-/>
+        slides={homeSlides}
+        editHref="/admin/inicio/carrusel"
+      />
 
       {/* About us */}
       <section className={styles.aboutSection}>
@@ -98,8 +115,8 @@ export default function Home() {
           </div>
 
           <p>
-            Diseñamos y ofrecemos productos de repostería fina
-            y saludable que generan experiencias memorables,
+            Diseñamos y ofrecemos productos de repostería fina y
+            saludable que generan experiencias memorables,
             elaborados con ingredientes naturales y funcionales
             que aportan bienestar al consumidor; mientras
             construimos una empresa rentable, sostenible y
@@ -110,13 +127,16 @@ export default function Home() {
         <div className={styles.aboutImageContainer}>
           <Image
             src="/images/home/quienes-somos.png"
-            alt="Macarrones artesanales de Brisée Bake"
+            alt="Macarons artesanales de Brisée Bake"
             fill
             className={styles.aboutImage}
             sizes="(max-width: 800px) 100vw, 50vw"
           />
 
-          <div className={styles.imagePlaceholder}>
+          <div
+            className={styles.imagePlaceholder}
+            aria-hidden="true"
+          >
             <span>Imagen para la sección</span>
             <strong>¿Quiénes somos?</strong>
           </div>
@@ -135,8 +155,8 @@ export default function Home() {
         </Link>
 
         <p>
-          “Creamos momentos dulces que nutren el cuerpo,
-          elevan los sentidos y se convierten en recuerdos.”
+          “Creamos momentos dulces que nutren el cuerpo, elevan
+          los sentidos y se convierten en recuerdos.”
         </p>
       </section>
 
@@ -152,7 +172,7 @@ export default function Home() {
 
         <div className={styles.benefitsGrid}>
           {benefits.map((benefit) => {
-            const Icon = benefit.icon;
+            const BenefitIcon = benefit.icon;
 
             return (
               <article
@@ -178,7 +198,7 @@ export default function Home() {
                     backgroundColor: benefit.iconBackground,
                   }}
                 >
-                  <Icon aria-hidden="true" />
+                  <BenefitIcon aria-hidden="true" />
                 </div>
 
                 <h3

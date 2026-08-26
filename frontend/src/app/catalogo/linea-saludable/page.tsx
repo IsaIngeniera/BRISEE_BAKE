@@ -1,13 +1,14 @@
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
 import {
   ArrowLeft,
   Pencil,
   Plus,
   ShoppingCart,
-} from "lucide-react";
+} from 'lucide-react';
 
-import styles from "./LineaSaludable.module.css";
+import styles from './linea-saludable.module.css';
 
 interface ProductImage {
   id: string;
@@ -28,7 +29,7 @@ interface Product {
   precio: number | string;
   presentacion: string;
   existencias: number;
-  estado: "ACTIVO" | "INACTIVO";
+  estado: 'ACTIVO' | 'INACTIVO';
   etiquetas: string[];
   categoria?: ProductCategory;
   imagenes?: ProductImage[];
@@ -36,8 +37,8 @@ interface Product {
 
 function normalizeText(value: string): string {
   return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim();
 }
@@ -45,27 +46,27 @@ function normalizeText(value: string): string {
 function isSaludableProduct(product: Product): boolean {
   const productName = normalizeText(product.nombre);
   const categoryName = normalizeText(
-    product.categoria?.nombre ?? "",
+    product.categoria?.nombre ?? '',
   );
 
   return (
-    productName.includes("saludable") ||
-    categoryName.includes("saludable")
+    productName.includes('saludable') ||
+    categoryName.includes('saludable')
   );
 }
 
 async function getSaludableProducts(): Promise<Product[]> {
   try {
     const apiUrl =
-      process.env.INTERNAL_API_URL || "http://backend:3001";
+      process.env.INTERNAL_API_URL ?? 'http://backend:3001';
 
     const response = await fetch(`${apiUrl}/products`, {
-      cache: "no-store",
+      cache: 'no-store',
     });
 
     if (!response.ok) {
       console.error(
-        `Error fetching products. Status: ${response.status}`,
+        `Error fetching healthy products. Status: ${response.status}`,
       );
 
       return [];
@@ -75,11 +76,11 @@ async function getSaludableProducts(): Promise<Product[]> {
 
     return products.filter(
       (product) =>
-        product.estado !== "INACTIVO" &&
+        product.estado !== 'INACTIVO' &&
         isSaludableProduct(product),
     );
   } catch (error) {
-    console.error("Error fetching saludable products:", error);
+    console.error('Error fetching healthy products:', error);
 
     return [];
   }
@@ -89,12 +90,12 @@ function formatPrice(price: number | string): string {
   const numericPrice = Number(price);
 
   if (Number.isNaN(numericPrice)) {
-    return "$ 0";
+    return '$ 0';
   }
 
-  return numericPrice.toLocaleString("es-CO", {
-    style: "currency",
-    currency: "COP",
+  return numericPrice.toLocaleString('es-CO', {
+    style: 'currency',
+    currency: 'COP',
     maximumFractionDigits: 0,
   });
 }
@@ -122,7 +123,8 @@ export default async function LineaSaludablePage() {
           <h1>Línea Saludable</h1>
 
           <p className={styles.subtitle}>
-            Opciones deliciosas pensadas para diferentes estilos de alimentación, sin perder el sabor artesanal.
+            Opciones deliciosas pensadas para diferentes estilos
+            de alimentación, sin perder el sabor artesanal.
           </p>
 
           <div
@@ -139,12 +141,16 @@ export default async function LineaSaludablePage() {
       {/* Products and add-product card */}
       <section
         className={styles.productGrid}
-        aria-label="Productos de macarrones"
+        aria-label="Productos de línea saludable"
       >
         {products.map((product) => {
-          const productImage =
-            product.imagenes?.[0]?.urlImagen ||
-            "/images/catalogo/linea-saludable-placeholder.jpg";
+          const productImageUrl =
+            product.imagenes?.[0]?.urlImagen ??
+            '/images/catalogo/linea-saludable-placeholder.jpg';
+
+          const productImageAlt =
+            product.imagenes?.[0]?.nombre ??
+            `Imagen de ${product.nombre}`;
 
           return (
             <article
@@ -163,13 +169,13 @@ export default async function LineaSaludablePage() {
 
               {/* Product image */}
               <div className={styles.productImageContainer}>
-                <img
-                  src={productImage}
-                  alt={
-                    product.imagenes?.[0]?.nombre ||
-                    `Imagen de ${product.nombre}`
-                  }
+                <Image
+                  src={productImageUrl}
+                  alt={productImageAlt}
                   className={styles.productImage}
+                  fill
+                  sizes="(max-width: 680px) 100vw, (max-width: 1100px) 50vw, 33vw"
+                  unoptimized
                 />
               </div>
 
@@ -187,14 +193,14 @@ export default async function LineaSaludablePage() {
                   {product.descripcion}
                 </p>
 
-                {product.etiquetas?.length > 0 && (
+                {product.etiquetas.length > 0 && (
                   <div
                     className={styles.labels}
                     aria-label="Etiquetas dietéticas"
                   >
                     {product.etiquetas.map((label) => (
                       <span key={label}>
-                        {label.replaceAll("_", " ")}
+                        {label.replaceAll('_', ' ')}
                       </span>
                     ))}
                   </div>
@@ -207,7 +213,7 @@ export default async function LineaSaludablePage() {
                 <p className={styles.stock}>
                   {product.existencias > 0
                     ? `${product.existencias} disponibles`
-                    : "Producto agotado"}
+                    : 'Producto agotado'}
                 </p>
 
                 <Link
@@ -215,15 +221,15 @@ export default async function LineaSaludablePage() {
                   className={`${styles.cartButton} ${
                     product.existencias <= 0
                       ? styles.disabledButton
-                      : ""
+                      : ''
                   }`}
                   aria-disabled={product.existencias <= 0}
                 >
                   <ShoppingCart aria-hidden="true" />
 
                   {product.existencias > 0
-                    ? "Añadir al carrito"
-                    : "Agotado"}
+                    ? 'Añadir al carrito'
+                    : 'Agotado'}
                 </Link>
               </div>
             </article>
@@ -235,7 +241,7 @@ export default async function LineaSaludablePage() {
           <Link
             href="/admin/productos/crear?categoria=linea_saludable"
             className={styles.addProductLink}
-            aria-label="Crear LineaSaludable"
+            aria-label="Crear producto de línea saludable"
           >
             <span className={styles.addIcon}>
               <Plus aria-hidden="true" />
@@ -246,7 +252,8 @@ export default async function LineaSaludablePage() {
             </span>
 
             <span className={styles.addDescription}>
-              Crea un producto saludable nuevo y agrégalo al catálogo.
+              Crea un producto saludable nuevo y agrégalo al
+              catálogo.
             </span>
           </Link>
         </article>
@@ -255,7 +262,9 @@ export default async function LineaSaludablePage() {
       {products.length === 0 && (
         <section className={styles.emptyMessage}>
           <p>
-            Aún no hay productos saludables registrados. Utiliza la tarjeta "Añadir producto" para crear el primero.
+            Aún no hay productos saludables registrados. Utiliza
+            la tarjeta &quot;Añadir producto&quot; para crear el
+            primero.
           </p>
         </section>
       )}

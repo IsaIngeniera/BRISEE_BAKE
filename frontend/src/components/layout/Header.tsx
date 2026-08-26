@@ -1,9 +1,13 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+import {
+  useState,
+  type ReactElement,
+} from 'react';
 
 import {
   ChevronDown,
@@ -12,72 +16,86 @@ import {
   ShoppingCart,
   UserRound,
   X,
-} from "lucide-react";
+} from 'lucide-react';
 
-import styles from "./Header.module.css";
+import styles from './header.module.css';
 
-const navigationLinks = [
+interface NavigationItem {
+  readonly label: string;
+  readonly href: string;
+}
+
+const navigationLinks: readonly NavigationItem[] = [
   {
-    label: "Bienvenido",
-    href: "/",
+    label: 'Bienvenido',
+    href: '/',
   },
   {
-    label: "Catálogo",
-    href: "/catalogo",
+    label: 'Catálogo',
+    href: '/catalogo',
   },
   {
-    label: "Contactos",
-    href: "/contacto",
+    label: 'Contactos',
+    href: '/contacto',
   },
 ];
 
-const analyticsLinks = [
+const analyticsLinks: readonly NavigationItem[] = [
   {
-    label: "Resumen",
-    href: "/analitica",
+    label: 'Resumen',
+    href: '/analitica',
   },
   {
-    label: "Administrar productos",
-    href: "/admin/productos",
+    label: 'Administrar productos',
+    href: '/admin/productos',
   },
   {
-    label: "Crear producto",
-    href: "/admin/productos/crear",
+    label: 'Crear producto',
+    href: '/admin/productos/crear',
   },
 ];
 
-export default function Header() {
+export default function Header(): ReactElement {
   const pathname = usePathname();
 
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [analyticsOpen, setAnalyticsOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] =
+    useState(false);
 
-  function closeMenus() {
-    setMobileMenuOpen(false);
-    setAnalyticsOpen(false);
+  const [isAnalyticsMenuOpen, setIsAnalyticsMenuOpen] =
+    useState(false);
+
+  function closeMenus(): void {
+    setIsMobileMenuOpen(false);
+    setIsAnalyticsMenuOpen(false);
   }
 
-  function handleSaveChanges() {
+  function handleSaveChanges(): void {
     /*
-     * This action will be connected later to the active admin form.
+     * This action will be connected later to the active
+     * administration form.
      */
-    window.dispatchEvent(new CustomEvent("brisee:save-changes"));
+    window.dispatchEvent(
+      new CustomEvent('brisee:save-changes'),
+    );
 
-    alert(
-      "El botón está preparado. Se conectará al formulario de la página administrativa.",
+    window.alert(
+      'El botón está preparado. Se conectará al formulario de la página administrativa.',
     );
   }
 
-  function isActive(href: string) {
-    if (href === "/") {
-      return pathname === "/";
+  function isActiveLink(href: string): boolean {
+    if (href === '/') {
+      return pathname === '/';
     }
 
-    return pathname.startsWith(href);
+    return (
+      pathname === href ||
+      pathname.startsWith(`${href}/`)
+    );
   }
 
-  const analyticsIsActive = analyticsLinks.some((item) =>
-    pathname.startsWith(item.href),
+  const isAnalyticsActive = analyticsLinks.some((item) =>
+    isActiveLink(item.href),
   );
 
   return (
@@ -94,10 +112,15 @@ export default function Header() {
             <Plus aria-hidden="true" />
           </Link>
 
-          <p className={styles.adminTitle}>BRISÉE BAKE ADMIN</p>
+          <p className={styles.adminTitle}>
+            BRISÉE BAKE ADMIN
+          </p>
 
           <div className={styles.adminActions}>
-            <Link href="/" className={styles.previewButton}>
+            <Link
+              href="/"
+              className={styles.previewButton}
+            >
               Vista previa
             </Link>
 
@@ -142,7 +165,9 @@ export default function Header() {
                 key={item.href}
                 href={item.href}
                 className={`${styles.navigationLink} ${
-                  isActive(item.href) ? styles.activeLink : ""
+                  isActiveLink(item.href)
+                    ? styles.activeLink
+                    : ''
                 }`}
               >
                 {item.label}
@@ -155,9 +180,17 @@ export default function Header() {
                 type="button"
                 className={`${styles.navigationLink} ${
                   styles.dropdownButton
-                } ${analyticsIsActive ? styles.activeLink : ""}`}
-                onClick={() => setAnalyticsOpen((current) => !current)}
-                aria-expanded={analyticsOpen}
+                } ${
+                  isAnalyticsActive
+                    ? styles.activeLink
+                    : ''
+                }`}
+                onClick={() =>
+                  setIsAnalyticsMenuOpen(
+                    (isOpen) => !isOpen,
+                  )
+                }
+                aria-expanded={isAnalyticsMenuOpen}
                 aria-controls="analytics-menu"
               >
                 Analítica
@@ -165,12 +198,14 @@ export default function Header() {
                 <ChevronDown
                   aria-hidden="true"
                   className={
-                    analyticsOpen ? styles.rotatedChevron : styles.chevron
+                    isAnalyticsMenuOpen
+                      ? styles.rotatedChevron
+                      : styles.chevron
                   }
                 />
               </button>
 
-              {analyticsOpen && (
+              {isAnalyticsMenuOpen && (
                 <div
                   id="analytics-menu"
                   className={styles.dropdownMenu}
@@ -213,15 +248,19 @@ export default function Header() {
             <button
               type="button"
               className={styles.mobileMenuButton}
-              onClick={() => setMobileMenuOpen((current) => !current)}
-              aria-label={
-                mobileMenuOpen
-                  ? "Cerrar menú de navegación"
-                  : "Abrir menú de navegación"
+              onClick={() =>
+                setIsMobileMenuOpen(
+                  (isOpen) => !isOpen,
+                )
               }
-              aria-expanded={mobileMenuOpen}
+              aria-label={
+                isMobileMenuOpen
+                  ? 'Cerrar menú de navegación'
+                  : 'Abrir menú de navegación'
+              }
+              aria-expanded={isMobileMenuOpen}
             >
-              {mobileMenuOpen ? (
+              {isMobileMenuOpen ? (
                 <X aria-hidden="true" />
               ) : (
                 <Menu aria-hidden="true" />
@@ -231,7 +270,7 @@ export default function Header() {
         </div>
 
         {/* Mobile navigation */}
-        {mobileMenuOpen && (
+        {isMobileMenuOpen && (
           <nav
             className={styles.mobileNavigation}
             aria-label="Navegación móvil"
@@ -241,7 +280,9 @@ export default function Header() {
                 key={item.href}
                 href={item.href}
                 className={`${styles.mobileLink} ${
-                  isActive(item.href) ? styles.mobileActiveLink : ""
+                  isActiveLink(item.href)
+                    ? styles.mobileActiveLink
+                    : ''
                 }`}
                 onClick={closeMenus}
               >
@@ -252,20 +293,26 @@ export default function Header() {
             <button
               type="button"
               className={`${styles.mobileLink} ${styles.mobileDropdownButton}`}
-              onClick={() => setAnalyticsOpen((current) => !current)}
-              aria-expanded={analyticsOpen}
+              onClick={() =>
+                setIsAnalyticsMenuOpen(
+                  (isOpen) => !isOpen,
+                )
+              }
+              aria-expanded={isAnalyticsMenuOpen}
             >
               Analítica
 
               <ChevronDown
                 aria-hidden="true"
                 className={
-                  analyticsOpen ? styles.rotatedChevron : styles.chevron
+                  isAnalyticsMenuOpen
+                    ? styles.rotatedChevron
+                    : styles.chevron
                 }
               />
             </button>
 
-            {analyticsOpen && (
+            {isAnalyticsMenuOpen && (
               <div className={styles.mobileDropdown}>
                 {analyticsLinks.map((item) => (
                   <Link

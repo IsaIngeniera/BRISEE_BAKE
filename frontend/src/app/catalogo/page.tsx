@@ -1,29 +1,31 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
-import HomeCarousel from "../../components/home/HomeCarousel";
-import type { CarouselSlide } from "../../components/home/HomeCarousel";
+import HomeCarousel, {
+  type CarouselSlide,
+} from '../../components/home/HomeCarousel';
 
-import { catalogCategories } from "../../data/catalogo";
-import styles from "./Catalogo.module.css";
+import { catalogCategories } from '../../data/catalogo';
+
+import styles from './catalog.module.css';
 
 const catalogSlides: CarouselSlide[] = [
   {
     id: 1,
-    image: "/images/carousel/catalogo/catalogo-1.jpg",
-    alt: "Productos artesanales de Brisée Bake",
+    image: '/images/carousel/catalogo/catalogo-1.jpg',
+    alt: 'Productos artesanales de Brisée Bake',
   },
   {
     id: 2,
-    image: "/images/carousel/catalogo/catalogo-2.jpg",
-    alt: "Galletas y granolas artesanales",
+    image: '/images/carousel/catalogo/catalogo-2.jpg',
+    alt: 'Galletas y granolas artesanales',
   },
   {
     id: 3,
-    image: "/images/carousel/catalogo/catalogo-3.jpg",
-    alt: "Macarrones y productos de Brisée Bake",
+    image: '/images/carousel/catalogo/catalogo-3.jpg',
+    alt: 'Macarons y productos de Brisée Bake',
   },
 ];
 
@@ -63,7 +65,10 @@ export default function CatalogoPage() {
                 backgroundColor: category.backgroundColor,
               }}
             >
-              <div className={styles.leafDecoration}>
+              <div
+                className={styles.leafDecoration}
+                aria-hidden="true"
+              >
                 <span>❧</span>
               </div>
 
@@ -75,18 +80,25 @@ export default function CatalogoPage() {
                   className={styles.categoryImage}
                   sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 25vw"
                   onError={(event) => {
-                    event.currentTarget.style.display = "none";
+                    event.currentTarget.style.display = 'none';
                   }}
                 />
 
-                <div className={styles.imagePlaceholder}>
+                <div
+                  className={styles.imagePlaceholder}
+                  aria-hidden="true"
+                >
                   <span>Imagen de</span>
                   <strong>{category.name}</strong>
                 </div>
               </div>
 
               <div className={styles.cardContent}>
-                <h2 style={{ color: category.titleColor }}>
+                <h2
+                  style={{
+                    color: category.titleColor,
+                  }}
+                >
                   {category.name}
                 </h2>
 

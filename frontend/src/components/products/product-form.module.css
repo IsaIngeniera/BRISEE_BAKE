@@ -11,25 +11,32 @@
 }
 
 .formGroup label {
-  font-family: Arial, sans-serif;
-  font-weight: bold;
   color: #513f45;
+  font-family: Arial, sans-serif;
   font-size: 0.9rem;
+  font-weight: 700;
 }
 
-.input, .select, .textarea {
+.input,
+.select,
+.textarea {
   padding: 10px 15px;
+  color: #333333;
   border: 1px solid #edaccc;
   border-radius: 8px;
+  outline: none;
   font-family: Arial, sans-serif;
   font-size: 1rem;
-  color: #333;
-  outline: none;
-  transition: border-color 0.2s;
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease;
 }
 
-.input:focus, .select:focus, .textarea:focus {
+.input:focus,
+.select:focus,
+.textarea:focus {
   border-color: #d66098;
+  box-shadow: 0 0 0 3px rgb(214 96 152 / 15%);
 }
 
 .textarea {
@@ -47,48 +54,57 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-family: Arial, sans-serif;
-  font-size: 0.85rem;
   color: #513f45;
   cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-size: 0.85rem;
 }
 
 .submitButton {
   margin-top: 20px;
+  padding: 12px;
+  color: #000000;
   background-color: #e48abd;
-  color: #000;
   border: none;
   border-radius: 8px;
-  padding: 12px;
-  font-size: 1rem;
-  font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.2s;
+  font-size: 1rem;
+  font-weight: 700;
+  transition:
+    color 200ms ease,
+    background-color 200ms ease,
+    transform 200ms ease;
 }
 
 .submitButton:hover {
+  color: #ffffff;
   background-color: #d66098;
-  color: #fff;
   transform: translateY(-2px);
 }
 
+.submitButton:focus-visible {
+  outline: 3px solid #d66098;
+  outline-offset: 3px;
+}
+
 .submitButton:disabled {
-  background-color: #ccc;
+  color: #666666;
+  background-color: #cccccc;
   cursor: not-allowed;
   transform: none;
 }
 
-.errorMsg {
-  color: red;
-  font-size: 0.85rem;
+.errorMessage {
   margin-top: -5px;
+  color: #c62828;
+  font-size: 0.85rem;
 }
 
-.successMsg {
+.successMessage {
+  margin-bottom: 20px;
+  padding: 15px;
   color: #2e7d32;
   background-color: #e8f5e9;
-  padding: 15px;
   border-radius: 8px;
-  margin-bottom: 20px;
   text-align: center;
 }

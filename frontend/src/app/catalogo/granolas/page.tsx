@@ -1,34 +1,35 @@
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 
 import {
   ArrowLeft,
   Pencil,
   Plus,
   ShoppingCart,
-} from "lucide-react";
+} from 'lucide-react';
 
-import styles from "./Granolas.module.css";
+import styles from './granolas.module.css';
 
 interface ProductImage {
-  id: string;
+  id: number;
   urlImagen: string;
   nombre: string;
 }
 
 interface ProductCategory {
-  id: string;
+  id: number;
   nombre: string;
 }
 
 interface Product {
-  id: string;
-  idCategoria: string;
+  id: number;
+  idCategoria: number;
   nombre: string;
   descripcion: string;
   precio: number | string;
   presentacion: string;
   existencias: number;
-  estado: "ACTIVO" | "INACTIVO";
+  estado: 'ACTIVO' | 'INACTIVO';
   etiquetas: string[];
   categoria?: ProductCategory;
   imagenes?: ProductImage[];
@@ -36,8 +37,8 @@ interface Product {
 
 function normalizeText(value: string): string {
   return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim();
 }
@@ -45,27 +46,27 @@ function normalizeText(value: string): string {
 function isGranolaProduct(product: Product): boolean {
   const productName = normalizeText(product.nombre);
   const categoryName = normalizeText(
-    product.categoria?.nombre ?? "",
+    product.categoria?.nombre ?? '',
   );
 
   return (
-    productName.includes("granola") ||
-    categoryName.includes("granola")
+    productName.includes('granola') ||
+    categoryName.includes('granola')
   );
 }
 
 async function getGranolaProducts(): Promise<Product[]> {
   try {
     const apiUrl =
-      process.env.INTERNAL_API_URL || "http://backend:3001";
+      process.env.INTERNAL_API_URL ?? 'http://backend:3001';
 
     const response = await fetch(`${apiUrl}/products`, {
-      cache: "no-store",
+      cache: 'no-store',
     });
 
     if (!response.ok) {
       console.error(
-        `Error fetching products. Status: ${response.status}`,
+        `Error fetching granola products. Status: ${response.status}`,
       );
 
       return [];
@@ -75,11 +76,11 @@ async function getGranolaProducts(): Promise<Product[]> {
 
     return products.filter(
       (product) =>
-        product.estado !== "INACTIVO" &&
+        product.estado !== 'INACTIVO' &&
         isGranolaProduct(product),
     );
   } catch (error) {
-    console.error("Error fetching granola products:", error);
+    console.error('Error fetching granola products:', error);
 
     return [];
   }
@@ -89,12 +90,12 @@ function formatPrice(price: number | string): string {
   const numericPrice = Number(price);
 
   if (Number.isNaN(numericPrice)) {
-    return "$ 0";
+    return '$ 0';
   }
 
-  return numericPrice.toLocaleString("es-CO", {
-    style: "currency",
-    currency: "COP",
+  return numericPrice.toLocaleString('es-CO', {
+    style: 'currency',
+    currency: 'COP',
     maximumFractionDigits: 0,
   });
 }
@@ -122,7 +123,8 @@ export default async function GranolasPage() {
           <h1>Granolas</h1>
 
           <p className={styles.subtitle}>
-            Ingredientes naturales seleccionados, frutos secos y combinaciones deliciosas para comenzar bien el día.
+            Ingredientes naturales seleccionados, frutos secos y
+            combinaciones deliciosas para comenzar bien el día.
           </p>
 
           <div
@@ -139,12 +141,16 @@ export default async function GranolasPage() {
       {/* Products and add-product card */}
       <section
         className={styles.productGrid}
-        aria-label="Productos de macarrones"
+        aria-label="Productos de granola"
       >
         {products.map((product) => {
-          const productImage =
-            product.imagenes?.[0]?.urlImagen ||
-            "/images/catalogo/granolas-placeholder.jpg";
+          const productImageUrl =
+            product.imagenes?.[0]?.urlImagen ??
+            '/images/catalogo/granolas-placeholder.jpg';
+
+          const productImageAlt =
+            product.imagenes?.[0]?.nombre ??
+            `Imagen de ${product.nombre}`;
 
           return (
             <article
@@ -163,13 +169,13 @@ export default async function GranolasPage() {
 
               {/* Product image */}
               <div className={styles.productImageContainer}>
-                <img
-                  src={productImage}
-                  alt={
-                    product.imagenes?.[0]?.nombre ||
-                    `Imagen de ${product.nombre}`
-                  }
+                <Image
+                  src={productImageUrl}
+                  alt={productImageAlt}
                   className={styles.productImage}
+                  fill
+                  sizes="(max-width: 680px) 100vw, (max-width: 1100px) 50vw, 33vw"
+                  unoptimized
                 />
               </div>
 
@@ -187,14 +193,14 @@ export default async function GranolasPage() {
                   {product.descripcion}
                 </p>
 
-                {product.etiquetas?.length > 0 && (
+                {product.etiquetas.length > 0 && (
                   <div
                     className={styles.labels}
                     aria-label="Etiquetas dietéticas"
                   >
                     {product.etiquetas.map((label) => (
                       <span key={label}>
-                        {label.replaceAll("_", " ")}
+                        {label.replaceAll('_', ' ')}
                       </span>
                     ))}
                   </div>
@@ -207,7 +213,7 @@ export default async function GranolasPage() {
                 <p className={styles.stock}>
                   {product.existencias > 0
                     ? `${product.existencias} disponibles`
-                    : "Producto agotado"}
+                    : 'Producto agotado'}
                 </p>
 
                 <Link
@@ -215,15 +221,15 @@ export default async function GranolasPage() {
                   className={`${styles.cartButton} ${
                     product.existencias <= 0
                       ? styles.disabledButton
-                      : ""
+                      : ''
                   }`}
                   aria-disabled={product.existencias <= 0}
                 >
                   <ShoppingCart aria-hidden="true" />
 
                   {product.existencias > 0
-                    ? "Añadir al carrito"
-                    : "Agotado"}
+                    ? 'Añadir al carrito'
+                    : 'Agotado'}
                 </Link>
               </div>
             </article>
@@ -235,7 +241,7 @@ export default async function GranolasPage() {
           <Link
             href="/admin/productos/crear?categoria=granolas"
             className={styles.addProductLink}
-            aria-label="Crear Granolas"
+            aria-label="Crear granola"
           >
             <span className={styles.addIcon}>
               <Plus aria-hidden="true" />
@@ -255,7 +261,8 @@ export default async function GranolasPage() {
       {products.length === 0 && (
         <section className={styles.emptyMessage}>
           <p>
-            Aún no hay granolas registradas. Utiliza la tarjeta "Añadir producto" para crear la primera.
+            Aún no hay granolas registradas. Utiliza la tarjeta
+            &quot;Añadir producto&quot; para crear la primera.
           </p>
         </section>
       )}

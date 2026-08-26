@@ -1,7 +1,7 @@
 .catalogLayout {
   width: min(100%, 1500px);
   margin: 0 auto;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Georgia, 'Times New Roman', serif;
 }
 
 .catalogPage {
@@ -89,8 +89,8 @@
   left: 18px;
   color: rgb(214 96 152 / 34%);
   font-size: 3rem;
-  transform: rotate(-35deg);
   pointer-events: none;
+  transform: rotate(-35deg);
 }
 
 .imageContainer {
