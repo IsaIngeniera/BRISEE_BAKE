@@ -3,6 +3,7 @@ import type { ReactElement } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import DeleteProductButton from '@/components/products/DeleteProductButton';
 import styles from './admin-productos.module.css';
 
 interface ProductImage {
@@ -226,13 +227,7 @@ export default async function AdminProductsPage(): Promise<ReactElement> {
                         Editar
                       </Link>
 
-                      <button
-                        type="button"
-                        className={styles.deleteButton}
-                        title="La eliminación se conectará posteriormente"
-                      >
-                        Eliminar
-                      </button>
+                      <DeleteProductButton id={product.id} nombre={product.nombre} />
                     </div>
                   </div>
                 </article>

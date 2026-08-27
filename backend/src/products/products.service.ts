@@ -210,7 +210,31 @@ export class ProductsService {
     }
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} product`;
+  async remove(id: string) {
+    try {
+      const existingProduct = await this.prisma.producto.findUnique({
+        where: { id },
+      });
+
+      if (!existingProduct) {
+        throw new BadRequestException('Producto no encontrado');
+      }
+
+      const deletedProduct = await this.prisma.producto.update({
+        where: { id },
+        data: {
+          estado: 'INACTIVO',
+        },
+      });
+
+      return {
+        message: 'Producto eliminado correctamente',
+        product: deletedProduct,
+      };
+    } catch {
+      throw new BadRequestException(
+        'Error al eliminar el producto. Intente nuevamente.',
+      );
+    }
   }
 }
