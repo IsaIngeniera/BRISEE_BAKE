@@ -9,9 +9,6 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'Brisée Bake',
   description: 'Pastelería Brisée Bake',
-  icons: {
-    icon: '/icon.jpg',
-  },
 };
 
 interface RootLayoutProps {

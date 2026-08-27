@@ -126,20 +126,13 @@ export default function HomePage(): ReactElement {
 
         <div className={styles.aboutImageContainer}>
           <Image
-            src="/images/home/quienes-somos.png"
+            src="/images/carousel/home/quienes-somos.jpg"
             alt="Macarons artesanales de Brisée Bake"
             fill
             className={styles.aboutImage}
             sizes="(max-width: 800px) 100vw, 50vw"
           />
 
-          <div
-            className={styles.imagePlaceholder}
-            aria-hidden="true"
-          >
-            <span>Imagen para la sección</span>
-            <strong>¿Quiénes somos?</strong>
-          </div>
         </div>
       </section>
 
