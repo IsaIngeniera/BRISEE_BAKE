@@ -95,7 +95,7 @@ export default function HomePage(): ReactElement {
       <section className={styles.aboutSection}>
         <Link
           href="/admin/inicio/quienes-somos"
-          className={styles.sectionEditButton}
+          className={`${styles.sectionEditButton} admin-only`}
           aria-label="Editar la sección Quiénes somos"
           title="Editar esta sección"
         >
@@ -140,7 +140,7 @@ export default function HomePage(): ReactElement {
       <section className={styles.brandPhrase}>
         <Link
           href="/admin/inicio/frase"
-          className={styles.phraseEditButton}
+          className={`${styles.phraseEditButton} admin-only`}
           aria-label="Editar frase principal"
           title="Editar frase"
         >
@@ -177,7 +177,7 @@ export default function HomePage(): ReactElement {
               >
                 <Link
                   href={benefit.editPath}
-                  className={styles.cardEditButton}
+                  className={`${styles.cardEditButton} admin-only`}
                   aria-label={`Editar ${benefit.title}`}
                   title={`Editar ${benefit.title}`}
                 >

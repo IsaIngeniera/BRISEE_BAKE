@@ -7,6 +7,7 @@ import {
   Plus,
   ShoppingCart,
 } from 'lucide-react';
+import ExpandableDescription from '@/components/products/ExpandableDescription';
 
 import styles from './macarons.module.css';
 
@@ -160,7 +161,7 @@ export default async function MacaronsPage() {
               {/* Admin edit button */}
               <Link
                 href={`/admin/productos/${product.id}/editar`}
-                className={styles.editButton}
+                className={`${styles.editButton} admin-only`}
                 aria-label={`Editar ${product.nombre}`}
                 title={`Editar ${product.nombre}`}
               >
@@ -168,7 +169,7 @@ export default async function MacaronsPage() {
               </Link>
 
               {/* Product image */}
-              <div className={styles.productImageContainer}>
+              <Link href={`/producto/${product.id}`} className={styles.productImageContainer}>
                 <Image
                   src={productImageUrl}
                   alt={productImageAlt}
@@ -177,11 +178,13 @@ export default async function MacaronsPage() {
                   sizes="(max-width: 680px) 100vw, (max-width: 1100px) 50vw, 33vw"
                   unoptimized
                 />
-              </div>
+              </Link>
 
               {/* Product information */}
               <div className={styles.productInformation}>
-                <h2>{product.nombre}</h2>
+                <Link href={`/producto/${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <h2>{product.nombre}</h2>
+                </Link>
 
                 {product.presentacion && (
                   <p className={styles.presentation}>
@@ -189,9 +192,11 @@ export default async function MacaronsPage() {
                   </p>
                 )}
 
-                <p className={styles.description}>
-                  {product.descripcion}
-                </p>
+                <ExpandableDescription
+                  text={product.descripcion}
+                  className={styles.description}
+                  maxLength={100}
+                />
 
                 {product.etiquetas.length > 0 && (
                   <div
@@ -237,7 +242,7 @@ export default async function MacaronsPage() {
         })}
 
         {/* Add-product card */}
-        <article className={styles.addProductCard}>
+        <article className={`${styles.addProductCard} admin-only`}>
           <Link
             href="/admin/productos/crear?categoria=macarons"
             className={styles.addProductLink}

@@ -106,7 +106,7 @@ export default function HomeCarousel({
       {editHref && (
         <Link
           href={editHref}
-          className={styles.adminEditButton}
+          className={`${styles.adminEditButton} admin-only`}
           aria-label="Editar carrusel"
           title="Editar carrusel"
         >

@@ -5,7 +5,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import {
+  useEffect,
   useState,
+  useSyncExternalStore,
   type ReactElement,
 } from 'react';
 
@@ -25,7 +27,13 @@ interface NavigationItem {
   readonly href: string;
 }
 
-const navigationLinks: readonly NavigationItem[] = [
+type ViewMode = 'CLIENT' | 'ADMIN';
+
+const VIEW_MODE_STORAGE_KEY = 'brisee_view_mode';
+const VIEW_MODE_CHANGE_EVENT =
+  'brisee:view-mode-change';
+
+const NAVIGATION_LINKS: readonly NavigationItem[] = [
   {
     label: 'Bienvenido',
     href: '/',
@@ -40,7 +48,7 @@ const navigationLinks: readonly NavigationItem[] = [
   },
 ];
 
-const analyticsLinks: readonly NavigationItem[] = [
+const ANALYTICS_LINKS: readonly NavigationItem[] = [
   {
     label: 'Resumen',
     href: '/analitica',
@@ -55,6 +63,46 @@ const analyticsLinks: readonly NavigationItem[] = [
   },
 ];
 
+function getViewModeSnapshot(): ViewMode {
+  const savedViewMode = localStorage.getItem(
+    VIEW_MODE_STORAGE_KEY,
+  );
+
+  return savedViewMode === 'ADMIN'
+    ? 'ADMIN'
+    : 'CLIENT';
+}
+
+function getServerViewModeSnapshot(): ViewMode {
+  return 'CLIENT';
+}
+
+function subscribeToViewMode(
+  notifyViewModeChange: () => void,
+): () => void {
+  window.addEventListener(
+    'storage',
+    notifyViewModeChange,
+  );
+
+  window.addEventListener(
+    VIEW_MODE_CHANGE_EVENT,
+    notifyViewModeChange,
+  );
+
+  return () => {
+    window.removeEventListener(
+      'storage',
+      notifyViewModeChange,
+    );
+
+    window.removeEventListener(
+      VIEW_MODE_CHANGE_EVENT,
+      notifyViewModeChange,
+    );
+  };
+}
+
 export default function Header(): ReactElement {
   const pathname = usePathname();
 
@@ -63,6 +111,33 @@ export default function Header(): ReactElement {
 
   const [isAnalyticsMenuOpen, setIsAnalyticsMenuOpen] =
     useState(false);
+
+  const viewMode = useSyncExternalStore(
+    subscribeToViewMode,
+    getViewModeSnapshot,
+    getServerViewModeSnapshot,
+  );
+
+  useEffect(() => {
+    document.documentElement.setAttribute(
+      'data-view-mode',
+      viewMode,
+    );
+  }, [viewMode]);
+
+  function toggleViewMode(): void {
+    const newViewMode: ViewMode =
+      viewMode === 'CLIENT' ? 'ADMIN' : 'CLIENT';
+
+    localStorage.setItem(
+      VIEW_MODE_STORAGE_KEY,
+      newViewMode,
+    );
+
+    window.dispatchEvent(
+      new Event(VIEW_MODE_CHANGE_EVENT),
+    );
+  }
 
   function closeMenus(): void {
     setIsMobileMenuOpen(false);
@@ -94,51 +169,50 @@ export default function Header(): ReactElement {
     );
   }
 
-  const isAnalyticsActive = analyticsLinks.some((item) =>
-    isActiveLink(item.href),
+  const isAnalyticsActive = ANALYTICS_LINKS.some(
+    (item) => isActiveLink(item.href),
   );
 
   return (
     <header className={styles.header}>
-      {/* Admin bar */}
-      <div className={styles.adminBar}>
-        <div className={styles.adminBarContent}>
-          <Link
-            href="/admin/productos/crear"
-            className={styles.addButton}
-            aria-label="Crear un producto nuevo"
-            title="Crear producto"
-          >
-            <Plus aria-hidden="true" />
-          </Link>
-
-          <p className={styles.adminTitle}>
-            BRISÉE BAKE ADMIN
-          </p>
-
-          <div className={styles.adminActions}>
+      {viewMode === 'ADMIN' && (
+        <div className={styles.adminBar}>
+          <div className={styles.adminBarContent}>
             <Link
-              href="/"
-              className={styles.previewButton}
+              href="/admin/productos/crear"
+              className={styles.addButton}
+              aria-label="Crear un producto nuevo"
+              title="Crear producto"
             >
-              Vista previa
+              <Plus aria-hidden="true" />
             </Link>
 
-            <button
-              type="button"
-              className={styles.saveButton}
-              onClick={handleSaveChanges}
-            >
-              Guardar cambios
-            </button>
+            <p className={styles.adminTitle}>
+              BRISÉE BAKE ADMIN
+            </p>
+
+            <div className={styles.adminActions}>
+              <Link
+                href="/"
+                className={styles.previewButton}
+              >
+                Vista previa
+              </Link>
+
+              <button
+                type="button"
+                className={styles.saveButton}
+                onClick={handleSaveChanges}
+              >
+                Guardar cambios
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Main navigation */}
       <div className={styles.navigation}>
         <div className={styles.navigationContent}>
-          {/* Logo */}
           <Link
             href="/"
             className={styles.logoLink}
@@ -155,12 +229,11 @@ export default function Header(): ReactElement {
             />
           </Link>
 
-          {/* Desktop navigation */}
           <nav
             className={styles.desktopNavigation}
             aria-label="Navegación principal"
           >
-            {navigationLinks.map((item) => (
+            {NAVIGATION_LINKS.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -174,58 +247,60 @@ export default function Header(): ReactElement {
               </Link>
             ))}
 
-            {/* Analytics dropdown */}
-            <div className={styles.dropdown}>
-              <button
-                type="button"
-                className={`${styles.navigationLink} ${
-                  styles.dropdownButton
-                } ${
-                  isAnalyticsActive
-                    ? styles.activeLink
-                    : ''
-                }`}
-                onClick={() =>
-                  setIsAnalyticsMenuOpen(
-                    (isOpen) => !isOpen,
-                  )
-                }
-                aria-expanded={isAnalyticsMenuOpen}
-                aria-controls="analytics-menu"
-              >
-                Analítica
-
-                <ChevronDown
-                  aria-hidden="true"
-                  className={
-                    isAnalyticsMenuOpen
-                      ? styles.rotatedChevron
-                      : styles.chevron
-                  }
-                />
-              </button>
-
-              {isAnalyticsMenuOpen && (
-                <div
-                  id="analytics-menu"
-                  className={styles.dropdownMenu}
+            {viewMode === 'ADMIN' && (
+              <div className={styles.dropdown}>
+                <button
+                  type="button"
+                  className={`${styles.navigationLink} ${
+                    styles.dropdownButton
+                  } ${
+                    isAnalyticsActive
+                      ? styles.activeLink
+                      : ''
+                  }`}
+                  onClick={() => {
+                    setIsAnalyticsMenuOpen(
+                      (isOpen) => !isOpen,
+                    );
+                  }}
+                  aria-expanded={isAnalyticsMenuOpen}
+                  aria-controls="analytics-menu"
                 >
-                  {analyticsLinks.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={styles.dropdownLink}
-                      onClick={closeMenus}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
+                  Analítica
+
+                  <ChevronDown
+                    aria-hidden="true"
+                    className={
+                      isAnalyticsMenuOpen
+                        ? styles.rotatedChevron
+                        : styles.chevron
+                    }
+                  />
+                </button>
+
+                {isAnalyticsMenuOpen && (
+                  <div
+                    id="analytics-menu"
+                    className={styles.dropdownMenu}
+                  >
+                    {ANALYTICS_LINKS.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={
+                          styles.dropdownLink
+                        }
+                        onClick={closeMenus}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </nav>
 
-          {/* User actions */}
           <div className={styles.userActions}>
             <Link
               href="/carrito"
@@ -248,11 +323,11 @@ export default function Header(): ReactElement {
             <button
               type="button"
               className={styles.mobileMenuButton}
-              onClick={() =>
+              onClick={() => {
                 setIsMobileMenuOpen(
                   (isOpen) => !isOpen,
-                )
-              }
+                );
+              }}
               aria-label={
                 isMobileMenuOpen
                   ? 'Cerrar menú de navegación'
@@ -269,13 +344,12 @@ export default function Header(): ReactElement {
           </div>
         </div>
 
-        {/* Mobile navigation */}
         {isMobileMenuOpen && (
           <nav
             className={styles.mobileNavigation}
             aria-label="Navegación móvil"
           >
-            {navigationLinks.map((item) => (
+            {NAVIGATION_LINKS.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -290,41 +364,51 @@ export default function Header(): ReactElement {
               </Link>
             ))}
 
-            <button
-              type="button"
-              className={`${styles.mobileLink} ${styles.mobileDropdownButton}`}
-              onClick={() =>
-                setIsAnalyticsMenuOpen(
-                  (isOpen) => !isOpen,
-                )
-              }
-              aria-expanded={isAnalyticsMenuOpen}
-            >
-              Analítica
+            {viewMode === 'ADMIN' && (
+              <>
+                <button
+                  type="button"
+                  className={`${styles.mobileLink} ${styles.mobileDropdownButton}`}
+                  onClick={() => {
+                    setIsAnalyticsMenuOpen(
+                      (isOpen) => !isOpen,
+                    );
+                  }}
+                  aria-expanded={isAnalyticsMenuOpen}
+                >
+                  Analítica
 
-              <ChevronDown
-                aria-hidden="true"
-                className={
-                  isAnalyticsMenuOpen
-                    ? styles.rotatedChevron
-                    : styles.chevron
-                }
-              />
-            </button>
+                  <ChevronDown
+                    aria-hidden="true"
+                    className={
+                      isAnalyticsMenuOpen
+                        ? styles.rotatedChevron
+                        : styles.chevron
+                    }
+                  />
+                </button>
 
-            {isAnalyticsMenuOpen && (
-              <div className={styles.mobileDropdown}>
-                {analyticsLinks.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={styles.mobileDropdownLink}
-                    onClick={closeMenus}
+                {isAnalyticsMenuOpen && (
+                  <div
+                    className={
+                      styles.mobileDropdown
+                    }
                   >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
+                    {ANALYTICS_LINKS.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={
+                          styles.mobileDropdownLink
+                        }
+                        onClick={closeMenus}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
 
             <Link
@@ -345,6 +429,40 @@ export default function Header(): ReactElement {
           </nav>
         )}
       </div>
+
+      <button
+        type="button"
+        onClick={toggleViewMode}
+        aria-label={
+          viewMode === 'ADMIN'
+            ? 'Cambiar a vista de cliente'
+            : 'Cambiar a vista de administrador'
+        }
+        style={{
+          position: 'fixed',
+          right: '20px',
+          bottom: '20px',
+          zIndex: 9999,
+          padding: '10px 20px',
+          color: '#ffffff',
+          backgroundColor:
+            viewMode === 'ADMIN'
+              ? '#d66098'
+              : '#f26f71',
+          border: 'none',
+          borderRadius: '30px',
+          boxShadow:
+            '0 4px 12px rgb(0 0 0 / 15%)',
+          fontFamily: 'Arial, sans-serif',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+        }}
+      >
+        Vista:{' '}
+        {viewMode === 'ADMIN'
+          ? 'Administrador'
+          : 'Cliente'}
+      </button>
     </header>
   );
 }

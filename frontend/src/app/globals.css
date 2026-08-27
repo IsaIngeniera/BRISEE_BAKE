@@ -674,3 +674,7 @@ main {
     transition: none !important;
   }
 }
+
+[data-view-mode='CLIENT'] .admin-only {
+  display: none !important;
+}
