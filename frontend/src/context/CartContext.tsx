@@ -29,83 +29,91 @@ interface CartContextValue {
   ) => void;
   removeFromCart: (productId: CartItem['productId']) => void;
   clearCart: () => void;
+  removedItems?: string[];
+  isHydrated?: boolean;
 }
 
 export const CartContext = createContext<CartContextValue | null>(null);
 
-const CART_STORAGE_KEY = 'brisee-bake-cart';
-
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [removedItems, setRemovedItems] = useState<string[]>([]);
   const [loadError, setLoadError] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  // Cargar el carrito guardado al montar (solo en el navegador)
-    useEffect(() => {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+  const fetchCart = async () => {
     try {
-      const storedCart = window.localStorage.getItem(CART_STORAGE_KEY);
-
-      if (storedCart) {
-        const parsedCart = JSON.parse(storedCart) as unknown as CartItem[];
-        queueMicrotask(() => setItems(parsedCart));
-      }
+      const res = await fetch(`${API_URL}/carrito`);
+      if (!res.ok) throw new Error('Failed to fetch cart');
+      const data = await res.json();
+      setItems(data.items);
+      setRemovedItems(data.removed);
+      setLoadError(false);
     } catch (error) {
-      console.error('Error loading cart from storage:', error);
-      queueMicrotask(() => setLoadError(true));
+      console.error('Error fetching cart:', error);
+      setLoadError(true);
     } finally {
-      queueMicrotask(() => setIsHydrated(true));
+      setIsHydrated(true);
     }
+  };
+
+  useEffect(() => {
+    fetchCart();
   }, []);
 
-  // Persistir cada vez que cambie (después de la carga inicial)
-  useEffect(() => {
-    if (!isHydrated) {
-      return;
-    }
-
-    try {
-      window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
-    } catch (error) {
-      console.error('Error saving cart to storage:', error);
-    }
-  }, [items, isHydrated]);
-
-  const addToCart = (
+  const addToCart = async (
     product: Omit<CartItem, 'cantidad'>,
     cantidad: number,
   ) => {
-    setItems((prevItems) => {
-      const existingItem = prevItems.find(
-        (item) => item.productId === product.productId,
-      );
+    try {
+      const res = await fetch(`${API_URL}/carrito/items`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          idProducto: product.productId,
+          cantidad,
+        }),
+      });
+      if (res.ok) {
+        await fetchCart(); // Refresh cart to get updated quantities
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+    }
+  };
 
-      if (existingItem) {
-        return prevItems.map((item) =>
-          item.productId === product.productId
-            ? { ...item, cantidad: item.cantidad + cantidad }
-            : item,
+  const removeFromCart = async (productId: CartItem['productId']) => {
+    try {
+      const res = await fetch(`${API_URL}/carrito/items/${productId}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setItems((prev) => prev.filter((item) => item.productId !== productId));
+      }
+    } catch (error) {
+      console.error('Error removing from cart:', error);
+    }
+  };
+
+  const updateQuantity = async (productId: CartItem['productId'], cantidad: number) => {
+    try {
+      const res = await fetch(`${API_URL}/carrito/items/${productId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cantidad }),
+      });
+      if (res.ok) {
+        setItems((prev) =>
+          prev.map((item) =>
+            item.productId === productId ? { ...item, cantidad } : item,
+          ),
         );
       }
-
-      return [...prevItems, { ...product, cantidad }];
-    });
-  };
-
-  const updateQuantity = (
-    productId: CartItem['productId'],
-    cantidad: number,
-  ) => {
-    setItems((prevItems) =>
-      prevItems.map((item) =>
-        item.productId === productId ? { ...item, cantidad } : item,
-      ),
-    );
-  };
-
-  const removeFromCart = (productId: CartItem['productId']) => {
-    setItems((prevItems) =>
-      prevItems.filter((item) => item.productId !== productId),
-    );
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+    }
   };
 
   const clearCart = () => setItems([]);
@@ -117,11 +125,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
       value={{
         items,
         totalItems,
-        loadError,
         addToCart,
-        updateQuantity,
         removeFromCart,
+        updateQuantity,
         clearCart,
+        loadError,
+        removedItems,
+        isHydrated,
       }}
     >
       {children}

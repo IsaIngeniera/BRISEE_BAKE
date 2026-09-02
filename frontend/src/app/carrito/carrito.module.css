@@ -45,10 +45,10 @@
 .checkoutButton {
   width: 100%;
   padding: 14px;
-  border: 1px solid currentColor;
+  border: none;
   border-radius: 999px;
-  background-color: transparent;
-  color: inherit;
+  background-color: #e580bb;
+  color: #180d0d;
   font-family: inherit;
   font-size: 1rem;
   font-weight: 600;
@@ -56,8 +56,7 @@
 }
 
 .checkoutButton:hover {
-  background-color: currentColor;
-  color: #ffffff;
+  background-color: #d66098;
 }
 
 .stateMessage {
@@ -79,12 +78,12 @@
   display: inline-block;
   padding: 12px 24px;
   border-radius: 999px;
-  background-color: currentColor;
+  background-color: #e580bb;
   color: #ffffff;
   text-decoration: none;
   font-weight: 600;
 }
 
 .goToCatalogButton:hover {
-  opacity: 0.9;
+  background-color: #d66098;
 }

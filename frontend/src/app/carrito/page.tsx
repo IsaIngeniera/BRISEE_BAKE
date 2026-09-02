@@ -29,54 +29,7 @@ function formatPrice(price: number | string): string {
 }
 
 export default function CarritoPage() {
-  const { items, loadError, updateQuantity, removeFromCart } = useCart();
-  const [removedProductNames, setRemovedProductNames] = useState<string[]>(
-    [],
-  );
-
-  // Verifica que cada producto del carrito siga existiendo en el catálogo.
-  // Si el admin lo eliminó, se retira del carrito y se avisa al cliente.
-  useEffect(() => {
-    if (loadError || items.length === 0) {
-      return;
-    }
-
-    const apiUrl =
-      process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-
-    fetch(`${apiUrl}/products`)
-      .then((response) => (response.ok ? response.json() : null))
-      .then((existingProducts: ExistingProduct[] | null) => {
-        if (!existingProducts) {
-          return;
-        }
-
-        const existingIds = new Set(
-          existingProducts.map((product) => String(product.id)),
-        );
-
-        const unavailableItems = items.filter(
-          (item) => !existingIds.has(String(item.productId)),
-        );
-
-        if (unavailableItems.length > 0) {
-          setRemovedProductNames(
-            unavailableItems.map((item) => item.nombre),
-          );
-          unavailableItems.forEach((item) =>
-            removeFromCart(item.productId),
-          );
-        }
-      })
-      .catch((error) => {
-        // Si falla la verificación de disponibilidad, no bloqueamos el
-        // carrito: solo se deja de validar hasta el próximo intento.
-        console.error('Error checking product availability:', error);
-      });
-    // Solo se re-ejecuta cuando cambia la cantidad de items o el error de
-    // carga, para no re-disparar el fetch en cada cambio de cantidad.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items.length, loadError]);
+  const { items, loadError, updateQuantity, removeFromCart, removedItems } = useCart();
 
   const total = items.reduce(
     (sum, item) => sum + Number(item.precio) * item.cantidad,
@@ -111,12 +64,12 @@ export default function CarritoPage() {
     <div className={styles.page}>
       <h1 className={styles.title}>Mi carrito</h1>
 
-      {removedProductNames.length > 0 && (
+      {removedItems && removedItems.length > 0 && (
         <section className={styles.warningBanner} role="alert">
           <p>
-            {removedProductNames.length === 1
-              ? `"${removedProductNames[0]}" ya no está disponible y fue retirado de tu carrito.`
-              : `Los siguientes productos ya no están disponibles y fueron retirados de tu carrito: ${removedProductNames.join(', ')}.`}
+            {removedItems.length === 1
+              ? `"${removedItems[0]}" ya no está disponible y fue retirado de tu carrito.`
+              : `Los siguientes productos ya no están disponibles y fueron retirados de tu carrito: ${removedItems.join(', ')}.`}
           </p>
         </section>
       )}
