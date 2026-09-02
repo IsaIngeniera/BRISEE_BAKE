@@ -1,10 +1,14 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { AddItemDto } from './dto/add-item.dto';
 
 @Injectable()
 export class CarritoService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async addItem(userId: string, addItemDto: AddItemDto) {
     const { idProducto, cantidad } = addItemDto;
@@ -53,7 +57,10 @@ export class CarritoService {
         data: { cantidad: nuevaCantidad },
         include: { producto: true },
       });
-      return { message: 'Cantidad actualizada en el carrito', item: itemActualizado };
+      return {
+        message: 'Cantidad actualizada en el carrito',
+        item: itemActualizado,
+      };
     } else {
       // Crear nuevo item
       const nuevoItem = await this.prisma.itemCarrito.create({
@@ -69,18 +76,18 @@ export class CarritoService {
   }
 
   async getCart(userId: string) {
-    let carrito = await this.prisma.carrito.findFirst({
+    const carrito = await this.prisma.carrito.findFirst({
       where: { idUsuario: userId, estado: 'ACTIVO' },
       include: {
         items: {
           include: {
             producto: {
               include: {
-                imagenes: true
-              }
-            }
-          }
-        }
+                imagenes: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -90,7 +97,7 @@ export class CarritoService {
 
     // Filtra los productos inactivos/eliminados y los sacamos del carrito
     const removed: string[] = [];
-    const validItems: any[] = [];
+    const validItems: typeof carrito.items = [];
 
     for (const item of carrito.items) {
       if (item.producto.estado === 'INACTIVO') {
@@ -103,9 +110,10 @@ export class CarritoService {
 
     // Dar formato similar a CartItem del frontend
     const mappedItems = validItems.map((item) => {
-      const firstImage = item.producto.imagenes && item.producto.imagenes.length > 0
-        ? item.producto.imagenes[0].urlImagen
-        : undefined;
+      const firstImage =
+        item.producto.imagenes && item.producto.imagenes.length > 0
+          ? item.producto.imagenes[0].urlImagen
+          : undefined;
 
       return {
         productId: item.idProducto,
@@ -119,7 +127,11 @@ export class CarritoService {
     return { items: mappedItems, removed };
   }
 
-  async updateItemQuantity(userId: string, productId: string, cantidad: number) {
+  async updateItemQuantity(
+    userId: string,
+    productId: string,
+    cantidad: number,
+  ) {
     if (cantidad <= 0) {
       throw new BadRequestException('La cantidad debe ser mayor a cero');
     }
@@ -173,4 +185,3 @@ export class CarritoService {
     return { message: 'Item eliminado del carrito' };
   }
 }
-

@@ -75,10 +75,15 @@ export class ProductsService {
     }
 
     if (tags) {
-      const activeTags = tags.split(',').map((t) => t.trim()).filter(Boolean);
+      const activeTags = tags
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean);
       if (activeTags.length > 0) {
         filtered = filtered.filter((product) =>
-          activeTags.every((tag) => (product.etiquetas as unknown as string[]).includes(tag)),
+          activeTags.every((tag) =>
+            (product.etiquetas as unknown as string[]).includes(tag),
+          ),
         );
       }
     }
