@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 import type { ReactNode } from 'react';
 
 import { useProductFilters } from '@/hooks/useProductFilters';
-import DietaryFilterChips from './DietaryFilterChips';
 import ProductSearchBar from './ProductSearchBar';
 import styles from './product-catalog-grid.module.css';
 
@@ -44,18 +43,6 @@ export default function ProductCatalogGrid<T extends FilterableProduct>({
   emptyCategoryClassName,
   searchPlaceholder,
 }: ProductCatalogGridProps<T>) {
-  const dietaryOptions = useMemo(() => {
-    const uniqueTags = new Set<string>();
-
-    items.forEach((item) => {
-      item.product.etiquetas.forEach((tag) => uniqueTags.add(tag));
-    });
-
-    return Array.from(uniqueTags)
-      .sort()
-      .map((tag) => ({ value: tag, label: formatDietaryLabel(tag) }));
-  }, [items]);
-
   const {
     searchTerm,
     setSearchTerm,
@@ -82,13 +69,6 @@ export default function ProductCatalogGrid<T extends FilterableProduct>({
             value={searchTerm}
             onChange={setSearchTerm}
             placeholder={searchPlaceholder}
-          />
-
-          <DietaryFilterChips
-            options={dietaryOptions}
-            activeTags={activeTags}
-            onToggle={toggleTag}
-            onClear={clearTags}
           />
         </>
       )}

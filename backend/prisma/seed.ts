@@ -8,9 +8,30 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('Borrando datos existentes para evitar duplicados...');
+  await prisma.itemCarrito.deleteMany();
+  await prisma.carrito.deleteMany();
+  await prisma.pedidoProducto.deleteMany();
+  await prisma.pago.deleteMany();
+  await prisma.pedido.deleteMany();
   await prisma.imagenProducto.deleteMany();
   await prisma.producto.deleteMany();
   await prisma.categoria.deleteMany();
+  await prisma.usuario.deleteMany();
+
+  console.log('Creando usuario de prueba...');
+  const dummyUser = await prisma.usuario.create({
+    data: {
+      id: '00000000-0000-0000-0000-000000000000',
+      nombre: 'Cliente',
+      apellido: 'Prueba',
+      fechaNacimiento: new Date('1990-01-01'),
+      correo: 'cliente@prueba.com',
+      rol: 'CLIENTE',
+      password: 'hash_falso',
+      celular: '3000000000',
+      estado: 'ACTIVO',
+    }
+  });
 
   console.log('Creando categorias...');
   const catGranolas = await prisma.categoria.create({ data: { nombre: 'Granolas' } });

@@ -7,7 +7,6 @@ import Link from 'next/link';
 import HomeCarousel, {
   type CarouselSlide,
 } from '../../components/home/HomeCarousel';
-import DietaryFilterChips from '../../components/products/DietaryFilterChips';
 import ProductSearchBar from '../../components/products/ProductSearchBar';
 import { useProductFilters } from '../../hooks/useProductFilters';
 
@@ -85,17 +84,7 @@ export default function CatalogoPage() {
       });
   }, []);
 
-  const dietaryOptions = useMemo(() => {
-    const uniqueTags = new Set<string>();
 
-    allProducts.forEach((product) => {
-      product.etiquetas.forEach((tag) => uniqueTags.add(tag));
-    });
-
-    return Array.from(uniqueTags)
-      .sort()
-      .map((tag) => ({ value: tag, label: formatDietaryLabel(tag) }));
-  }, [allProducts]);
 
   const {
     searchTerm,
@@ -137,13 +126,6 @@ export default function CatalogoPage() {
           value={searchTerm}
           onChange={setSearchTerm}
           placeholder="Buscar producto en todo el catálogo..."
-        />
-
-        <DietaryFilterChips
-          options={dietaryOptions}
-          activeTags={activeTags}
-          onToggle={toggleTag}
-          onClear={clearTags}
         />
 
         {isFiltering ? (
