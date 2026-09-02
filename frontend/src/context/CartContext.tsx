@@ -18,8 +18,13 @@ export interface CartItem {
 interface CartContextValue {
   items: CartItem[];
   totalItems: number;
+  loadError: boolean;
   addToCart: (
     product: Omit<CartItem, 'cantidad'>,
+    cantidad: number,
+  ) => void;
+  updateQuantity: (
+    productId: CartItem['productId'],
     cantidad: number,
   ) => void;
   removeFromCart: (productId: CartItem['productId']) => void;
@@ -33,22 +38,24 @@ const CART_STORAGE_KEY = 'brisee-bake-cart';
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
   // Cargar el carrito guardado al montar (solo en el navegador)
- useEffect(() => {
-  try {
-    const storedCart = window.localStorage.getItem(CART_STORAGE_KEY);
+    useEffect(() => {
+    try {
+      const storedCart = window.localStorage.getItem(CART_STORAGE_KEY);
 
-    if (storedCart) {
-      const parsedCart = JSON.parse(storedCart) as unknown as CartItem[];
-      queueMicrotask(() => setItems(parsedCart));
+      if (storedCart) {
+        const parsedCart = JSON.parse(storedCart) as unknown as CartItem[];
+        queueMicrotask(() => setItems(parsedCart));
+      }
+    } catch (error) {
+      console.error('Error loading cart from storage:', error);
+      queueMicrotask(() => setLoadError(true));
+    } finally {
+      queueMicrotask(() => setIsHydrated(true));
     }
-  } catch (error) {
-    console.error('Error loading cart from storage:', error);
-  } finally {
-    setIsHydrated(true);
-  }
-}, []);
+  }, []);
 
   // Persistir cada vez que cambie (después de la carga inicial)
   useEffect(() => {
@@ -84,6 +91,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const updateQuantity = (
+    productId: CartItem['productId'],
+    cantidad: number,
+  ) => {
+    setItems((prevItems) =>
+      prevItems.map((item) =>
+        item.productId === productId ? { ...item, cantidad } : item,
+      ),
+    );
+  };
+
   const removeFromCart = (productId: CartItem['productId']) => {
     setItems((prevItems) =>
       prevItems.filter((item) => item.productId !== productId),
@@ -96,7 +114,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   return (
     <CartContext.Provider
-      value={{ items, totalItems, addToCart, removeFromCart, clearCart }}
+      value={{
+        items,
+        totalItems,
+        loadError,
+        addToCart,
+        updateQuantity,
+        removeFromCart,
+        clearCart,
+      }}
     >
       {children}
     </CartContext.Provider>

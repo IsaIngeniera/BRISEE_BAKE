@@ -1,0 +1,90 @@
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.warningBanner {
+  background-color: rgba(0, 0, 0, 0.04);
+  border-radius: 10px;
+  padding: 12px 18px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+}
+
+.warningBanner p {
+  margin: 0;
+}
+
+.itemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.summary {
+  margin-top: 32px;
+  background-color: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+}
+
+.checkoutButton {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background-color: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.checkoutButton:hover {
+  background-color: currentColor;
+  color: #ffffff;
+}
+
+.stateMessage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.emptyIcon {
+  width: 48px;
+  height: 48px;
+  opacity: 0.4;
+}
+
+.goToCatalogButton {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 999px;
+  background-color: currentColor;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.goToCatalogButton:hover {
+  opacity: 0.9;
+}
