@@ -1,0 +1,147 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { ShoppingCart } from 'lucide-react';
+
+import CartItemRow from '@/components/cart/CartItemRow';
+import { useCart } from '@/hooks/useCart';
+import type { CartItem } from '@/context/CartContext';
+
+import styles from './carrito.module.css';
+
+interface ExistingProduct {
+  id: string | number;
+}
+
+function formatPrice(price: number | string): string {
+  const numericPrice = Number(price);
+
+  if (Number.isNaN(numericPrice)) {
+    return '$ 0';
+  }
+
+  return numericPrice.toLocaleString('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    maximumFractionDigits: 0,
+  });
+}
+
+export default function CarritoPage() {
+  const { items, loadError, updateQuantity, removeFromCart } = useCart();
+  const [removedProductNames, setRemovedProductNames] = useState<string[]>(
+    [],
+  );
+
+  // Verifica que cada producto del carrito siga existiendo en el catálogo.
+  // Si el admin lo eliminó, se retira del carrito y se avisa al cliente.
+  useEffect(() => {
+    if (loadError || items.length === 0) {
+      return;
+    }
+
+    const apiUrl =
+      process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+    fetch(`${apiUrl}/products`)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((existingProducts: ExistingProduct[] | null) => {
+        if (!existingProducts) {
+          return;
+        }
+
+        const existingIds = new Set(
+          existingProducts.map((product) => String(product.id)),
+        );
+
+        const unavailableItems = items.filter(
+          (item) => !existingIds.has(String(item.productId)),
+        );
+
+        if (unavailableItems.length > 0) {
+          setRemovedProductNames(
+            unavailableItems.map((item) => item.nombre),
+          );
+          unavailableItems.forEach((item) =>
+            removeFromCart(item.productId),
+          );
+        }
+      })
+      .catch((error) => {
+        // Si falla la verificación de disponibilidad, no bloqueamos el
+        // carrito: solo se deja de validar hasta el próximo intento.
+        console.error('Error checking product availability:', error);
+      });
+    // Solo se re-ejecuta cuando cambia la cantidad de items o el error de
+    // carga, para no re-disparar el fetch en cada cambio de cantidad.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items.length, loadError]);
+
+  const total = items.reduce(
+    (sum, item) => sum + Number(item.precio) * item.cantidad,
+    0,
+  );
+
+  if (loadError) {
+    return (
+      <div className={styles.page}>
+        <section className={styles.stateMessage} role="alert">
+          <p>No se pudo cargar tu carrito, intenta nuevamente</p>
+        </section>
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className={styles.page}>
+        <section className={styles.stateMessage}>
+          <ShoppingCart aria-hidden="true" className={styles.emptyIcon} />
+          <p>Tu carrito está vacío</p>
+          <Link href="/catalogo" className={styles.goToCatalogButton}>
+            Ir al catálogo
+          </Link>
+        </section>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.page}>
+      <h1 className={styles.title}>Mi carrito</h1>
+
+      {removedProductNames.length > 0 && (
+        <section className={styles.warningBanner} role="alert">
+          <p>
+            {removedProductNames.length === 1
+              ? `"${removedProductNames[0]}" ya no está disponible y fue retirado de tu carrito.`
+              : `Los siguientes productos ya no están disponibles y fueron retirados de tu carrito: ${removedProductNames.join(', ')}.`}
+          </p>
+        </section>
+      )}
+
+      <div className={styles.itemsList}>
+        {items.map((item: CartItem) => (
+          <CartItemRow
+            key={item.productId}
+            item={item}
+            onQuantityChange={updateQuantity}
+            onRemove={removeFromCart}
+          />
+        ))}
+      </div>
+
+      <section className={styles.summary}>
+        <div className={styles.summaryRow}>
+          <span>Total</span>
+          <strong>{formatPrice(total)}</strong>
+        </div>
+
+        <button type="button" className={styles.checkoutButton}>
+          Continuar al pago
+        </button>
+      </section>
+    </div>
+  );
+}
