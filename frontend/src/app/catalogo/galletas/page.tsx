@@ -241,7 +241,7 @@ export default async function CookiesPage() {
           </p>
         }
         renderExtra={
-          <article className={`${styles.addProductCard} admin-only`}>
+          <article key="add-product-extra" className={`${styles.addProductCard} admin-only`}>
             <Link
               href="/admin/productos/crear?categoria=galletas"
               className={styles.addProductLink}

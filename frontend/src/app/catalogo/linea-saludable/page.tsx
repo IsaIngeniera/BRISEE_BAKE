@@ -243,7 +243,7 @@ export default async function LineaSaludablePage() {
           </p>
         }
         renderExtra={
-          <article className={`${styles.addProductCard} admin-only`}>
+          <article key="add-product-extra" className={`${styles.addProductCard} admin-only`}>
             <Link
               href="/admin/productos/crear?categoria=linea_saludable"
               className={styles.addProductLink}

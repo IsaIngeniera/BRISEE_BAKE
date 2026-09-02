@@ -242,7 +242,7 @@ export default async function GranolasPage() {
           </p>
         }
         renderExtra={
-          <article className={`${styles.addProductCard} admin-only`}>
+          <article key="add-product-extra" className={`${styles.addProductCard} admin-only`}>
             <Link
               href="/admin/productos/crear?categoria=granolas"
               className={styles.addProductLink}
