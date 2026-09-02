@@ -1,0 +1,51 @@
+.chipsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  max-width: 720px;
+  margin: 0 auto 28px;
+}
+
+.chip {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background-color: #ffffff;
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.chip:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.chipActive {
+  background-color: currentColor;
+  color: #ffffff;
+  border-color: currentColor;
+}
+
+.chipActive:hover {
+  opacity: 0.9;
+}
+
+.clearButton {
+  padding: 8px 14px;
+  border: none;
+  background: none;
+  color: inherit;
+  opacity: 0.6;
+  font-family: inherit;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.clearButton:hover {
+  opacity: 1;
+}

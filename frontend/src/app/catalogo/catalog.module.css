@@ -229,3 +229,55 @@
     padding: 23px 18px;
   }
 }
+
+.noResults {
+  max-width: 650px;
+  margin: 35px auto 0;
+  padding: 18px 25px;
+  border-radius: 12px;
+  background-color: rgba(0, 0, 0, 0.03);
+  font-family: Arial, Helvetica, sans-serif;
+  text-align: center;
+}
+
+.searchResultsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+  margin-top: 35px;
+}
+
+.searchResultCard {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 14px;
+  overflow: hidden;
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.searchResultImageContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.searchResultImageContainer img {
+  object-fit: cover;
+}
+
+.searchResultInfo {
+  padding: 12px 14px;
+}
+
+.searchResultInfo h3 {
+  font-size: 1rem;
+  margin: 0 0 4px;
+}
+
+.searchResultInfo p {
+  margin: 0;
+  font-weight: 600;
+}

@@ -34,7 +34,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    command: npm run start:dev --workspace=backend
+    command: sh -c "npx prisma generate && npm run start:dev --workspace=backend"
 
   frontend:
     build:
@@ -44,11 +44,12 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    working_dir: /app
     ports:
       - "3000:3000"
     volumes:
       - ./frontend:/app/frontend
+      - frontend_node_modules:/app/frontend/node_modules
+      - /app/frontend/.next
     depends_on:
       backend:
         condition: service_started
