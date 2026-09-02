@@ -1,0 +1,55 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.addButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  background-color: #e580bb; /* Color rosado principal similar al de las tarjetas */
+  color: #ffffff;
+  cursor: pointer;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition:
+    background-color 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.addButton:hover {
+  background-color: #d66098; /* Tono más oscuro al pasar el cursor */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(214, 96, 152, 0.25);
+}
+
+.disabledButton {
+  width: 100%;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  background-color: #eadbe2;
+  color: #896f78;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.confirmationMessage {
+  margin: 4px 0 0;
+  font-family: Arial, sans-serif;
+  font-size: 0.8rem;
+  color: #2e7d32;
+  text-align: center;
+}

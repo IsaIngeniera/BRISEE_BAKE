@@ -3,6 +3,7 @@ import type { ReactElement, ReactNode } from 'react';
 
 import Footer from '../components/layout/Footer';
 import Header from '../components/layout/Header';
+import { CartProvider } from '../context/CartContext';
 
 import './globals.css';
 
@@ -21,11 +22,13 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body>
-        <Header />
+        <CartProvider>
+          <Header />
 
-        <main>{children}</main>
+          <main>{children}</main>
 
-        <Footer />
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );
