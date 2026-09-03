@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  useEffect,
   useState,
   type ChangeEvent,
   type FormEvent,
@@ -88,30 +87,16 @@ export default function ProductForm(): ReactElement {
   const searchParams = useSearchParams();
   const categorySlug = searchParams.get('categoria');
 
-  const [formData, setFormData] =
-    useState<ProductFormData>(INITIAL_FORM_DATA);
+  const selectedCategory = CATEGORIES.find(
+    (category) => category.slug === categorySlug,
+  );
 
-  const [isSubmitting, setIsSubmitting] =
-    useState(false);
-
-  const [isSuccess, setIsSuccess] =
-    useState(false);
-
-  const [errorMessage, setErrorMessage] =
-    useState('');
-
-  useEffect(() => {
-    if (!categorySlug) {
-      return;
-    }
-
-    const selectedCategory = CATEGORIES.find(
-      (category) => category.slug === categorySlug,
-    );
-
-    if (!selectedCategory) {
-      return;
-    }
+  const [formData, setFormData] = useState<ProductFormData>(
+    () => ({
+      ...INITIAL_FORM_DATA,
+      idCategoria: selectedCategory?.id.toString() ?? '',
+    }),
+  );
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setFormData((previousFormData) => ({
