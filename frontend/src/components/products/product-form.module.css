@@ -1,0 +1,110 @@
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formGroup label {
+  color: #513f45;
+  font-family: Arial, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.input,
+.select,
+.textarea {
+  padding: 10px 15px;
+  color: #333333;
+  border: 1px solid #edaccc;
+  border-radius: 8px;
+  outline: none;
+  font-family: Arial, sans-serif;
+  font-size: 1rem;
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  border-color: #d66098;
+  box-shadow: 0 0 0 3px rgb(214 96 152 / 15%);
+}
+
+.textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.checkboxGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #513f45;
+  cursor: pointer;
+  font-family: Arial, sans-serif;
+  font-size: 0.85rem;
+}
+
+.submitButton {
+  margin-top: 20px;
+  padding: 12px;
+  color: #000000;
+  background-color: #e48abd;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
+  transition:
+    color 200ms ease,
+    background-color 200ms ease,
+    transform 200ms ease;
+}
+
+.submitButton:hover {
+  color: #ffffff;
+  background-color: #d66098;
+  transform: translateY(-2px);
+}
+
+.submitButton:focus-visible {
+  outline: 3px solid #d66098;
+  outline-offset: 3px;
+}
+
+.submitButton:disabled {
+  color: #666666;
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.errorMessage {
+  margin-top: -5px;
+  color: #c62828;
+  font-size: 0.85rem;
+}
+
+.successMessage {
+  margin-bottom: 20px;
+  padding: 15px;
+  color: #2e7d32;
+  background-color: #e8f5e9;
+  border-radius: 8px;
+  text-align: center;
+}

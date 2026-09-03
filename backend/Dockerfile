@@ -11,6 +11,7 @@ RUN npm ci
 COPY backend ./backend
 
 WORKDIR /app/backend
+RUN npx prisma generate
 
 EXPOSE 3001
 
