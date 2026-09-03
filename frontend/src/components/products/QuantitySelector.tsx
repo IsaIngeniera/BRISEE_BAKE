@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-
+import { useEffect, useState } from 'react';
 import styles from './quantity-selector.module.css';
 
 interface QuantitySelectorProps {
@@ -16,7 +15,6 @@ interface QuantitySelectorProps {
 function isPositiveInteger(rawValue: string): boolean {
   return /^[1-9]\d*$/.test(rawValue.trim());
 }
-
 export default function QuantitySelector({
   value,
   onChange,
