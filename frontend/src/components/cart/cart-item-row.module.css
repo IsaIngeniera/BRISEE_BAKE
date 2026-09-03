@@ -3,11 +3,11 @@
   grid-template-columns: 90px 1fr auto auto auto;
   align-items: center;
   gap: 20px;
-  background-color: #ffffff;
+  background-color: var(--pink-100);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 16px;
 }
-
 .imageContainer {
   position: relative;
   width: 90px;

@@ -7,6 +7,11 @@
 .title {
   text-align: center;
   margin-bottom: 24px;
+  font-family: var(--font-display), serif;
+  font-size: 2rem;
+  color: var(--pink-500)
+
+  
 }
 
 .warningBanner {
@@ -26,10 +31,10 @@
   flex-direction: column;
   gap: 16px;
 }
-
 .summary {
   margin-top: 32px;
-  background-color: #ffffff;
+  background-color: var(--pink-100);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 24px;
 }
@@ -38,7 +43,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 1.4rem;
+  color: var(--rose-text);
+  font-family: var(--font-display), serif;
+  font-size: 1.5rem;
   margin-bottom: 20px;
 }
 
@@ -46,19 +53,23 @@
   width: 100%;
   padding: 14px;
   border: none;
-  border-radius: 999px;
-  background-color: #e580bb;
-  color: #180d0d;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--pink-500), var(--pink-600));
+  color: #ffffff;
   font-family: inherit;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
+  transition:
+    filter 0.2s,
+    transform 0.2s;
 }
 
-.checkoutButton:hover {
-  background-color: #d66098;
+.checkoutButton:hover,
+.checkoutButton:focus-visible {
+  filter: brightness(0.93);
+  transform: scale(1.02);
 }
-
 .stateMessage {
   display: flex;
   flex-direction: column;
@@ -73,7 +84,6 @@
   height: 48px;
   opacity: 0.4;
 }
-
 .goToCatalogButton {
   display: inline-block;
   padding: 12px 24px;
@@ -82,8 +92,13 @@
   color: #ffffff;
   text-decoration: none;
   font-weight: 600;
+  transition:
+    filter 0.2s,
+    transform 0.2s;
 }
 
-.goToCatalogButton:hover {
-  background-color: #d66098;
+.goToCatalogButton:hover,
+.goToCatalogButton:focus-visible {
+  filter: brightness(0.93);
+  transform: scale(1.03);
 }

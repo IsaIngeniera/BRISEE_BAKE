@@ -88,8 +88,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const removeFromCart = async (productId: CartItem['productId']) => {
     try {
-      const res = await fetch(`${API_URL}/carrito/items/${productId}`, {
-        method: 'DELETE',
+      const res = await fetch(`${API_URL}/carrito/items/${String(productId)}`, {
+      method: 'DELETE',
       });
       if (res.ok) {
         setItems((prev) => prev.filter((item) => item.productId !== productId));
@@ -101,7 +101,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const updateQuantity = async (productId: CartItem['productId'], cantidad: number) => {
     try {
-      const res = await fetch(`${API_URL}/carrito/items/${productId}`, {
+      const res = await fetch(`${API_URL}/carrito/items/${String(productId)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cantidad }),

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+
 import Link from 'next/link';
 import { ShoppingCart } from 'lucide-react';
 
@@ -10,9 +10,6 @@ import type { CartItem } from '@/context/CartContext';
 
 import styles from './carrito.module.css';
 
-interface ExistingProduct {
-  id: string | number;
-}
 
 function formatPrice(price: number | string): string {
   const numericPrice = Number(price);
