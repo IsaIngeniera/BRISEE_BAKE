@@ -56,7 +56,7 @@
   border-radius: 10px;
   background: linear-gradient(135deg, var(--pink-500), var(--pink-600));
   color: #ffffff;
-  font-family: inherit;
+  font-family: var(--font-display), serif;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
