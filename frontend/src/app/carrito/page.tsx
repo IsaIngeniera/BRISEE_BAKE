@@ -75,9 +75,9 @@ export default function CarritoPage() {
       )}
 
       <div className={styles.itemsList}>
-        {items.map((item: CartItem) => (
+        {items.map((item: CartItem, index: number) => (
           <CartItemRow
-            key={item.productId}
+            key={`${item.productId}-${index}`}
             item={item}
             onQuantityChange={updateQuantity}
             onRemove={removeFromCart}
