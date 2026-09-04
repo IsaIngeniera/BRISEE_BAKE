@@ -1,6 +1,5 @@
 'use client';
 
-import { useMemo } from 'react';
 import type { ReactNode } from 'react';
 
 import { useProductFilters } from '@/hooks/useProductFilters';
@@ -27,12 +26,6 @@ interface ProductCatalogGridProps<T extends FilterableProduct> {
   searchPlaceholder?: string;
 }
 
-function formatDietaryLabel(tag: string): string {
-  return tag
-    .toLowerCase()
-    .replaceAll('_', ' ')
-    .replace(/^\w/, (letter) => letter.toUpperCase());
-}
 
 export default function ProductCatalogGrid<T extends FilterableProduct>({
   items,
@@ -46,9 +39,6 @@ export default function ProductCatalogGrid<T extends FilterableProduct>({
   const {
     searchTerm,
     setSearchTerm,
-    activeTags,
-    toggleTag,
-    clearTags,
     filteredItems,
     isSearching,
     hasActiveFilters,
