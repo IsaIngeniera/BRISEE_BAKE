@@ -50,7 +50,7 @@ async function main() {
       { idCategoria: catGranolas.id, nombre: 'Granola Almendras y Nueces 500g', descripcion: descGranolaAlmendras, precio: 58000, presentacion: '500g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
       { idCategoria: catGranolas.id, nombre: 'Granola Almendras y Nueces 300g', descripcion: descGranolaAlmendras, precio: 38500, presentacion: '300g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
       { idCategoria: catGranolas.id, nombre: 'Granola Almendras y Nueces 60g', descripcion: descGranolaAlmendras, precio: 7400, presentacion: '60g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
-      
+
       { idCategoria: catGranolas.id, nombre: 'Granola Nueces y Cacao 500g', descripcion: descGranolaCacao, precio: 60000, presentacion: '500g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
       { idCategoria: catGranolas.id, nombre: 'Granola Nueces y Cacao 300g', descripcion: descGranolaCacao, precio: 41500, presentacion: '300g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
       { idCategoria: catGranolas.id, nombre: 'Granola Nueces y Cacao 60g', descripcion: descGranolaCacao, precio: 8100, presentacion: '60g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
@@ -93,7 +93,7 @@ async function main() {
 
   console.log('Agregando imágenes de prueba a los productos...');
   const todosLosProductos = await prisma.producto.findMany();
-  
+
   const imagenesData = todosLosProductos.map((p) => {
     const nombreLimpio = p.nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '-');
     return {
@@ -102,13 +102,14 @@ async function main() {
       nombre: 'Principal'
     };
   });
-  
+
   await prisma.imagenProducto.createMany({
     data: imagenesData
   });
 
   console.log('Seeder ejecutado con exito!');
 }
+
 
 main()
   .catch((e) => {
