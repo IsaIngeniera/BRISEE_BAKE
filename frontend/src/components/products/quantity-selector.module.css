@@ -1,0 +1,57 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 999px;
+  overflow: hidden;
+  width: fit-content;
+}
+
+.stepButton {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: transparent;
+  color: currentColor;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.stepButton:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.stepButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.input {
+  width: 36px;
+  border: none;
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.95rem;
+  color: inherit;
+  background-color: transparent;
+}
+
+.input:focus-visible {
+  outline: none;
+}
+
+.errorMessage {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #c0392b;
+  max-width: 200px;
+}

@@ -68,9 +68,15 @@ export function useProductFilters<T>(
       return dietaryFiltered;
     }
 
-    return dietaryFiltered.filter((item) =>
-      normalizeText(getSearchableText(item)).includes(normalizedSearch),
-    );
+    return dietaryFiltered.filter((item) => {
+      const nameMatch = normalizeText(getSearchableText(item)).includes(normalizedSearch);
+      
+      const tagMatch = getTags(item).some((tag) => 
+        normalizeText(tag.replaceAll('_', ' ')).includes(normalizedSearch)
+      );
+      
+      return nameMatch || tagMatch;
+    });
   }, [items, searchTerm, activeTags, getSearchableText, getTags]);
 
   return {

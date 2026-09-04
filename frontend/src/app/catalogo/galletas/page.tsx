@@ -1,11 +1,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import ProductCardActions from '@/components/products/ProductCardActions';
 
 import {
   ArrowLeft,
   Pencil,
   Plus,
-  ShoppingCart,
 } from 'lucide-react';
 import ExpandableDescription from '@/components/products/ExpandableDescription';
 import ProductCatalogGrid from '@/components/products/ProductCatalogGrid';
@@ -172,36 +172,20 @@ export default async function CookiesPage() {
               </div>
             )}
 
-            <p className={styles.price}>
-              {formatPrice(product.precio)}
-            </p>
-
-            <p className={styles.stock}>
-              {product.existencias > 0
-                ? `${product.existencias} disponibles`
-                : 'Producto agotado'}
-            </p>
-
-            <Link
-              href={`/carrito?producto=${product.id}`}
-              className={`${styles.cartButton} ${
-                product.existencias <= 0
-                  ? styles.disabledButton
-                  : ''
-              }`}
-              aria-disabled={product.existencias <= 0}
-            >
-              <ShoppingCart aria-hidden="true" />
-
-              {product.existencias > 0
-                ? 'Añadir al carrito'
-                : 'Agotado'}
-            </Link>
+            <ProductCardActions
+              productId={product.id}
+              nombre={product.nombre}
+              precio={product.precio}
+              imagenUrl={productImageUrl}
+              existencias={product.existencias}
+              formattedPrice={formatPrice(product.precio)}
+            />
           </div>
         </article>
       ),
     };
   });
+
 
   return (
     <div className={styles.page}>

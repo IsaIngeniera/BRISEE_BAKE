@@ -1,8 +1,9 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, ShoppingCart } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import styles from './product-detail.module.css';
+import ProductDetailActions from '@/components/products/ProductDetailActions';
 
 interface ProductImage {
   id: string;
@@ -141,23 +142,20 @@ export default async function ProductDetailPage({
               </div>
             )}
 
-            <div className={styles.actions}>
-              <Link
-                href={`/carrito?producto=${product.id}`}
-                className={`${styles.cartButton} ${
-                  product.existencias <= 0 ? styles.disabledButton : ''
-                }`}
-                aria-disabled={product.existencias <= 0}
-              >
-                <ShoppingCart aria-hidden="true" />
-                {product.existencias > 0 ? 'Añadir al carrito' : 'Agotado'}
-              </Link>
-              
+            <div className={styles.actions}>  
               <p className={styles.stock}>
                 {product.existencias > 0
                   ? `${product.existencias} disponibles`
                   : 'Sin existencias'}
               </p>
+
+              <ProductDetailActions
+                productId={product.id}
+                nombre={product.nombre}
+                precio={product.precio}
+                imagenUrl={productImageUrl}
+                existencias={product.existencias}
+              />
             </div>
           </div>
         </article>

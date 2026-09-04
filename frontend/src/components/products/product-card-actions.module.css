@@ -1,0 +1,26 @@
+.actionsWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.priceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Separa el precio a la izq y la cantidad a la der */
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.price {
+  font-family: var(--font-baskerville, Georgia, serif); /* Tipografía principal */
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #000000; /* Negro */
+  margin: 0;
+}
+
+.stock {
+  display: none;
+}
+

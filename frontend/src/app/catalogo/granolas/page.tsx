@@ -5,13 +5,13 @@ import {
   ArrowLeft,
   Pencil,
   Plus,
-  ShoppingCart,
 } from 'lucide-react';
 import ExpandableDescription from '@/components/products/ExpandableDescription';
 import ProductCatalogGrid from '@/components/products/ProductCatalogGrid';
 import { normalizeText } from '@/utils/normalize-text';
 
 import styles from './granolas.module.css';
+import ProductCardActions from '@/components/products/ProductCardActions';
 
 interface ProductImage {
   id: number;
@@ -170,31 +170,14 @@ export default async function GranolasPage() {
               </div>
             )}
 
-            <p className={styles.price}>
-              {formatPrice(product.precio)}
-            </p>
-
-            <p className={styles.stock}>
-              {product.existencias > 0
-                ? `${product.existencias} disponibles`
-                : 'Producto agotado'}
-            </p>
-
-            <Link
-              href={`/carrito?producto=${product.id}`}
-              className={`${styles.cartButton} ${
-                product.existencias <= 0
-                  ? styles.disabledButton
-                  : ''
-              }`}
-              aria-disabled={product.existencias <= 0}
-            >
-              <ShoppingCart aria-hidden="true" />
-
-              {product.existencias > 0
-                ? 'Añadir al carrito'
-                : 'Agotado'}
-            </Link>
+            <ProductCardActions
+              productId={product.id}
+              nombre={product.nombre}
+              precio={product.precio}
+              imagenUrl={productImageUrl}
+              existencias={product.existencias}
+              formattedPrice={formatPrice(product.precio)}
+            />
           </div>
         </article>
       ),
