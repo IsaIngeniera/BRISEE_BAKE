@@ -36,8 +36,18 @@ export class ProductsController {
   }
 
   @Get()
-  @ApiQuery({ name: 'q', required: false, type: String, description: 'Término de búsqueda por nombre' })
-  @ApiQuery({ name: 'tags', required: false, type: String, description: 'Etiquetas dietéticas separadas por coma' })
+  @ApiQuery({
+    name: 'q',
+    required: false,
+    type: String,
+    description: 'Término de búsqueda por nombre',
+  })
+  @ApiQuery({
+    name: 'tags',
+    required: false,
+    type: String,
+    description: 'Etiquetas dietéticas separadas por coma',
+  })
   findAll(@Query('q') search?: string, @Query('tags') tags?: string) {
     return this.productsService.findAll(search, tags);
   }

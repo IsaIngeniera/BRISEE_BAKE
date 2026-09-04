@@ -1,0 +1,97 @@
+.row {
+  display: grid;
+  grid-template-columns: 90px 1fr auto auto auto;
+  align-items: center;
+  gap: 20px;
+  background-color: var(--pink-100);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+}
+.imageContainer {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.imageContainer img {
+  object-fit: cover;
+}
+
+.info h3 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+}
+
+.unitPrice {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.quantityColumn {
+  display: flex;
+  justify-content: center;
+}
+
+.subtotalColumn {
+  min-width: 90px;
+  text-align: right;
+  font-weight: 600;
+}
+
+.subtotalColumn p {
+  margin: 0;
+}
+
+.removeButton {
+  border: none;
+  background: none;
+  color: inherit;
+  opacity: 0.5;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.removeButton:hover {
+  opacity: 1;
+}
+
+@media (max-width: 640px) {
+  .row {
+    grid-template-columns: 70px 1fr;
+    grid-template-areas:
+      'image info'
+      'image quantity'
+      'image subtotal'
+      'remove remove';
+  }
+
+  .imageContainer {
+    grid-area: image;
+    width: 70px;
+    height: 70px;
+  }
+
+  .info {
+    grid-area: info;
+  }
+
+  .quantityColumn {
+    grid-area: quantity;
+    justify-content: flex-start;
+  }
+
+  .subtotalColumn {
+    grid-area: subtotal;
+    text-align: left;
+  }
+
+  .removeButton {
+    grid-area: remove;
+    justify-self: end;
+  }
+}
