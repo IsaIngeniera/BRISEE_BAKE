@@ -56,6 +56,7 @@ export class ProductsService {
     return this.prisma.producto.findMany({
       include: {
         categoria: true,
+        imagenes: true,
       },
     });
   }

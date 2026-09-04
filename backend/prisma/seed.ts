@@ -8,6 +8,7 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('Borrando datos existentes para evitar duplicados...');
+  await prisma.imagenProducto.deleteMany();
   await prisma.producto.deleteMany();
   await prisma.categoria.deleteMany();
 
@@ -28,7 +29,7 @@ async function main() {
       { idCategoria: catGranolas.id, nombre: 'Granola Almendras y Nueces 500g', descripcion: descGranolaAlmendras, precio: 58000, presentacion: '500g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
       { idCategoria: catGranolas.id, nombre: 'Granola Almendras y Nueces 300g', descripcion: descGranolaAlmendras, precio: 38500, presentacion: '300g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
       { idCategoria: catGranolas.id, nombre: 'Granola Almendras y Nueces 60g', descripcion: descGranolaAlmendras, precio: 7400, presentacion: '60g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
-      
+
       { idCategoria: catGranolas.id, nombre: 'Granola Nueces y Cacao 500g', descripcion: descGranolaCacao, precio: 60000, presentacion: '500g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
       { idCategoria: catGranolas.id, nombre: 'Granola Nueces y Cacao 300g', descripcion: descGranolaCacao, precio: 41500, presentacion: '300g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
       { idCategoria: catGranolas.id, nombre: 'Granola Nueces y Cacao 60g', descripcion: descGranolaCacao, precio: 8100, presentacion: '60g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
@@ -47,13 +48,13 @@ async function main() {
   });
 
   // Galletas Congeladas (280g)
-  const descGalletasCongeladas = 'Masa congelada (Empaque por 8). Mini galletas de harina de almendra, endulzadas con alulosa y chocolate real sin azúcar.';
+  const descGalletasCongeladas = 'Galleta congelada (Empaque por 8). Mini galletas de harina de almendra, endulzadas con alulosa y chocolate real sin azúcar.';
   await prisma.producto.createMany({
     data: [
-      { idCategoria: catGalletasCongeladas.id, nombre: 'Masa choco blanco y pistachos', descripcion: descGalletasCongeladas, precio: 55000, presentacion: '280g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
-      { idCategoria: catGalletasCongeladas.id, nombre: 'Masa zanahoria choco blanco y nueces', descripcion: descGalletasCongeladas, precio: 37000, presentacion: '280g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
-      { idCategoria: catGalletasCongeladas.id, nombre: 'Masa choco chips', descripcion: descGalletasCongeladas, precio: 44000, presentacion: '280g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
-      { idCategoria: catGalletasCongeladas.id, nombre: 'Masa doble chocolate', descripcion: descGalletasCongeladas, precio: 52000, presentacion: '280g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
+      { idCategoria: catGalletasCongeladas.id, nombre: 'Galleta congelada choco blanco y pistachos', descripcion: descGalletasCongeladas, precio: 55000, presentacion: '280g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
+      { idCategoria: catGalletasCongeladas.id, nombre: 'Galleta congelada zanahoria choco blanco y nueces', descripcion: descGalletasCongeladas, precio: 37000, presentacion: '280g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
+      { idCategoria: catGalletasCongeladas.id, nombre: 'Galleta congelada choco chips', descripcion: descGalletasCongeladas, precio: 44000, presentacion: '280g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
+      { idCategoria: catGalletasCongeladas.id, nombre: 'Galleta congelada doble chocolate', descripcion: descGalletasCongeladas, precio: 52000, presentacion: '280g', existencias: 50, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
     ]
   });
 
@@ -69,7 +70,23 @@ async function main() {
     ]
   });
 
-  console.log('Seeder ejecutado con exito!');
+  console.log('Agregando imágenes de prueba a los productos...');
+  const todosLosProductos = await prisma.producto.findMany();
+
+  const imagenesData = todosLosProductos.map((p) => {
+    const nombreLimpio = p.nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '-');
+    return {
+      idProducto: p.id,
+      urlImagen: `/images/productos/${nombreLimpio}.jpg`,
+      nombre: 'Principal'
+    };
+  });
+
+  await prisma.imagenProducto.createMany({
+    data: imagenesData
+  });
+
+  console.log('Seeder  ejecutado con exito!');
 }
 
 main()

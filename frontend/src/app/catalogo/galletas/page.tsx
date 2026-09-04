@@ -170,7 +170,11 @@ export default async function CookiesPage() {
                 <Image
                   src={productImageUrl}
                   alt={productImageAlt}
-                  className={styles.productImage}
+                  className={
+                    product.categoria?.nombre === 'Galletas congeladas'
+                      ? styles.productImageContain
+                      : styles.productImage
+                  }
                   fill
                   sizes="(max-width: 680px) 100vw, (max-width: 1100px) 50vw, 33vw"
                   unoptimized
