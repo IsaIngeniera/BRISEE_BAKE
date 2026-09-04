@@ -51,9 +51,15 @@ jobs:
 
       - name: Lint
         run: npm run lint --workspace=backend
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
 
       - name: Build
         run: npm run build --workspace=backend
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
 
       - name: Tests
         run: npm test --workspace=backend
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"

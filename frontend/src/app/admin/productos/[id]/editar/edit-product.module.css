@@ -1,0 +1,60 @@
+.page {
+  min-height: 100vh;
+  padding: 40px 20px;
+  background-color: #fcebf2;
+}
+
+.formCard {
+  width: min(100%, 850px);
+  margin: 0 auto;
+  padding: 32px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 6px 22px rgb(81 63 69 / 8%);
+}
+
+.heading {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: #d66098;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.heading h1 {
+  margin: 0;
+  color: #513f45;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 500;
+}
+
+.description {
+  max-width: 600px;
+  margin: 12px auto 0;
+  color: #806971;
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.6;
+}
+
+@media (max-width: 680px) {
+  .page {
+    padding: 20px 12px;
+  }
+
+  .formCard {
+    padding: 24px 16px;
+    border-radius: 12px;
+  }
+
+  .heading {
+    margin-bottom: 24px;
+  }
+}

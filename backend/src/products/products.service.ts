@@ -1,5 +1,10 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaService } from '../prisma.service';
 
 @Injectable()
@@ -61,8 +66,20 @@ export class ProductsService {
     });
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} product`;
+  async findOne(id: string) {
+    const product = await this.prisma.producto.findUnique({
+      where: { id },
+      include: {
+        categoria: true,
+        imagenes: true,
+      },
+    });
+
+    if (!product) {
+      throw new NotFoundException(`Producto con ID ${id} no encontrado`);
+    }
+
+    return product;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

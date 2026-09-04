@@ -9,6 +9,7 @@ import {
   IsOptional,
   IsArray,
 } from 'class-validator';
+import { Type, Transform } from 'class-transformer';
 import { EstadoProducto, EtiquetaDietetica } from '@prisma/client';
 
 const missingDataMsg = 'Faltan datos por completar';
@@ -39,6 +40,7 @@ export class CreateProductDto {
     message:
       'Formato de moneda aceptado por el sistema (ej. COP, sin decimales negativos, máximo 2 decimales)',
   })
+  @Type(() => Number)
   precio: number;
 
   @IsString({ message: missingDataMsg })
@@ -49,6 +51,7 @@ export class CreateProductDto {
   @IsInt({ message: missingDataMsg })
   @IsNotEmpty({ message: missingDataMsg })
   @Min(0)
+  @Type(() => Number)
   existencias: number;
 
   @IsEnum(EstadoProducto, { message: missingDataMsg })
@@ -58,5 +61,10 @@ export class CreateProductDto {
   @IsArray({ message: missingDataMsg })
   @IsEnum(EtiquetaDietetica, { each: true, message: missingDataMsg })
   @IsOptional()
+  @Transform(({ value }: { value: any }) => {
+    if (!value) return [] as string[];
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return Array.isArray(value) ? value : [value];
+  })
   etiquetas?: EtiquetaDietetica[];
 }
