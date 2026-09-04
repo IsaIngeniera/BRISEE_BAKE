@@ -15,18 +15,22 @@ export default function CreateProductPage(): ReactElement {
         style={{
           maxWidth: '800px',
           margin: '0 auto',
-          padding: '30px',
-          backgroundColor: '#ffffff',
-          borderRadius: '12px',
-          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.05)',
+          padding: '40px 30px',
+          backgroundColor: '#fcebf2',
+          borderRadius: '24px',
+          border: '1px solid rgb(214 96 152 / 8%)',
+          boxShadow: '0 12px 30px rgb(123 75 93 / 10%)',
         }}
       >
         <h1
           style={{
-            marginBottom: '20px',
-            color: '#000000',
-            fontFamily: 'Georgia, serif',
+            margin: '0 0 30px',
+            color: '#d66098',
+            fontFamily: 'Georgia, "Times New Roman", serif',
+            fontSize: 'clamp(2.1rem, 4vw, 2.8rem)',
+            fontWeight: 400,
             textAlign: 'center',
+            lineHeight: 1.1,
           }}
         >
           Crear nuevo producto

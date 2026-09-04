@@ -78,6 +78,7 @@
   z-index: 2;
   object-fit: contain;
   object-position: center;
+  mix-blend-mode: multiply;
 }
 
 .imagePlaceholder {

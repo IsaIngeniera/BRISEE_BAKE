@@ -7,10 +7,11 @@
 .formCard {
   width: min(100%, 850px);
   margin: 0 auto;
-  padding: 32px;
-  background-color: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 6px 22px rgb(81 63 69 / 8%);
+  padding: 40px 32px;
+  background-color: #fcebf2;
+  border-radius: 24px;
+  border: 1px solid rgb(214 96 152 / 8%);
+  box-shadow: 0 12px 30px rgb(123 75 93 / 10%);
 }
 
 .heading {
@@ -20,9 +21,9 @@
 
 .eyebrow {
   margin: 0 0 8px;
-  color: #d66098;
+  color: #ed637b;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 700;
   letter-spacing: 1.8px;
   text-transform: uppercase;
@@ -30,10 +31,11 @@
 
 .heading h1 {
   margin: 0;
-  color: #513f45;
+  color: #d66098;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(2rem, 5vw, 3rem);
-  font-weight: 500;
+  font-size: clamp(2.1rem, 4vw, 3rem);
+  font-weight: 400;
+  line-height: 1.1;
 }
 
 .description {
