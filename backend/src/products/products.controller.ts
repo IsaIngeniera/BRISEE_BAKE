@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  Query,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProductsService } from './products.service';
@@ -19,7 +20,7 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Rol } from '@prisma/client';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiQuery } from '@nestjs/swagger';
 
 @ApiTags('products')
 @Controller('products')
@@ -35,8 +36,10 @@ export class ProductsController {
   }
 
   @Get()
-  findAll() {
-    return this.productsService.findAll();
+  @ApiQuery({ name: 'q', required: false, type: String, description: 'Término de búsqueda por nombre' })
+  @ApiQuery({ name: 'tags', required: false, type: String, description: 'Etiquetas dietéticas separadas por coma' })
+  findAll(@Query('q') search?: string, @Query('tags') tags?: string) {
+    return this.productsService.findAll(search, tags);
   }
 
   @Get(':id')

@@ -57,13 +57,33 @@ export class ProductsService {
     }
   }
 
-  findAll() {
-    return this.prisma.producto.findMany({
+  async findAll(search?: string, tags?: string) {
+    const products = await this.prisma.producto.findMany({
       include: {
         categoria: true,
         imagenes: true,
       },
     });
+
+    let filtered = products;
+
+    if (search) {
+      const normalizedSearch = this.normalizeString(search);
+      filtered = filtered.filter((product) =>
+        this.normalizeString(product.nombre).includes(normalizedSearch),
+      );
+    }
+
+    if (tags) {
+      const activeTags = tags.split(',').map((t) => t.trim()).filter(Boolean);
+      if (activeTags.length > 0) {
+        filtered = filtered.filter((product) =>
+          activeTags.every((tag) => (product.etiquetas as unknown as string[]).includes(tag)),
+        );
+      }
+    }
+
+    return filtered;
   }
 
   async findOne(id: string) {
