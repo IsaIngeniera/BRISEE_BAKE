@@ -107,7 +107,7 @@ async function main() {
     data: imagenesData
   });
 
-  console.log('Seeder ejecutado con exito!');
+  console.log('Seeder  ejecutado con exito!');
 }
 
 

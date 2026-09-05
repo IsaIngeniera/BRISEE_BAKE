@@ -25,12 +25,23 @@ function formatPrice(price: number | string): string {
 }
 
 export default function CarritoPage() {
-  const { items, loadError, updateQuantity, removeFromCart, removedItems } = useCart();
+  const { items, loadError, updateQuantity, removeFromCart,  isHydrated, removedItems } = useCart();
 
   const total = items.reduce(
     (sum, item) => sum + Number(item.precio) * item.cantidad,
     0,
   );
+
+   // respuesta real del backend.
+  if (!isHydrated) {
+    return (
+      <div className={styles.page}>
+        <section className={styles.stateMessage}>
+          <p>Cargando tu carrito...</p>
+        </section>
+      </div>
+    );
+  }
 
   if (loadError) {
     return (

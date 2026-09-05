@@ -3,11 +3,11 @@
   grid-template-columns: 90px 1fr auto auto auto;
   align-items: center;
   gap: 20px;
-  background-color: #ffffff;
+  background-color: var(--pink-100);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 16px;
 }
-
 .imageContainer {
   position: relative;
   width: 90px;
@@ -20,27 +20,30 @@
 .imageContainer img {
   object-fit: cover;
 }
-
 .info h3 {
   margin: 0 0 4px;
-  font-size: 1rem;
+  font-family: var(--font-display), serif;
+  font-size: 1.1rem;
 }
 
 .unitPrice {
   margin: 0;
-  font-size: 0.85rem;
+  font-family: var(--font-display), serif;
+  font-size: 0.9rem;
   opacity: 0.75;
 }
 
 .quantityColumn {
   display: flex;
   justify-content: center;
+  font-family: var(--font-display), serif;
 }
 
 .subtotalColumn {
   min-width: 90px;
   text-align: right;
   font-weight: 600;
+  font-family: var(--font-display), serif;
 }
 
 .subtotalColumn p {

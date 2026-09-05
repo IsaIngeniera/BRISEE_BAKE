@@ -101,6 +101,12 @@ export default function ProductForm(): ReactElement {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFormData((previousFormData) => ({
+      ...previousFormData,
+      idCategoria: selectedCategory.id.toString(),
+    }));
+  }, [categorySlug]);
 
   function handleInputChange(
     event: ChangeEvent<
