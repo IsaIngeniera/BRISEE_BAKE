@@ -101,12 +101,6 @@ export default function ProductForm(): ReactElement {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setFormData((previousFormData) => ({
-      ...previousFormData,
-      idCategoria: selectedCategory.id.toString(),
-    }));
-  }, [categorySlug]);
 
   function handleInputChange(
     event: ChangeEvent<
@@ -191,7 +185,7 @@ export default function ProductForm(): ReactElement {
 
         throw new Error(
           errorResponse.message ??
-            'Error al crear el producto',
+          'Error al crear el producto',
         );
       }
 

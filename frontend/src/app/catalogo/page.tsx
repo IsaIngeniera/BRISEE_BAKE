@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -60,12 +60,6 @@ function formatPrice(price: number | string): string {
   });
 }
 
-function formatDietaryLabel(tag: string): string {
-  return tag
-    .toLowerCase()
-    .replaceAll('_', ' ')
-    .replace(/^\w/, (letter) => letter.toUpperCase());
-}
 
 export default function CatalogoPage() {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
@@ -89,9 +83,6 @@ export default function CatalogoPage() {
   const {
     searchTerm,
     setSearchTerm,
-    activeTags,
-    toggleTag,
-    clearTags,
     filteredItems,
     isSearching,
     hasActiveFilters,

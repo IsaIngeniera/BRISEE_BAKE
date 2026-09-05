@@ -110,6 +110,7 @@ async function main() {
   console.log('Seeder  ejecutado con exito!');
 }
 
+
 main()
   .catch((e) => {
     console.error(e);

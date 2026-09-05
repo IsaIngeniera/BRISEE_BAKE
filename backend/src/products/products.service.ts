@@ -3,8 +3,8 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import type { CreateProductDto } from './dto/create-product.dto';
+
 import { PrismaService } from '../prisma.service';
 
 @Injectable()
@@ -108,7 +108,7 @@ export class ProductsService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  update(id: string, _updateProductDto: any) {
+  update(id: string, _updateProductDto: any, _file?: any) {
     return `This action updates a #${id} product`;
   }
 
