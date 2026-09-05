@@ -2,16 +2,45 @@
   max-width: 900px;
   margin: 0 auto;
   padding: 40px 20px 80px;
+  font-family: var(--font-display), serif;
 }
 
-.title {
+.heading {
+  padding: 10px 20px 30px;
   text-align: center;
-  margin-bottom: 24px;
-  font-family: var(--font-display), serif;
-  font-size: 2rem;
-  color: var(--pink-500)
+}
 
-  
+.heading h1 {
+  margin: 0;
+  color: var(--pink-600);
+  font-size: clamp(2.1rem, 4vw, 3.5rem);
+  font-weight: 400;
+  line-height: 1.1;
+  font-family: var(--font-display), serif;
+}
+
+.heading p {
+  max-width: 620px;
+  margin: 14px auto 0;
+  color: #765f67;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.decorativeLine {
+  margin: 13px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  color: var(--pink-400);
+}
+
+.decorativeLine span:first-child,
+.decorativeLine span:last-child {
+  width: 43px;
+  height: 1px;
+  background-color: var(--pink-400);
 }
 
 .warningBanner {

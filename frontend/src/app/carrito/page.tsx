@@ -69,7 +69,19 @@ export default function CarritoPage() {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.title}>Mi carrito</h1>
+      <section className={styles.heading}>
+        <h1>Mi carrito</h1>
+
+        <div className={styles.decorativeLine} aria-hidden="true">
+          <span />
+          <span>❀</span>
+          <span />
+        </div>
+
+        <p>
+          Revisa los productos que has seleccionado y continúa con tu compra.
+        </p>
+      </section>
 
       {removedItems && removedItems.length > 0 && (
         <section className={styles.warningBanner} role="alert">
