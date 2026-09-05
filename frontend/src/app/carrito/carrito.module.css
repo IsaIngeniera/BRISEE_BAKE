@@ -43,6 +43,25 @@
   background-color: var(--pink-400);
 }
 
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  color: var(--pink-600);
+  font-weight: 600;
+}
+
+.backButton svg {
+  width: 18px;
+  height: 18px;
+}
+
+.backButton:hover,
+.backButton:focus-visible {
+  color: var(--rose-text);
+}
+
 .warningBanner {
   background-color: rgba(0, 0, 0, 0.04);
   border-radius: 10px;
@@ -60,6 +79,7 @@
   flex-direction: column;
   gap: 16px;
 }
+
 .summary {
   margin-top: 32px;
   background-color: var(--pink-100);
@@ -74,7 +94,7 @@
   align-items: center;
   color: var(--rose-text);
   font-family: var(--font-display), serif;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   margin-bottom: 20px;
 }
 
@@ -86,7 +106,7 @@
   background: linear-gradient(135deg, var(--pink-500), var(--pink-600));
   color: #ffffff;
   font-family: var(--font-display), serif;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
   transition:
@@ -99,6 +119,7 @@
   filter: brightness(0.93);
   transform: scale(1.02);
 }
+
 .stateMessage {
   display: flex;
   flex-direction: column;
@@ -113,11 +134,22 @@
   height: 48px;
   opacity: 0.4;
 }
+
+.emptyTotal {
+  margin: -6px 0 4px;
+  color: var(--rose-text);
+  font-family: var(--font-display), serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
 .goToCatalogButton {
-  display: inline-block;
-  padding: 12px 24px;
-  border-radius: 999px;
-  background-color: #e580bb;
+  display: inline-flex;
+  justify-content: center;
+  min-width: 160px;
+  padding: 11px 24px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--pink-500), var(--pink-600));
   color: #ffffff;
   text-decoration: none;
   font-weight: 600;
