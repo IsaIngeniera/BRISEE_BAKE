@@ -1,14 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { ShoppingCart } from 'lucide-react';
+import { ArrowLeft, ShoppingCart } from 'lucide-react';
 
 import CartItemRow from '@/components/cart/CartItemRow';
 import { useCart } from '@/hooks/useCart';
 import type { CartItem } from '@/context/CartContext';
 
 import styles from './carrito.module.css';
-
 
 function formatPrice(price: number | string): string {
   const numericPrice = Number(price);
@@ -25,14 +24,22 @@ function formatPrice(price: number | string): string {
 }
 
 export default function CarritoPage() {
-  const { items, loadError, updateQuantity, removeFromCart,  isHydrated, removedItems } = useCart();
+  const {
+    items,
+    loadError,
+    removedItems,
+    isHydrated,
+    updateQuantity,
+    removeFromCart,
+  } = useCart();
 
   const total = items.reduce(
     (sum, item) => sum + Number(item.precio) * item.cantidad,
     0,
   );
 
-   // respuesta real del backend.
+  // Evita mostrar "carrito vacío" un instante antes de que llegue la
+  // respuesta real del backend.
   if (!isHydrated) {
     return (
       <div className={styles.page}>
@@ -59,6 +66,7 @@ export default function CarritoPage() {
         <section className={styles.stateMessage}>
           <ShoppingCart aria-hidden="true" className={styles.emptyIcon} />
           <p>Tu carrito está vacío</p>
+          <p className={styles.emptyTotal}>Total: {formatPrice(total)}</p>
           <Link href="/catalogo" className={styles.goToCatalogButton}>
             Ir al catálogo
           </Link>
@@ -69,6 +77,11 @@ export default function CarritoPage() {
 
   return (
     <div className={styles.page}>
+      <Link href="/catalogo" className={styles.backButton}>
+        <ArrowLeft aria-hidden="true" />
+        Volver al catálogo
+      </Link>
+
       <section className={styles.heading}>
         <h1>Mi carrito</h1>
 
@@ -94,9 +107,9 @@ export default function CarritoPage() {
       )}
 
       <div className={styles.itemsList}>
-        {items.map((item: CartItem, index: number) => (
+        {items.map((item: CartItem) => (
           <CartItemRow
-            key={`${item.productId}-${index}`}
+            key={item.productId}
             item={item}
             onQuantityChange={updateQuantity}
             onRemove={removeFromCart}
