@@ -108,7 +108,7 @@ export class ProductsService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  update(id: string, _updateProductDto: any) {
+  update(id: string, _updateProductDto: any, _file?: any) {
     return `This action updates a #${id} product`;
   }
 
