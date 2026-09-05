@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import styles from './quantity-selector.module.css';
 
 interface QuantitySelectorProps {
