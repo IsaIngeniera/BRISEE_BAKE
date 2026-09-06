@@ -31,6 +31,7 @@ interface CartContextValue {
   clearCart: () => void;
   removedItems?: string[];
   isHydrated?: boolean;
+  refreshCart: () => Promise<void>;
 }
 
 export const CartContext = createContext<CartContextValue | null>(null);
@@ -134,6 +135,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         loadError,
         removedItems,
         isHydrated,
+        refreshCart: fetchCart,
       }}
     >
       {children}

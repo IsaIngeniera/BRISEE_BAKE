@@ -48,21 +48,15 @@ interface Product {
 
 function formatPrice(price: number | string): string {
   const numericPrice = Number(price);
-
-  if (Number.isNaN(numericPrice)) {
-    return '$ 0';
-  }
-
-  return numericPrice.toLocaleString('es-CO', {
-    style: 'currency',
-    currency: 'COP',
-    maximumFractionDigits: 0,
-  });
+  if (Number.isNaN(numericPrice)) return 'COP $ 0';
+  const formatted = numericPrice.toLocaleString('es-CO', { maximumFractionDigits: 0 });
+  return `COP $ ${formatted}`;
 }
 
 
 export default function CatalogoPage() {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const apiUrl =
@@ -72,9 +66,11 @@ export default function CatalogoPage() {
       .then((response) => (response.ok ? response.json() : []))
       .then((products: Product[]) => {
         setAllProducts(products.filter((p) => p.estado !== 'INACTIVO'));
+        setIsLoading(false);
       })
       .catch((error) => {
         console.error('Error fetching products for search:', error);
+        setIsLoading(false);
       });
   }, []);
 
@@ -86,6 +82,9 @@ export default function CatalogoPage() {
     filteredItems,
     isSearching,
     hasActiveFilters,
+    activeTags,
+    toggleTag,
+    clearTags,
   } = useProductFilters(allProducts, {
     getSearchableText: (product) => product.nombre,
     getTags: (product) => product.etiquetas,
@@ -98,7 +97,13 @@ export default function CatalogoPage() {
       <HomeCarousel slides={catalogSlides} />
 
       <div className={styles.catalogPage}>
-        <section className={styles.heading}>
+        {!isLoading && allProducts.length === 0 ? (
+          <section className={styles.noResults} role="status">
+            <p>Aún no hay productos creados</p>
+          </section>
+        ) : (
+          <>
+            <section className={styles.heading}>
           <h1>Elige tu favorito</h1>
 
           <div className={styles.decorativeLine} aria-hidden="true">
@@ -117,6 +122,10 @@ export default function CatalogoPage() {
           value={searchTerm}
           onChange={setSearchTerm}
           placeholder="Buscar producto en todo el catálogo..."
+          activeTags={activeTags}
+          toggleTag={toggleTag}
+          clearTags={clearTags}
+          hasActiveFilters={hasActiveFilters}
         />
 
         {isFiltering ? (
@@ -216,6 +225,8 @@ export default function CatalogoPage() {
               </article>
             ))}
           </section>
+        )}
+              </>
         )}
       </div>
     </div>

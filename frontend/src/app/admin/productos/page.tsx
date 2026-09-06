@@ -61,21 +61,19 @@ function formatPrice(price: number | string): string {
   const numericPrice = Number(price);
 
   if (Number.isNaN(numericPrice)) {
-    return PRICE_FORMATTER.format(0);
+    return 'COP $ 0';
   }
 
-  return PRICE_FORMATTER.format(numericPrice);
+  const formatted = numericPrice.toLocaleString('es-CO', {
+    maximumFractionDigits: 0,
+  });
+  
+  return `COP $ ${formatted}`;
 }
 
-function shortenDescription(
-  description: string,
-): string {
+function shortenDescription(description: string): string {
   const maximumLength = 80;
-
-  if (description.length <= maximumLength) {
-    return description;
-  }
-
+  if (description.length <= maximumLength) return description;
   return `${description.substring(0, maximumLength)}...`;
 }
 
