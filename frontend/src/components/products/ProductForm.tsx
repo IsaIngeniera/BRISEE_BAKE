@@ -35,6 +35,7 @@ interface ProductFormData {
   idCategoria: string;
   estado: ProductStatus;
   etiquetas: DietaryLabel[];
+  imagenUrl: string;
 }
 
 interface ApiErrorResponse {
@@ -81,6 +82,7 @@ const INITIAL_FORM_DATA: ProductFormData = {
   idCategoria: '',
   estado: 'ACTIVO',
   etiquetas: [],
+  imagenUrl: '',
 };
 
 export default function ProductForm(): ReactElement {
@@ -260,6 +262,21 @@ export default function ProductForm(): ReactElement {
           value={formData.descripcion}
           onChange={handleInputChange}
           required
+        />
+      </div>
+
+      <div className={styles.formGroup}>
+        <label htmlFor="imagenUrl">
+          URL de la Imagen (Opcional)
+        </label>
+        <input
+          type="text"
+          id="imagenUrl"
+          name="imagenUrl"
+          className={styles.input}
+          value={formData.imagenUrl}
+          onChange={handleInputChange}
+          placeholder="Ej: /images/productos/mi-producto.jpg o https://..."
         />
       </div>
 
