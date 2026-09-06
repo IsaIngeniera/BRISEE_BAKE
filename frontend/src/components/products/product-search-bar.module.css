@@ -30,3 +30,59 @@
   outline: 2px solid currentColor;
   outline-offset: 2px;
 }
+
+.filtersPopover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.filtersHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #d66098;
+}
+
+.clearButton {
+  background: none;
+  border: none;
+  font-size: 0.8rem;
+  color: #555;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.filtersList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filterTag {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  border: 1px solid #d66098;
+  background-color: transparent;
+  color: #d66098;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filterTagActive {
+  background-color: #d66098;
+  color: white;
+}

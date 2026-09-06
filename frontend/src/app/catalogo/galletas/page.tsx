@@ -83,14 +83,14 @@ function formatPrice(price: number | string): string {
   const numericPrice = Number(price);
 
   if (Number.isNaN(numericPrice)) {
-    return '$ 0';
+    return 'COP $ 0';
   }
 
-  return numericPrice.toLocaleString('es-CO', {
-    style: 'currency',
-    currency: 'COP',
+  const formatted = numericPrice.toLocaleString('es-CO', {
     maximumFractionDigits: 0,
   });
+  
+  return `COP $ ${formatted}`;
 }
 
 export default async function CookiesPage() {

@@ -58,6 +58,10 @@ export class CreateProductDto {
   @IsNotEmpty({ message: missingDataMsg })
   estado: EstadoProducto;
 
+  @IsString({ message: missingDataMsg })
+  @IsOptional()
+  imagenUrl?: string;
+
   @IsArray({ message: missingDataMsg })
   @IsEnum(EtiquetaDietetica, { each: true, message: missingDataMsg })
   @IsOptional()
