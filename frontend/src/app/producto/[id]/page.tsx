@@ -39,10 +39,16 @@ const PRICE_FORMATTER = new Intl.NumberFormat('es-CO', {
 
 function formatPrice(price: number | string): string {
   const numericPrice = Number(price);
+
   if (Number.isNaN(numericPrice)) {
-    return PRICE_FORMATTER.format(0);
+    return 'COP $ 0';
   }
-  return PRICE_FORMATTER.format(numericPrice);
+
+  const formatted = numericPrice.toLocaleString('es-CO', {
+    maximumFractionDigits: 0,
+  });
+  
+  return `COP $ ${formatted}`;
 }
 
 async function getProduct(id: string): Promise<Product | null> {

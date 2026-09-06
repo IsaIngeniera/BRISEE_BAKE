@@ -56,6 +56,7 @@ interface ProductFormData {
   idCategoria: string;
   estado: ProductStatus;
   etiquetas: DietaryLabel[];
+  imagenUrl: string;
 }
 
 interface EditProductFormProps {
@@ -79,6 +80,7 @@ const EMPTY_FORM_DATA: ProductFormData = {
   idCategoria: '',
   estado: 'ACTIVO',
   etiquetas: [],
+  imagenUrl: '',
 };
 
 function createFormData(
@@ -93,6 +95,7 @@ function createFormData(
     idCategoria: product.idCategoria,
     estado: product.estado,
     etiquetas: [...product.etiquetas],
+    imagenUrl: product.imagenes?.[0]?.urlImagen || '',
   };
 }
 
@@ -117,18 +120,6 @@ export default function EditProductForm({
   const [categories, setCategories] =
     useState<ProductCategory[]>([]);
 
-  const [currentImageUrl, setCurrentImageUrl] =
-    useState<string>('');
-
-  const [previewImageUrl, setPreviewImageUrl] =
-    useState<string>('');
-
-  const [selectedImageName, setSelectedImageName] =
-    useState<string>('');
-
-  const [selectedImageFile, setSelectedImageFile] =
-    useState<File | null>(null);
-
   const [isLoading, setIsLoading] =
     useState<boolean>(true);
 
@@ -148,9 +139,6 @@ export default function EditProductForm({
     process.env.NEXT_PUBLIC_API_URL ??
     'http://localhost:3001';
 
-  const displayedImageUrl =
-    previewImageUrl || currentImageUrl;
-
   const hasChanges = useMemo((): boolean => {
     if (!savedFormData) {
       return false;
@@ -158,10 +146,9 @@ export default function EditProductForm({
 
     return (
       serializeFormData(formData) !==
-        serializeFormData(savedFormData) ||
-      Boolean(selectedImageName)
+      serializeFormData(savedFormData)
     );
-  }, [formData, savedFormData, selectedImageName]);
+  }, [formData, savedFormData]);
 
   useEffect(() => {
     async function loadProduct(): Promise<void> {
@@ -236,9 +223,7 @@ export default function EditProductForm({
           ),
         );
 
-        setCurrentImageUrl(
-          product.imagenes?.[0]?.urlImagen ?? '',
-        );
+        
       } catch (caughtError: unknown) {
         const message =
           caughtError instanceof Error
@@ -254,13 +239,7 @@ export default function EditProductForm({
     void loadProduct();
   }, [apiUrl, productId]);
 
-  useEffect(() => {
-    return (): void => {
-      if (previewImageUrl) {
-        URL.revokeObjectURL(previewImageUrl);
-      }
-    };
-  }, [previewImageUrl]);
+  
 
   function clearMessages(): void {
     setErrorMessage('');
@@ -311,50 +290,11 @@ export default function EditProductForm({
     clearMessages();
   }
 
-  function handleImageChange(
-    event: ChangeEvent<HTMLInputElement>,
-  ): void {
-    const selectedFile = event.target.files?.[0];
-
-    clearMessages();
-
-    if (!selectedFile) {
-      return;
-    }
-
-    if (previewImageUrl) {
-      URL.revokeObjectURL(previewImageUrl);
-    }
-
-    setPreviewImageUrl(
-      URL.createObjectURL(selectedFile),
-    );
-
-    setSelectedImageName(selectedFile.name);
-    setSelectedImageFile(selectedFile);
-  }
-
-  function handleRestoreImage(): void {
-    if (previewImageUrl) {
-      URL.revokeObjectURL(previewImageUrl);
-    }
-
-    setPreviewImageUrl('');
-    setSelectedImageName('');
-    setSelectedImageFile(null);
-    clearMessages();
-  }
-
   function handleRestoreData(): void {
-    if (!savedFormData) {
-      return;
+    if (savedFormData) {
+      setFormData(savedFormData);
     }
-
-    setFormData(savedFormData);
-    handleRestoreImage();
-    setInformationMessage(
-      'Se restauró la información original del producto.',
-    );
+    setInformationMessage('Datos restaurados a la última versión guardada');
   }
 
   async function handleSubmit(
@@ -375,25 +315,19 @@ export default function EditProductForm({
     setIsSaving(true);
 
     try {
-      const formDataPayload = new FormData();
-      
-      formDataPayload.append('nombre', formData.nombre);
-      formDataPayload.append('descripcion', formData.descripcion);
-      formDataPayload.append('precio', formData.precio);
-      formDataPayload.append('presentacion', formData.presentacion);
-      formDataPayload.append('existencias', formData.existencias);
-      formDataPayload.append('idCategoria', formData.idCategoria);
-      formDataPayload.append('estado', formData.estado);
-      
-      formData.etiquetas.forEach(et => formDataPayload.append('etiquetas', et));
-
-      if (selectedImageFile) {
-        formDataPayload.append('imagen', selectedImageFile);
-      }
+      const payload = {
+        ...formData,
+        precio: Number.parseFloat(formData.precio),
+        existencias: Number.parseInt(formData.existencias, 10),
+        idCategoria: Number.parseInt(formData.idCategoria, 10),
+      };
 
       const response = await fetch(`${apiUrl}/products/${productId}`, {
         method: 'PATCH',
-        body: formDataPayload,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -410,12 +344,6 @@ export default function EditProductForm({
         etiquetas: [...formData.etiquetas],
       });
 
-      if (previewImageUrl) {
-        setCurrentImageUrl(previewImageUrl);
-      }
-
-      setSelectedImageName('');
-      setSelectedImageFile(null);
       setSuccessMessage('Producto actualizado exitosamente');
     } catch (caughtError: unknown) {
       const message = caughtError instanceof Error ? caughtError.message : 'Error al actualizar el producto';
@@ -626,41 +554,30 @@ export default function EditProductForm({
       </fieldset>
 
       <div className={styles.formGroup}>
-        <label htmlFor="imagen">
-          Reemplazar imagen
+        <label htmlFor="imagenUrl">
+          URL de la Imagen (Opcional)
         </label>
-
-        {displayedImageUrl && (
+        
+        {formData.imagenUrl && (
           <div className={styles.imagePreview}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={displayedImageUrl}
+              src={formData.imagenUrl}
               alt="Vista previa del producto"
+              style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'cover' }}
             />
           </div>
         )}
 
         <input
-          type="file"
-          id="imagen"
-          name="imagen"
-          className={styles.fileInput}
-          accept="image/*"
-          onChange={handleImageChange}
+          type="text"
+          id="imagenUrl"
+          name="imagenUrl"
+          className={styles.input}
+          value={formData.imagenUrl}
+          onChange={handleInputChange}
+          placeholder="Ej: /images/productos/mi-producto.jpg o https://..."
         />
-
-        {selectedImageName && (
-          <div className={styles.selectedImage}>
-            <span>{selectedImageName}</span>
-
-            <button
-              type="button"
-              onClick={handleRestoreImage}
-            >
-              Conservar imagen anterior
-            </button>
-          </div>
-        )}
       </div>
 
       <div className={styles.actionButtons}>
