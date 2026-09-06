@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { ArrowLeft, ShoppingCart } from 'lucide-react';
+import { useEffect } from 'react';
 
 import CartItemRow from '@/components/cart/CartItemRow';
 import { useCart } from '@/hooks/useCart';
@@ -11,16 +12,9 @@ import styles from './carrito.module.css';
 
 function formatPrice(price: number | string): string {
   const numericPrice = Number(price);
-
-  if (Number.isNaN(numericPrice)) {
-    return '$ 0';
-  }
-
-  return numericPrice.toLocaleString('es-CO', {
-    style: 'currency',
-    currency: 'COP',
-    maximumFractionDigits: 0,
-  });
+  if (Number.isNaN(numericPrice)) return 'COP $ 0';
+  const formatted = numericPrice.toLocaleString('es-CO', { maximumFractionDigits: 0 });
+  return `COP $ ${formatted}`;
 }
 
 export default function CarritoPage() {
@@ -31,7 +25,12 @@ export default function CarritoPage() {
     isHydrated,
     updateQuantity,
     removeFromCart,
+    refreshCart,
   } = useCart();
+
+  useEffect(() => {
+    refreshCart();
+  }, [refreshCart]);
 
   const total = items.reduce(
     (sum, item) => sum + Number(item.precio) * item.cantidad,

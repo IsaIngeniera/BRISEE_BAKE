@@ -4,6 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import type { CreateProductDto } from './dto/create-product.dto';
+import type { UpdateProductDto } from './dto/update-product.dto';
+import { Prisma } from '@prisma/client';
 
 import { PrismaService } from '../prisma.service';
 
@@ -45,6 +47,16 @@ export class ProductsService {
           existencias: createProductDto.existencias,
           estado: createProductDto.estado,
           etiquetas: createProductDto.etiquetas || [],
+          imagenes: createProductDto.imagenUrl
+            ? {
+                create: [
+                  {
+                    urlImagen: createProductDto.imagenUrl,
+                    nombre: 'Principal',
+                  },
+                ],
+              }
+            : undefined,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -107,9 +119,60 @@ export class ProductsService {
     return product;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  update(id: string, _updateProductDto: any, _file?: any) {
-    return `This action updates a #${id} product`;
+  async update(id: string, updateProductDto: UpdateProductDto) {
+    const existingProduct = await this.prisma.producto.findUnique({
+      where: { id },
+    });
+
+    if (!existingProduct) {
+      throw new NotFoundException(`Producto con ID ${id} no encontrado`);
+    }
+
+    try {
+      const dataToUpdate: Prisma.ProductoUncheckedUpdateInput = {
+        nombre: updateProductDto.nombre,
+        descripcion: updateProductDto.descripcion,
+        precio: updateProductDto.precio,
+        presentacion: updateProductDto.presentacion,
+        existencias: updateProductDto.existencias,
+        estado: updateProductDto.estado,
+      };
+
+      if (updateProductDto.etiquetas) {
+        dataToUpdate.etiquetas = {
+          set: updateProductDto.etiquetas,
+        };
+      }
+
+      if (updateProductDto.idCategoria) {
+        dataToUpdate.idCategoria = updateProductDto.idCategoria;
+      }
+
+      if (updateProductDto.imagenUrl) {
+        // En una implementación real se podría actualizar o crear, por simplicidad:
+        dataToUpdate.imagenes = {
+          deleteMany: {},
+          create: [
+            {
+              urlImagen: updateProductDto.imagenUrl,
+              nombre: 'Principal',
+            },
+          ],
+        };
+      }
+
+      const updatedProduct = await this.prisma.producto.update({
+        where: { id },
+        data: dataToUpdate,
+      });
+
+      return {
+        message: 'Producto actualizado exitosamente',
+        product: updatedProduct,
+      };
+    } catch {
+      throw new BadRequestException('Error al actualizar el producto');
+    }
   }
 
   async remove(id: string) {
