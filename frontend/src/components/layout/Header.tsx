@@ -64,13 +64,14 @@ const ANALYTICS_LINKS: readonly NavigationItem[] = [
 ];
 
 function getViewModeSnapshot(): ViewMode {
-  const savedViewMode = localStorage.getItem(
-    VIEW_MODE_STORAGE_KEY,
-  );
+  // const savedViewMode = localStorage.getItem(
+  //   VIEW_MODE_STORAGE_KEY,
+  // );
 
-  return savedViewMode === 'ADMIN'
-    ? 'ADMIN'
-    : 'CLIENT';
+  // return savedViewMode === 'ADMIN'
+  //   ? 'ADMIN'
+  //   : 'CLIENT';
+  return 'CLIENT'; // Oculto y forzado a cliente
 }
 
 function getServerViewModeSnapshot(): ViewMode {
@@ -439,6 +440,7 @@ export default function Header(): ReactElement {
             : 'Cambiar a vista de administrador'
         }
         style={{
+          display: 'none', // Ocultamos el botón como solicitaste
           position: 'fixed',
           right: '20px',
           bottom: '20px',
