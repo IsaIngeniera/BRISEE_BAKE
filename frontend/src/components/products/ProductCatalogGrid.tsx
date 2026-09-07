@@ -42,6 +42,9 @@ export default function ProductCatalogGrid<T extends FilterableProduct>({
     filteredItems,
     isSearching,
     hasActiveFilters,
+    activeTags,
+    toggleTag,
+    clearTags,
   } = useProductFilters(items, {
     getSearchableText: (item) => item.product.nombre,
     getTags: (item) => item.product.etiquetas,
@@ -59,6 +62,10 @@ export default function ProductCatalogGrid<T extends FilterableProduct>({
             value={searchTerm}
             onChange={setSearchTerm}
             placeholder={searchPlaceholder}
+            activeTags={activeTags}
+            toggleTag={toggleTag}
+            clearTags={clearTags}
+            hasActiveFilters={hasActiveFilters}
           />
         </>
       )}
