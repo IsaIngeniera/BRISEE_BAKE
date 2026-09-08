@@ -4,6 +4,7 @@ import {
   createContext,
   useEffect,
   useState,
+  useCallback,
   type ReactNode,
 } from 'react';
 
@@ -44,21 +45,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-  const fetchCart = async () => {
+  const fetchCart = useCallback(async () => {
     try {
-      const res = await fetch(`${API_URL}/carrito`);
-      if (!res.ok) throw new Error('Failed to fetch cart');
-      const data = await res.json();
-      setItems(data.items);
-      setRemovedItems(data.removed);
+      if (typeof window !== 'undefined') {
+        const storedCart = localStorage.getItem('brisee_cart');
+        if (storedCart) {
+          setItems(JSON.parse(storedCart));
+        } else {
+          setItems([]);
+        }
+      }
+      setRemovedItems([]); // Ya no tenemos backend para items removidos
       setLoadError(false);
     } catch (error) {
-      console.error('Error fetching cart:', error);
+      console.error('Error fetching cart from localStorage:', error);
       setLoadError(true);
     } finally {
       setIsHydrated(true);
     }
-  };
+  }, []);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -70,56 +75,49 @@ export function CartProvider({ children }: { children: ReactNode }) {
     product: Omit<CartItem, 'cantidad'>,
     cantidad: number,
   ) => {
-    try {
-      const res = await fetch(`${API_URL}/carrito/items`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          idProducto: product.productId,
-          cantidad,
-        }),
-      });
-      if (res.ok) {
-        await fetchCart(); // Refresh cart to get updated quantities
+    setItems((prev) => {
+      const currentCart = [...prev];
+      const existingIndex = currentCart.findIndex((item) => item.productId === product.productId);
+      if (existingIndex > -1) {
+        currentCart[existingIndex].cantidad += cantidad;
+      } else {
+        currentCart.push({ ...product, cantidad });
       }
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-    }
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('brisee_cart', JSON.stringify(currentCart));
+      }
+      return currentCart;
+    });
   };
 
   const removeFromCart = async (productId: CartItem['productId']) => {
-    try {
-      const res = await fetch(`${API_URL}/carrito/items/${String(productId)}`, {
-      method: 'DELETE',
-      });
-      if (res.ok) {
-        setItems((prev) => prev.filter((item) => item.productId !== productId));
+    setItems((prev) => {
+      const currentCart = prev.filter((item) => item.productId !== productId);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('brisee_cart', JSON.stringify(currentCart));
       }
-    } catch (error) {
-      console.error('Error removing from cart:', error);
-    }
+      return currentCart;
+    });
   };
 
   const updateQuantity = async (productId: CartItem['productId'], cantidad: number) => {
-    try {
-      const res = await fetch(`${API_URL}/carrito/items/${String(productId)}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cantidad }),
-      });
-      if (res.ok) {
-        setItems((prev) =>
-          prev.map((item) =>
-            item.productId === productId ? { ...item, cantidad } : item,
-          ),
-        );
+    setItems((prev) => {
+      const currentCart = prev.map((item) =>
+        item.productId === productId ? { ...item, cantidad } : item,
+      );
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('brisee_cart', JSON.stringify(currentCart));
       }
-    } catch (error) {
-      console.error('Error updating quantity:', error);
-    }
+      return currentCart;
+    });
   };
 
-  const clearCart = () => setItems([]);
+  const clearCart = () => {
+    setItems([]);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('brisee_cart');
+    }
+  };
 
   const totalItems = items.reduce((sum, item) => sum + item.cantidad, 0);
 

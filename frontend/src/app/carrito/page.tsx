@@ -37,6 +37,31 @@ export default function CarritoPage() {
     0,
   );
 
+  const handleWhatsAppCheckout = () => {
+    if (items.length === 0) {
+      alert('El carrito está vacío');
+      return;
+    }
+
+    const phoneNumber = '573003685556';
+
+    let messageText = '¡Hola Brisee Bake! 🧁 Quiero realizar el siguiente pedido:\n\n';
+    let calculoTotal = 0;
+
+    items.forEach((item) => {
+      const subtotal = Number(item.precio) * item.cantidad;
+      calculoTotal += subtotal;
+      messageText += `• ${item.nombre} (x${item.cantidad}) - $${subtotal.toLocaleString('es-CO')}\n`;
+    });
+
+    messageText += `\n*Total a pagar:* $${calculoTotal.toLocaleString('es-CO')}`;
+
+    const encodedMessage = encodeURIComponent(messageText);
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+
+    window.open(whatsappUrl, '_blank');
+  };
+
   // Evita mostrar "carrito vacío" un instante antes de que llegue la
   // respuesta real del backend.
   if (!isHydrated) {
@@ -122,8 +147,12 @@ export default function CarritoPage() {
           <strong>{formatPrice(total)}</strong>
         </div>
 
-        <button type="button" className={styles.checkoutButton}>
-          Continuar al pago
+        <button 
+          type="button" 
+          className={styles.checkoutButton}
+          onClick={handleWhatsAppCheckout}
+        >
+          Finalizar Pedido por WhatsApp
         </button>
       </section>
     </div>
