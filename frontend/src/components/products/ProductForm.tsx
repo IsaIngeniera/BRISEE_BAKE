@@ -163,10 +163,7 @@ export default function ProductForm(): ReactElement {
           formData.existencias,
           10,
         ),
-        idCategoria: Number.parseInt(
-          formData.idCategoria,
-          10,
-        ),
+        idCategoria: formData.idCategoria,
       };
 
       const apiUrl =
