@@ -1,118 +1,85 @@
 .page {
-  --primary-pink: #e48abd;
-  --coral: #f26f71;
-  --dark-pink: #d66098;
-  --soft-pink: #fff5fa;
-  --pale-pink: #fbe3f1;
-  --text: #513f45;
+  --brand-pink: #e48abd;
+  --brand-pink-hover: #cf72a5;
+  --brand-border: #e48abd;
+  --brand-pale: #fbe3f1;
+  --brand-soft: #fff5fa;
+  --brand-font: 'Baskerville Old Face', Baskerville,
+    'Times New Roman', Georgia, serif;
 
   min-height: calc(100vh - 120px);
+  padding: 44px 24px 70px;
   background: #fff;
-  color: var(--text);
-  font-family: Georgia, 'Times New Roman', serif;
+  color: #513f45;
+  font-family: var(--brand-font);
 }
 
-.columns {
+.accountCard,
+.checkoutCard {
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  max-width: 1200px;
-  min-height: calc(100vh - 120px);
+  width: min(100%, 1320px);
   margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid var(--brand-border);
+  border-radius: 0;
+  background: #fff;
 }
 
-.formColumn {
-  padding: 44px clamp(28px, 5vw, 72px) 80px 28px;
+.accountCard {
+  grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.9fr);
+}
+
+.checkoutCard {
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+}
+
+.content {
+  min-width: 0;
+  padding: clamp(30px, 4vw, 62px);
 }
 
 .backLink {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 28px;
-  color: var(--dark-pink);
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1rem;
-  font-weight: 400;
+  margin-bottom: 26px;
+  color: var(--brand-pink);
+  font-size: 1.1rem;
   text-decoration: none;
-  transition: opacity 0.2s ease;
 }
 
-.backLink:hover {
-  opacity: 0.75;
+.backLink:hover,
+.loginLink a:hover {
+  text-decoration: underline;
 }
 
-.backLink svg {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-  stroke-width: 1.8;
-}
-
-.notice {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 7px;
-  margin-bottom: 36px;
-  padding: 16px 18px;
-  border-radius: 8px;
-  background: var(--soft-pink);
-  font-family: Arial, Helvetica, sans-serif;
+.eyebrow {
+  margin: 0 0 10px;
+  color: var(--brand-pink);
   font-size: 0.95rem;
-  line-height: 1.5;
+  font-weight: 700;
+  letter-spacing: 0.18em;
 }
 
-.notice strong {
-  color: var(--dark-pink);
-}
-
-.formColumn h1 {
+.content h1 {
   margin: 0 0 12px;
-  color: var(--dark-pink);
-  font-size: clamp(2rem, 3vw, 2.6rem);
+  color: var(--brand-pink);
+  font-size: clamp(3rem, 4.5vw, 4.3rem);
   font-weight: 400;
+  line-height: 1.08;
 }
 
 .intro {
+  max-width: 660px;
   margin: 0 0 32px;
-  color: #68545c;
-  font-family: Arial, Helvetica, sans-serif;
-  line-height: 1.6;
+  color: #6b5a64;
+  font-size: 1.34rem;
+  line-height: 1.45;
 }
 
 .form {
   display: grid;
-  gap: 22px;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-.form label {
-  display: grid;
-  gap: 9px;
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.form input {
-  width: 100%;
-  height: 52px;
-  padding: 12px 15px;
-  border: 1px solid #dfcbd5;
-  border-radius: 7px;
-  background: #fff;
-  color: var(--text);
-  font: inherit;
-  font-weight: 400;
-}
-
-.form input:focus {
-  outline: 2px solid var(--primary-pink);
-  outline-offset: 2px;
-}
-
-.form small {
-  color: #77646b;
-  font-size: 0.82rem;
-  font-weight: 400;
+  gap: 20px;
 }
 
 .twoFields {
@@ -121,75 +88,152 @@
   gap: 18px;
 }
 
-.form button {
-  min-height: 54px;
-  margin-top: 5px;
-  padding: 13px 24px;
+.field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field label {
+  color: #513f45;
+  font-size: 1.23rem;
+}
+
+.inputBox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 53px;
+  padding: 0 13px;
+  border: 1px solid var(--brand-border);
+  border-radius: 0;
+  background: #fff;
+  color: var(--brand-pink);
+}
+
+.inputBox:focus-within {
+  outline: 2px solid var(--brand-pink);
+  outline-offset: 2px;
+}
+
+.inputBox > svg {
+  width: 21px;
+  height: 21px;
+  flex: none;
+}
+
+.inputBox input {
+  width: 100%;
+  min-width: 0;
+  height: 51px;
   border: 0;
-  border-radius: 8px;
-  background: linear-gradient(135deg, var(--coral), var(--dark-pink));
-  color: #fff;
-  font: 700 1rem Arial, Helvetica, sans-serif;
+  outline: 0;
+  background: transparent;
+  color: #513f45;
+  font: 1.14rem var(--brand-font);
+}
+
+.inputBox input::placeholder {
+  color: #86747d;
+  opacity: 1;
+}
+
+.visibilityButton {
+  display: grid;
+  width: 34px;
+  height: 42px;
+  flex: none;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--brand-pink);
   cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
 }
 
-.form button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgb(242 111 113 / 25%);
+.visibilityButton svg {
+  width: 21px;
+  height: 21px;
 }
 
-.form button:disabled {
-  opacity: 0.65;
-  cursor: wait;
-}
-
-.error,
-.success {
-  margin: 0 0 24px;
-  padding: 14px 16px;
-  border-radius: 8px;
-  font: 1rem/1.5 Arial, Helvetica, sans-serif;
+.visibilityButton:focus-visible,
+.submit:focus-visible,
+.backLink:focus-visible,
+.loginLink a:focus-visible {
+  outline: 2px solid var(--brand-pink);
+  outline-offset: 2px;
 }
 
 .error {
-  background: #fff0f0;
+  margin: 0;
+  padding: 13px 15px;
+  background: #fff0f3;
   color: #942c37;
+  font-size: 1.12rem;
+  line-height: 1.4;
 }
 
-.success {
-  background: #edf8f0;
-  color: #24633b;
+.submit {
+  min-height: 54px;
+  margin-top: 4px;
+  border: 0;
+  border-radius: 0;
+  background: var(--brand-pink);
+  color: #fff;
+  font: 1.35rem var(--brand-font);
+  cursor: pointer;
 }
 
-.success p {
-  margin: 0 0 8px;
+.submit:hover:not(:disabled) {
+  background: var(--brand-pink-hover);
 }
 
-.success a {
-  color: #24633b;
+.submit:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.loginLink {
+  margin: 23px 0 0;
+  font-size: 1.16rem;
+  text-align: center;
+}
+
+.loginLink a {
+  color: var(--brand-pink);
   font-weight: 700;
 }
 
+.photo {
+  position: relative;
+  min-height: 790px;
+  background: var(--brand-soft);
+}
+
+.photoImage {
+  object-fit: cover;
+  object-position: center;
+}
+
 .summary {
-  padding: 64px clamp(28px, 4vw, 60px);
-  border-left: 1px solid var(--pale-pink);
-  background: var(--soft-pink);
-  font-family: Arial, Helvetica, sans-serif;
+  min-width: 0;
+  padding: 54px clamp(26px, 4vw, 55px);
+  border-left: 1px solid var(--brand-pale);
+  background: var(--brand-soft);
+  font-size: 1.16rem;
 }
 
 .summary h2 {
-  margin: 0 0 30px;
-  color: var(--dark-pink);
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 1.8rem;
+  margin: 0 0 28px;
+  color: var(--brand-pink);
+  font-size: clamp(2.2rem, 3.5vw, 3.1rem);
   font-weight: 400;
+  line-height: 1.15;
 }
 
 .summary p {
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .summary ul {
@@ -202,9 +246,10 @@
 .total {
   display: flex;
   justify-content: space-between;
-  gap: 20px;
-  padding: 18px 0;
-  border-bottom: 1px solid #e9cada;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  padding: 17px 0;
+  border-bottom: 1px solid var(--brand-pale);
 }
 
 .summary li strong,
@@ -213,36 +258,61 @@
 }
 
 .total {
-  margin-top: 28px;
-  font-size: 1.15rem;
+  margin-top: 24px;
+  font-size: 1.35rem;
 }
 
 .total strong {
-  color: var(--dark-pink);
+  color: var(--brand-pink);
 }
 
 .summaryNote {
   margin-top: 20px;
   color: #77646b;
-  font-size: 0.85rem;
+  font-size: 1.05rem;
+}
+
+@media (max-width: 900px) {
+  .accountCard {
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 0.75fr);
+  }
+
+  .content {
+    padding: 32px 26px;
+  }
 }
 
 @media (max-width: 760px) {
-  .columns {
+  .page {
+    padding: 25px 16px 48px;
+  }
+
+  .accountCard,
+  .checkoutCard {
     grid-template-columns: 1fr;
   }
 
-  .formColumn {
-    padding: 30px 20px 48px;
+  .photo {
+    min-height: 310px;
   }
 
   .summary {
-    padding: 38px 20px 48px;
-    border-top: 1px solid var(--pale-pink);
+    padding: 36px 22px;
+    border-top: 1px solid var(--brand-pale);
     border-left: 0;
   }
+}
 
+@media (max-width: 520px) {
   .twoFields {
     grid-template-columns: 1fr;
+  }
+
+  .content {
+    padding: 28px 20px;
+  }
+
+  .content h1 {
+    font-size: 2.8rem;
   }
 }

@@ -44,24 +44,24 @@ interface ApiErrorResponse {
 
 const CATEGORIES: readonly ProductCategory[] = [
   {
-    id: '44444444-4444-4444-4444-444444444444',
+    id: 'd4f60d9c-9d35-47d4-9441-9c8d2308ffcf',
     slug: 'macarons',
     name: 'Macarons',
   },
   {
-    id: '22222222-2222-2222-2222-222222222222',
+    id: 'e5f8dc69-0540-4a9f-a70e-17cfc1659f15',
     slug: 'galletas',
     name: 'Galletas',
   },
   {
-    id: '11111111-1111-1111-1111-111111111111',
-    slug: 'granolas',
-    name: 'Granolas',
+    id: '4ab9066a-35e7-4f74-b80d-724de7116472',
+    slug: 'galletas-congeladas',
+    name: 'Galletas congeladas',
   },
   {
-    id: '33333333-3333-3333-3333-333333333333',
-    slug: 'linea-saludable',
-    name: 'Línea saludable',
+    id: 'c1853103-46a8-410d-97b4-73f9cf62afc9',
+    slug: 'granolas',
+    name: 'Granolas',
   },
 ];
 

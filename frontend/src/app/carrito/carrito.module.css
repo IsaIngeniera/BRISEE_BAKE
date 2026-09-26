@@ -106,7 +106,7 @@
   padding: 14px;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, var(--pink-500), var(--pink-600));
+  background: var(--pink-600);
   color: #ffffff;
   font-family: var(--font-display), serif;
   font-size: 1.1rem;
@@ -116,6 +116,10 @@
     filter 0.2s,
     transform 0.2s;
 }
+
+.checkoutButton:disabled { opacity: .65; cursor: not-allowed; }
+.checkoutButton:disabled:hover { filter: none; transform: none; }
+.checkoutNote { margin: 10px 0 0; text-align: center; color: #715b65; }
 
 .checkoutButton:hover,
 .checkoutButton:focus-visible {

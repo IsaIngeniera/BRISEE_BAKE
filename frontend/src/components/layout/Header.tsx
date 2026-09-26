@@ -2,15 +2,13 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-
+import { usePathname, useRouter } from 'next/navigation';
 import {
   useEffect,
   useState,
   useSyncExternalStore,
   type ReactElement,
 } from 'react';
-
 import {
   ChevronDown,
   Menu,
@@ -19,6 +17,11 @@ import {
   UserRound,
   X,
 } from 'lucide-react';
+
+import {
+  AUTH_CHANGE_EVENT,
+  getSessionUser,
+} from '@/services/auth';
 
 import styles from './header.module.css';
 
@@ -29,49 +32,21 @@ interface NavigationItem {
 
 type ViewMode = 'CLIENT' | 'ADMIN';
 
-const VIEW_MODE_STORAGE_KEY = 'brisee_view_mode';
-const VIEW_MODE_CHANGE_EVENT =
-  'brisee:view-mode-change';
-
 const NAVIGATION_LINKS: readonly NavigationItem[] = [
-  {
-    label: 'Bienvenido',
-    href: '/',
-  },
-  {
-    label: 'Catálogo',
-    href: '/catalogo',
-  },
-  {
-    label: 'Contactos',
-    href: '/contacto',
-  },
+  { label: 'Bienvenido', href: '/' },
+  { label: 'Catálogo', href: '/catalogo' },
+  { label: 'Contactos', href: '/contacto' },
 ];
 
-const ANALYTICS_LINKS: readonly NavigationItem[] = [
-  {
-    label: 'Resumen',
-    href: '/analitica',
-  },
-  {
-    label: 'Administrar productos',
-    href: '/admin/productos',
-  },
-  {
-    label: 'Crear producto',
-    href: '/admin/productos/crear',
-  },
+const ADMIN_LINKS: readonly NavigationItem[] = [
+  { label: 'Administrar productos', href: '/admin/productos' },
+  { label: 'Crear producto', href: '/admin/productos/crear' },
+  { label: 'Administrar pedidos', href: '/admin/pedidos' },
+  { label: 'Administrar clientes', href: '/admin/clientes' },
 ];
 
 function getViewModeSnapshot(): ViewMode {
-  // const savedViewMode = localStorage.getItem(
-  //   VIEW_MODE_STORAGE_KEY,
-  // );
-
-  // return savedViewMode === 'ADMIN'
-  //   ? 'ADMIN'
-  //   : 'CLIENT';
-  return 'CLIENT';
+  return getSessionUser()?.rol === 'ADMIN' ? 'ADMIN' : 'CLIENT';
 }
 
 function getServerViewModeSnapshot(): ViewMode {
@@ -81,24 +56,16 @@ function getServerViewModeSnapshot(): ViewMode {
 function subscribeToViewMode(
   notifyViewModeChange: () => void,
 ): () => void {
+  window.addEventListener('storage', notifyViewModeChange);
   window.addEventListener(
-    'storage',
-    notifyViewModeChange,
-  );
-
-  window.addEventListener(
-    VIEW_MODE_CHANGE_EVENT,
+    AUTH_CHANGE_EVENT,
     notifyViewModeChange,
   );
 
   return () => {
+    window.removeEventListener('storage', notifyViewModeChange);
     window.removeEventListener(
-      'storage',
-      notifyViewModeChange,
-    );
-
-    window.removeEventListener(
-      VIEW_MODE_CHANGE_EVENT,
+      AUTH_CHANGE_EVENT,
       notifyViewModeChange,
     );
   };
@@ -106,11 +73,11 @@ function subscribeToViewMode(
 
 export default function Header(): ReactElement {
   const pathname = usePathname();
+  const router = useRouter();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] =
     useState(false);
-
-  const [isAnalyticsMenuOpen, setIsAnalyticsMenuOpen] =
+  const [isAdminMenuOpen, setIsAdminMenuOpen] =
     useState(false);
 
   const viewMode = useSyncExternalStore(
@@ -126,18 +93,12 @@ export default function Header(): ReactElement {
     );
   }, [viewMode]);
 
-
-
   function closeMenus(): void {
     setIsMobileMenuOpen(false);
-    setIsAnalyticsMenuOpen(false);
+    setIsAdminMenuOpen(false);
   }
 
   function handleSaveChanges(): void {
-    /*
-     * This action will be connected later to the active
-     * administration form.
-     */
     window.dispatchEvent(
       new CustomEvent('brisee:save-changes'),
     );
@@ -158,7 +119,7 @@ export default function Header(): ReactElement {
     );
   }
 
-  const isAnalyticsActive = ANALYTICS_LINKS.some(
+  const isAdminSectionActive = ADMIN_LINKS.some(
     (item) => isActiveLink(item.href),
   );
 
@@ -226,10 +187,12 @@ export default function Header(): ReactElement {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`${styles.navigationLink} ${isActiveLink(item.href)
-                  ? styles.activeLink
-                  : ''
-                  }`}
+                className={`${styles.navigationLink} ${
+                  isActiveLink(item.href)
+                    ? styles.activeLink
+                    : ''
+                }`}
+                onClick={closeMenus}
               >
                 {item.label}
               </Link>
@@ -239,43 +202,41 @@ export default function Header(): ReactElement {
               <div className={styles.dropdown}>
                 <button
                   type="button"
-                  className={`${styles.navigationLink} ${styles.dropdownButton
-                    } ${isAnalyticsActive
+                  className={`${styles.navigationLink} ${
+                    styles.dropdownButton
+                  } ${
+                    isAdminSectionActive
                       ? styles.activeLink
                       : ''
-                    }`}
-                  onClick={() => {
-                    setIsAnalyticsMenuOpen(
-                      (isOpen) => !isOpen,
-                    );
-                  }}
-                  aria-expanded={isAnalyticsMenuOpen}
-                  aria-controls="analytics-menu"
+                  }`}
+                  onClick={() =>
+                    setIsAdminMenuOpen((isOpen) => !isOpen)
+                  }
+                  aria-expanded={isAdminMenuOpen}
+                  aria-controls="admin-navigation-menu"
                 >
-                  Analítica
+                  Administración
 
                   <ChevronDown
                     aria-hidden="true"
                     className={
-                      isAnalyticsMenuOpen
+                      isAdminMenuOpen
                         ? styles.rotatedChevron
                         : styles.chevron
                     }
                   />
                 </button>
 
-                {isAnalyticsMenuOpen && (
+                {isAdminMenuOpen && (
                   <div
-                    id="analytics-menu"
+                    id="admin-navigation-menu"
                     className={styles.dropdownMenu}
                   >
-                    {ANALYTICS_LINKS.map((item) => (
+                    {ADMIN_LINKS.map((item) => (
                       <Link
                         key={item.href}
                         href={item.href}
-                        className={
-                          styles.dropdownLink
-                        }
+                        className={styles.dropdownLink}
                         onClick={closeMenus}
                       >
                         {item.label}
@@ -288,20 +249,32 @@ export default function Header(): ReactElement {
           </nav>
 
           <div className={styles.userActions}>
-            <Link
-              href="/carrito"
-              className={styles.iconButton}
-              aria-label="Abrir carrito de compras"
-              title="Carrito"
-            >
-              <ShoppingCart aria-hidden="true" />
-            </Link>
+            {viewMode === 'ADMIN' ? (
+              <button
+                type="button"
+                className={styles.iconButton}
+                aria-label="Carrito del administrador"
+                title="Carrito del administrador"
+              >
+                <ShoppingCart aria-hidden="true" />
+              </button>
+            ) : (
+              <Link
+                href="/carrito"
+                className={styles.iconButton}
+                aria-label="Abrir carrito de compras"
+                title="Carrito"
+              >
+                <ShoppingCart aria-hidden="true" />
+              </Link>
+            )}
 
             <Link
               href="/cuenta"
               className={styles.iconButton}
               aria-label="Abrir mi cuenta"
               title="Mi cuenta"
+              onClick={closeMenus}
             >
               <UserRound aria-hidden="true" />
             </Link>
@@ -309,11 +282,9 @@ export default function Header(): ReactElement {
             <button
               type="button"
               className={styles.mobileMenuButton}
-              onClick={() => {
-                setIsMobileMenuOpen(
-                  (isOpen) => !isOpen,
-                );
-              }}
+              onClick={() =>
+                setIsMobileMenuOpen((isOpen) => !isOpen)
+              }
               aria-label={
                 isMobileMenuOpen
                   ? 'Cerrar menú de navegación'
@@ -339,10 +310,11 @@ export default function Header(): ReactElement {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`${styles.mobileLink} ${isActiveLink(item.href)
-                  ? styles.mobileActiveLink
-                  : ''
-                  }`}
+                className={`${styles.mobileLink} ${
+                  isActiveLink(item.href)
+                    ? styles.mobileActiveLink
+                    : ''
+                }`}
                 onClick={closeMenus}
               >
                 {item.label}
@@ -353,39 +325,33 @@ export default function Header(): ReactElement {
               <>
                 <button
                   type="button"
-                  className={`${styles.mobileLink} ${styles.mobileDropdownButton}`}
-                  onClick={() => {
-                    setIsAnalyticsMenuOpen(
-                      (isOpen) => !isOpen,
-                    );
-                  }}
-                  aria-expanded={isAnalyticsMenuOpen}
+                  className={`${styles.mobileLink} ${
+                    styles.mobileDropdownButton
+                  }`}
+                  onClick={() =>
+                    setIsAdminMenuOpen((isOpen) => !isOpen)
+                  }
+                  aria-expanded={isAdminMenuOpen}
                 >
-                  Analítica
+                  Administración
 
                   <ChevronDown
                     aria-hidden="true"
                     className={
-                      isAnalyticsMenuOpen
+                      isAdminMenuOpen
                         ? styles.rotatedChevron
                         : styles.chevron
                     }
                   />
                 </button>
 
-                {isAnalyticsMenuOpen && (
-                  <div
-                    className={
-                      styles.mobileDropdown
-                    }
-                  >
-                    {ANALYTICS_LINKS.map((item) => (
+                {isAdminMenuOpen && (
+                  <div className={styles.mobileDropdown}>
+                    {ADMIN_LINKS.map((item) => (
                       <Link
                         key={item.href}
                         href={item.href}
-                        className={
-                          styles.mobileDropdownLink
-                        }
+                        className={styles.mobileDropdownLink}
                         onClick={closeMenus}
                       >
                         {item.label}
@@ -396,21 +362,33 @@ export default function Header(): ReactElement {
               </>
             )}
 
-            <Link
-              href="/carrito"
-              className={styles.mobileLink}
-              onClick={closeMenus}
-            >
-              Carrito de compras
-            </Link>
+            {viewMode === 'ADMIN' ? (
+              <Link
+                href="/cuenta"
+                className={styles.mobileLink}
+                onClick={closeMenus}
+              >
+                Mi cuenta
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/carrito"
+                  className={styles.mobileLink}
+                  onClick={closeMenus}
+                >
+                  Carrito de compras
+                </Link>
 
-            <Link
-              href="/cuenta"
-              className={styles.mobileLink}
-              onClick={closeMenus}
-            >
-              Mi cuenta
-            </Link>
+                <Link
+                  href="/cuenta"
+                  className={styles.mobileLink}
+                  onClick={closeMenus}
+                >
+                  Mi cuenta
+                </Link>
+              </>
+            )}
           </nav>
         )}
       </div>

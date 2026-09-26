@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { ArrowLeft, ShoppingCart } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import CartItemRow from '@/components/cart/CartItemRow';
 import { useCart } from '@/hooks/useCart';
 import type { CartItem } from '@/context/CartContext';
+import { getSessionUser } from '@/services/auth';
 
 import styles from './carrito.module.css';
 
@@ -18,6 +19,7 @@ function formatPrice(price: number | string): string {
 }
 
 export default function CarritoPage() {
+  const [hasSession, setHasSession] = useState<boolean | null>(null);
   const {
     items,
     loadError,
@@ -31,6 +33,10 @@ export default function CarritoPage() {
   useEffect(() => {
     refreshCart();
   }, [refreshCart]);
+
+  useEffect(() => {
+    setHasSession(Boolean(getSessionUser()));
+  }, []);
 
   const total = items.reduce(
     (sum, item) => sum + Number(item.precio) * item.cantidad,
@@ -122,9 +128,17 @@ export default function CarritoPage() {
           <strong>{formatPrice(total)}</strong>
         </div>
 
-        <Link href="/registro" className={styles.checkoutButton}>
-          Continuar con la compra
-        </Link>
+        {hasSession === null ? null : hasSession ? (
+          <>
+            <button type="button" className={styles.checkoutButton}>
+              Continuar con la compra
+            </button>
+          </>
+        ) : (
+          <Link href="/registro?from=carrito" className={styles.checkoutButton}>
+            Continuar con la compra
+          </Link>
+        )}
       </section>
     </div>
   );

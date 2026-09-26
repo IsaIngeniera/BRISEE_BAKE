@@ -32,8 +32,7 @@ interface Product {
 
 async function getProducts(): Promise<Product[]> {
   const apiUrl =
-    process.env.INTERNAL_API_URL ??
-    'http://backend:3001';
+    process.env.INTERNAL_API_URL ?? 'http://backend:3001';
 
   const response = await fetch(`${apiUrl}/products`, {
     cache: 'no-store',
@@ -47,7 +46,7 @@ async function getProducts(): Promise<Product[]> {
 
   const products: Product[] = await response.json();
 
-  return products;
+  return products.filter((product) => product.estado === 'ACTIVO');
 }
 
 function formatPrice(price: number | string): string {
@@ -60,13 +59,17 @@ function formatPrice(price: number | string): string {
   const formatted = numericPrice.toLocaleString('es-CO', {
     maximumFractionDigits: 0,
   });
-  
+
   return `COP $ ${formatted}`;
 }
 
 function shortenDescription(description: string): string {
   const maximumLength = 80;
-  if (description.length <= maximumLength) return description;
+
+  if (description.length <= maximumLength) {
+    return description;
+  }
+
   return `${description.substring(0, maximumLength)}...`;
 }
 
@@ -78,11 +81,7 @@ export default async function AdminProductsPage(): Promise<ReactElement> {
     products = await getProducts();
   } catch (caughtError: unknown) {
     errorOccurred = true;
-
-    console.error(
-      'Error fetching products:',
-      caughtError,
-    );
+    console.error('Error fetching products:', caughtError);
   }
 
   return (
@@ -139,8 +138,7 @@ export default async function AdminProductsPage(): Promise<ReactElement> {
             aria-label="Productos registrados"
           >
             {products.map((product) => {
-              const imageUrl =
-                product.imagenes?.[0]?.urlImagen;
+              const imageUrl = product.imagenes?.[0]?.urlImagen;
 
               return (
                 <article
@@ -164,15 +162,9 @@ export default async function AdminProductsPage(): Promise<ReactElement> {
                     )}
                   </div>
 
-                  <div
-                    className={styles.productInformation}
-                  >
+                  <div className={styles.productInformation}>
                     {product.categoria && (
-                      <p
-                        className={
-                          styles.productCategory
-                        }
-                      >
+                      <p className={styles.productCategory}>
                         {product.categoria.nombre}
                       </p>
                     )}
@@ -185,31 +177,19 @@ export default async function AdminProductsPage(): Promise<ReactElement> {
                       {formatPrice(product.precio)}
                     </p>
 
-                    <p
-                      className={
-                        styles.productPresentation
-                      }
-                    >
+                    <p className={styles.productPresentation}>
                       {product.presentacion}
                     </p>
 
-                    <p
-                      className={
-                        styles.productDescription
-                      }
-                    >
-                      {shortenDescription(
-                        product.descripcion,
-                      )}
+                    <p className={styles.productDescription}>
+                      {shortenDescription(product.descripcion)}
                     </p>
 
                     <p className={styles.productStock}>
                       {product.existencias} existencias
                     </p>
 
-                    <div
-                      className={styles.productActions}
-                    >
+                    <div className={styles.productActions}>
                       <Link
                         href={`/admin/productos/${product.id}/editar`}
                         className={styles.editButton}
@@ -218,7 +198,10 @@ export default async function AdminProductsPage(): Promise<ReactElement> {
                         Editar
                       </Link>
 
-                      <DeleteProductButton id={product.id} nombre={product.nombre} />
+                      <DeleteProductButton
+                        id={product.id}
+                        nombre={product.nombre}
+                      />
                     </div>
                   </div>
                 </article>
