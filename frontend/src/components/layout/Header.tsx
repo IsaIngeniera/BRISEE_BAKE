@@ -71,7 +71,7 @@ function getViewModeSnapshot(): ViewMode {
   // return savedViewMode === 'ADMIN'
   //   ? 'ADMIN'
   //   : 'CLIENT';
-  return 'CLIENT'; // Oculto y forzado a cliente
+  return 'CLIENT';
 }
 
 function getServerViewModeSnapshot(): ViewMode {
@@ -238,11 +238,10 @@ export default function Header(): ReactElement {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`${styles.navigationLink} ${
-                  isActiveLink(item.href)
-                    ? styles.activeLink
-                    : ''
-                }`}
+                className={`${styles.navigationLink} ${isActiveLink(item.href)
+                  ? styles.activeLink
+                  : ''
+                  }`}
               >
                 {item.label}
               </Link>
@@ -252,13 +251,11 @@ export default function Header(): ReactElement {
               <div className={styles.dropdown}>
                 <button
                   type="button"
-                  className={`${styles.navigationLink} ${
-                    styles.dropdownButton
-                  } ${
-                    isAnalyticsActive
+                  className={`${styles.navigationLink} ${styles.dropdownButton
+                    } ${isAnalyticsActive
                       ? styles.activeLink
                       : ''
-                  }`}
+                    }`}
                   onClick={() => {
                     setIsAnalyticsMenuOpen(
                       (isOpen) => !isOpen,
@@ -354,11 +351,10 @@ export default function Header(): ReactElement {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`${styles.mobileLink} ${
-                  isActiveLink(item.href)
-                    ? styles.mobileActiveLink
-                    : ''
-                }`}
+                className={`${styles.mobileLink} ${isActiveLink(item.href)
+                  ? styles.mobileActiveLink
+                  : ''
+                  }`}
                 onClick={closeMenus}
               >
                 {item.label}
@@ -430,41 +426,6 @@ export default function Header(): ReactElement {
           </nav>
         )}
       </div>
-
-      <button
-        type="button"
-        onClick={toggleViewMode}
-        aria-label={
-          viewMode === 'ADMIN'
-            ? 'Cambiar a vista de cliente'
-            : 'Cambiar a vista de administrador'
-        }
-        style={{
-          display: 'none', // Ocultamos el botón como solicitaste
-          position: 'fixed',
-          right: '20px',
-          bottom: '20px',
-          zIndex: 9999,
-          padding: '10px 20px',
-          color: '#ffffff',
-          backgroundColor:
-            viewMode === 'ADMIN'
-              ? '#d66098'
-              : '#f26f71',
-          border: 'none',
-          borderRadius: '30px',
-          boxShadow:
-            '0 4px 12px rgb(0 0 0 / 15%)',
-          fontFamily: 'Arial, sans-serif',
-          fontWeight: 'bold',
-          cursor: 'pointer',
-        }}
-      >
-        Vista:{' '}
-        {viewMode === 'ADMIN'
-          ? 'Administrador'
-          : 'Cliente'}
-      </button>
     </header>
   );
 }

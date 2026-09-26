@@ -33,6 +33,20 @@ async function main() {
     }
   });
 
+  const adminUser = await prisma.usuario.create({
+    data: {
+      id: '99999999-9999-9999-9999-999999999999',
+      nombre: 'Admin',
+      apellido: 'Principal',
+      fechaNacimiento: new Date('1990-01-01'),
+      correo: 'admin@briseebake.com',
+      rol: 'ADMIN',
+      password: '$2b$10$14eZEX/ZfRWkC/Ffo5Z0tup/FlKyk0I3RVKlEs/gzmPoLSOs3sGbi', // admin123
+      celular: '3000000000',
+      estado: 'ACTIVO',
+    }
+  });
+
   console.log('Creando categorias...');
   const catGranolas = await prisma.categoria.create({ data: { id: '11111111-1111-1111-1111-111111111111', nombre: 'Granolas' } });
   const catGalletas = await prisma.categoria.create({ data: { id: '22222222-2222-2222-2222-222222222222', nombre: 'Galletas' } });
