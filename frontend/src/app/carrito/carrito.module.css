@@ -99,6 +99,9 @@
 }
 
 .checkoutButton {
+  display: block;
+  text-align: center;
+  text-decoration: none;
   width: 100%;
   padding: 14px;
   border: none;

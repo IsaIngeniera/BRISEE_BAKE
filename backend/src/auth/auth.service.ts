@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma.service';
 import { Rol, EstadoUsuario } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -9,6 +11,43 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
   ) {}
+
+  async register(registerDto: RegisterDto) {
+    const existingUser = await this.prisma.usuario.findUnique({
+      where: { correo: registerDto.correo },
+    });
+
+    if (existingUser) {
+      throw new BadRequestException('Este correo ya está registrado');
+    }
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(registerDto.password, saltRounds);
+
+    const newUser = await this.prisma.usuario.create({
+      data: {
+        nombre: registerDto.nombre,
+        apellido: registerDto.apellido,
+        correo: registerDto.correo,
+        password: hashedPassword,
+        rol: Rol.CLIENTE,
+        celular: registerDto.celular,
+        estado: EstadoUsuario.ACTIVO,
+        fechaNacimiento: new Date(registerDto.fechaNacimiento),
+        createdAt: new Date(),
+      },
+    });
+
+    const payload = {
+      sub: newUser.id,
+      correo: newUser.correo,
+      rol: newUser.rol,
+    };
+    return {
+      message: 'Registro exitoso',
+      access_token: await this.jwtService.signAsync(payload),
+    };
+  }
 
   async loginMockAdmin() {
     // 1. Check if mock admin exists

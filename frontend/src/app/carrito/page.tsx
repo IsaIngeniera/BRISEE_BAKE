@@ -122,9 +122,9 @@ export default function CarritoPage() {
           <strong>{formatPrice(total)}</strong>
         </div>
 
-        <button type="button" className={styles.checkoutButton}>
-          Continuar al pago
-        </button>
+        <Link href="/registro" className={styles.checkoutButton}>
+          Continuar con la compra
+        </Link>
       </section>
     </div>
   );
