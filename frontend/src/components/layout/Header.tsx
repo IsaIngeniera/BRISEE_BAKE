@@ -126,19 +126,7 @@ export default function Header(): ReactElement {
     );
   }, [viewMode]);
 
-  function toggleViewMode(): void {
-    const newViewMode: ViewMode =
-      viewMode === 'CLIENT' ? 'ADMIN' : 'CLIENT';
 
-    localStorage.setItem(
-      VIEW_MODE_STORAGE_KEY,
-      newViewMode,
-    );
-
-    window.dispatchEvent(
-      new Event(VIEW_MODE_CHANGE_EVENT),
-    );
-  }
 
   function closeMenus(): void {
     setIsMobileMenuOpen(false);

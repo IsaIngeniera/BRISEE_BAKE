@@ -43,7 +43,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [loadError, setLoadError] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
 
   const fetchCart = useCallback(async () => {
     try {

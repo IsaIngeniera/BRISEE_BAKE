@@ -22,7 +22,10 @@ export class AuthController {
 
   @Post('login')
   @ApiOperation({ summary: 'Iniciar sesión con correo y contraseña' })
-  @ApiResponse({ status: 201, description: 'Inicio de sesión exitoso, retorna el token JWT' })
+  @ApiResponse({
+    status: 201,
+    description: 'Inicio de sesión exitoso, retorna el token JWT',
+  })
   @ApiResponse({
     status: 401,
     description: 'Nombre de Usuario y/o contraseñas incorrectas',

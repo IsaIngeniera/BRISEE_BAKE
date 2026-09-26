@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma.service';
 import { Rol, EstadoUsuario } from '@prisma/client';
@@ -56,13 +60,20 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new UnauthorizedException('Nombre de Usuario y/o contraseñas incorrectas');
+      throw new UnauthorizedException(
+        'Nombre de Usuario y/o contraseñas incorrectas',
+      );
     }
 
-    const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      loginDto.password,
+      user.password,
+    );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Nombre de Usuario y/o contraseñas incorrectas');
+      throw new UnauthorizedException(
+        'Nombre de Usuario y/o contraseñas incorrectas',
+      );
     }
 
     const payload = {
@@ -75,7 +86,6 @@ export class AuthService {
       access_token: await this.jwtService.signAsync(payload),
     };
   }
-
 
   async loginMockAdmin() {
     // 1. Check if mock admin exists
