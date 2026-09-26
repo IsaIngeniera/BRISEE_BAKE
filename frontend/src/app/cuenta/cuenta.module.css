@@ -1,0 +1,63 @@
+.page {
+  display: grid;
+  min-height: calc(100vh - 120px);
+  place-items: center;
+  padding: 40px 20px 80px;
+  background: #fcebf2;
+  color: #513f45;
+}
+
+.card {
+  width: min(100%, 520px);
+  padding: clamp(30px, 5vw, 56px);
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 10px 30px rgb(110 67 83 / 10%);
+  text-align: center;
+}
+
+.eyebrow {
+  color: #e48abd;
+  font: 700 0.8rem Arial, Helvetica, sans-serif;
+  letter-spacing: 0.15em;
+}
+
+.card h1 {
+  margin: 12px 0;
+  color: #d66098;
+  font: 400 clamp(2rem, 5vw, 2.7rem) Georgia, 'Times New Roman', serif;
+}
+
+.card > p:not(.eyebrow),
+.login {
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.6;
+}
+
+.primaryButton {
+  display: block;
+  margin: 30px 0;
+  padding: 15px 20px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #f26f71, #d66098);
+  color: white;
+  font: 700 1rem Arial, Helvetica, sans-serif;
+  text-decoration: none;
+}
+
+.login {
+  padding-top: 25px;
+  border-top: 1px solid #fbe3f1;
+}
+
+.login h2 {
+  color: #d66098;
+  font-size: 1.1rem;
+}
+
+.backLink {
+  display: inline-block;
+  margin-top: 18px;
+  color: #d66098;
+  font: 600 0.95rem Arial, Helvetica, sans-serif;
+}
