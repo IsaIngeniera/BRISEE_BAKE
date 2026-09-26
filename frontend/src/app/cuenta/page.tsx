@@ -71,6 +71,7 @@ export default function CuentaPage() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
     const sessionUser = getSessionUser();
     setUser(sessionUser);
 
@@ -79,6 +80,7 @@ export default function CuentaPage() {
       setProfile(saved);
       setDraft(saved);
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
   function updateField(field: keyof Profile, value: string) {

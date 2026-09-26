@@ -73,7 +73,6 @@ function subscribeToViewMode(
 
 export default function Header(): ReactElement {
   const pathname = usePathname();
-  const router = useRouter();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] =
     useState(false);

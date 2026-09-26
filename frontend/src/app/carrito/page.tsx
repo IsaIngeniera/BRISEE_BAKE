@@ -35,6 +35,7 @@ export default function CarritoPage() {
   }, [refreshCart]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHasSession(Boolean(getSessionUser()));
   }, []);
 

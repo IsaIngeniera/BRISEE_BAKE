@@ -5,10 +5,11 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma.service';
-import { Rol, EstadoUsuario } from '@prisma/client';
+import { Rol, EstadoUsuario, Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -115,5 +116,42 @@ export class AuthService {
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
+  }
+
+  async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
+    const { password, fechaNacimiento, ...rest } = updateProfileDto;
+
+    const dataToUpdate: Prisma.UsuarioUpdateInput = { ...rest };
+
+    if (fechaNacimiento) {
+      dataToUpdate.fechaNacimiento = new Date(fechaNacimiento);
+    }
+
+    if (password) {
+      const saltRounds = 10;
+      dataToUpdate.password = await bcrypt.hash(password, saltRounds);
+    }
+
+    try {
+      const updatedUser = await this.prisma.usuario.update({
+        where: { id: userId },
+        data: dataToUpdate,
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password: _password, ...userWithoutPassword } = updatedUser;
+      return {
+        message: 'Perfil actualizado exitosamente',
+        user: userWithoutPassword,
+      };
+    } catch (error: unknown) {
+      const err = error as { code?: string };
+      if (err.code === 'P2002') {
+        throw new BadRequestException(
+          'El correo ya está en uso por otro usuario',
+        );
+      }
+      throw error;
+    }
   }
 }
