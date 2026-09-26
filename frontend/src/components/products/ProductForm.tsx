@@ -21,7 +21,7 @@ type DietaryLabel =
   | 'LIBRE_DE_LACTEOS';
 
 interface ProductCategory {
-  readonly id: number;
+  readonly id: string;
   readonly slug: string;
   readonly name: string;
 }
@@ -44,22 +44,22 @@ interface ApiErrorResponse {
 
 const CATEGORIES: readonly ProductCategory[] = [
   {
-    id: 1,
+    id: '44444444-4444-4444-4444-444444444444',
     slug: 'macarons',
     name: 'Macarons',
   },
   {
-    id: 2,
+    id: '22222222-2222-2222-2222-222222222222',
     slug: 'galletas',
     name: 'Galletas',
   },
   {
-    id: 3,
+    id: '11111111-1111-1111-1111-111111111111',
     slug: 'granolas',
     name: 'Granolas',
   },
   {
-    id: 4,
+    id: '33333333-3333-3333-3333-333333333333',
     slug: 'linea-saludable',
     name: 'Línea saludable',
   },
@@ -163,10 +163,7 @@ export default function ProductForm(): ReactElement {
           formData.existencias,
           10,
         ),
-        idCategoria: Number.parseInt(
-          formData.idCategoria,
-          10,
-        ),
+        idCategoria: formData.idCategoria,
       };
 
       const apiUrl =

@@ -313,9 +313,9 @@ export default function Header(): ReactElement {
             </Link>
 
             <Link
-              href="/login"
+              href="/cuenta"
               className={styles.iconButton}
-              aria-label="Iniciar sesión o abrir perfil"
+              aria-label="Abrir mi cuenta"
               title="Mi cuenta"
             >
               <UserRound aria-hidden="true" />
@@ -421,11 +421,11 @@ export default function Header(): ReactElement {
             </Link>
 
             <Link
-              href="/login"
+              href="/cuenta"
               className={styles.mobileLink}
               onClick={closeMenus}
             >
-              Iniciar sesión
+              Mi cuenta
             </Link>
           </nav>
         )}

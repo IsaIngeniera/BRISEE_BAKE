@@ -37,6 +37,7 @@ export class ProductsService {
     }
 
     try {
+      console.log('Incoming payload:', createProductDto);
       const newProduct = await this.prisma.producto.create({
         data: {
           idCategoria: createProductDto.idCategoria,
@@ -62,7 +63,8 @@ export class ProductsService {
         },
       });
       return { message: 'Producto creado exitosamente', product: newProduct };
-    } catch {
+    } catch (error) {
+      console.error('Error in createProduct:', error);
       throw new BadRequestException(
         'Error al crear el producto. Verifique los datos enviados.',
       );

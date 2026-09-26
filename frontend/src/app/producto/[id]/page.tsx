@@ -30,13 +30,6 @@ interface Product {
   imagenes?: ProductImage[];
 }
 
-const PRICE_FORMATTER = new Intl.NumberFormat('es-CO', {
-  style: 'currency',
-  currency: 'COP',
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 0,
-});
-
 function formatPrice(price: number | string): string {
   const numericPrice = Number(price);
 
