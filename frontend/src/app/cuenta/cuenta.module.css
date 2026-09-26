@@ -1,0 +1,498 @@
+.page {
+  --pink: #E48ABD;
+  --soft: #fff5fa;
+
+  min-height: calc(100vh - 120px);
+  padding: 38px 20px 80px;
+  background: #fff;
+  color: #513f45;
+  font-family: 'Baskerville Old Face', Baskerville, Georgia, serif;
+}
+
+.container {
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  color: var(--pink);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.backLink:hover,
+.textLink:hover {
+  text-decoration: underline;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.7fr) minmax(0, 1.3fr);
+  overflow: hidden;
+  border: 1px solid #f3d2e2;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 12px 35px rgb(110 67 83 / 9%);
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 28px;
+  background: #fbe3f1;
+  text-align: center;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 20px;
+  border: 1px solid #edaccc;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--pink);
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--pink);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.sidebar h1 {
+  margin: 0;
+  color: var(--pink);
+  font-size: clamp(2.1rem, 4vw, 3rem);
+  font-weight: 400;
+}
+
+.welcome {
+  margin: 19px 0 5px;
+  font-size: 1.3rem;
+}
+
+.email {
+  max-width: 100%;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: #715b65;
+  font-size: 1rem;
+}
+
+.separator {
+  width: 100%;
+  margin: 26px 0;
+  color: #E48ABD;
+}
+
+.cartLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  max-width: 220px;
+  min-height: 46px;
+  border: 1px solid var(--pink);
+  border-radius: 7px;
+  color: var(--pink);
+  font-weight: 700;
+}
+
+.cartLink:hover {
+  background: #fff;
+}
+
+.details {
+  padding: clamp(26px, 4vw, 48px);
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.heading h2 {
+  margin: 0;
+  color: var(--pink);
+  font-size: clamp(1.8rem, 3vw, 2.3rem);
+  font-weight: 400;
+}
+
+.note {
+  margin: 18px 0 26px;
+  color: #705e66;
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.editButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+  padding: 9px 13px;
+  border: 1px solid #E48ABD;
+  border-radius: 7px;
+  background: #fff;
+  color: var(--pink);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.editButton:hover {
+  background: var(--soft);
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.field {
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid #f1d9e4;
+  border-radius: 7px;
+  background: #fffafd;
+}
+
+.field span {
+  display: block;
+  margin-bottom: 7px;
+  color: #826c75;
+  font-size: 0.88rem;
+}
+
+.field strong {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 1.05rem;
+  font-weight: 400;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.form input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #e8bfd3;
+  border-radius: 7px;
+  background: #fff;
+  color: #513f45;
+  font: 1rem 'Baskerville Old Face', Baskerville, Georgia, serif;
+}
+
+.form input:focus-visible,
+.editButton:focus-visible,
+.primaryButton:focus-visible,
+.cancelButton:focus-visible {
+  outline: 2px solid var(--pink);
+  outline-offset: 2px;
+}
+
+.form input[readonly] {
+  background: #f8f2f5;
+}
+
+.form small {
+  color: #78646f;
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.primaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 21px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--pink);
+  color: #fff;
+  font: 700 1rem 'Baskerville Old Face', Baskerville, Georgia, serif;
+  cursor: pointer;
+}
+
+.cancelButton {
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid #e8bfd3;
+  border-radius: 7px;
+  background: #fff;
+  color: #715b65;
+  cursor: pointer;
+}
+
+.status {
+  padding: 11px 14px;
+  border-radius: 7px;
+  background: #fff5fa;
+  color: #82465f;
+  line-height: 1.4;
+}
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  max-width: 520px;
+  margin: 45px auto;
+  padding: 52px 30px;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--pink);
+  text-align: center;
+}
+
+.state h1,
+.state p {
+  margin: 0;
+}
+
+.state p {
+  color: #513f45;
+}
+
+.textLink {
+  color: var(--pink);
+  font-weight: 700;
+}
+
+.logoutButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  margin-top: 22px;
+  padding: 9px 16px;
+  border: 1px solid var(--pink);
+  border-radius: 7px;
+  background: #fff;
+  color: #a84670;
+  font: 700 1rem 'Baskerville Old Face', Baskerville, Georgia, serif;
+  cursor: pointer;
+}
+
+.logoutButton:hover {
+  background: #fff5fa;
+}
+
+.adminCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 13px;
+  max-width: 560px;
+  margin: 22px auto;
+  padding: 48px 30px;
+  border: 1px solid #f3d2e2;
+  border-radius: 12px;
+  background: #fff;
+  text-align: center;
+}
+
+.adminCard h1 {
+  margin: 0;
+  color: var(--pink);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 400;
+}
+
+.adminCard p:not(.eyebrow) {
+  margin: 0 0 12px;
+  overflow-wrap: anywhere;
+}
+
+.adminCard .cartLink {
+  max-width: none;
+  width: auto;
+  padding: 0 24px;
+}
+
+.adminCard .avatar {
+  margin-bottom: 4px;
+}
+
+.guestPage {
+  background: #fff;
+}
+
+.welcomeCard {
+  width: min(100%, 540px);
+  margin: 24px auto 0;
+  padding: clamp(28px, 5vw, 48px);
+  border: 1px solid #ec9dca;
+  border-radius: 5px;
+  background: #fff;
+  text-align: center;
+}
+
+.welcomeEyebrow {
+  margin: 0 0 8px;
+  color: var(--pink);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+
+.welcomeCard h1 {
+  margin: 0 0 10px;
+  color: var(--pink);
+  font-size: clamp(2.8rem, 5vw, 4rem);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.welcomeIntro {
+  max-width: 390px;
+  margin: 0 auto 22px;
+  color: #68545c;
+  font-size: 1.27rem;
+  line-height: 1.45;
+}
+
+.welcomePhoto {
+  position: relative;
+  width: min(100%, 390px);
+  height: clamp(220px, 35vw, 310px);
+  margin: 0 auto 26px;
+  overflow: hidden;
+
+  border-radius: 110px 110px 16px 16px;
+
+  background-color: #fff5fc;
+
+  background-image: url('/images/cuenta-bienvenida.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.welcomeFlower {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  color: var(--pink);
+  font-size: 2rem;
+  opacity: 0.55;
+}
+
+.welcomeActions {
+  display: grid;
+  gap: 13px;
+  width: min(100%, 390px);
+  margin: 0 auto;
+}
+
+.welcomeActions a {
+  display: grid;
+  place-items: center;
+  min-height: 56px;
+  border-radius: 8px;
+  font-size: 1.24rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.welcomeLogin {
+  border: 2px solid var(--pink);
+  background: #fff;
+  color: var(--pink);
+}
+
+.welcomeLogin:hover {
+  background: #fff5fa;
+}
+
+.welcomeSignup {
+  border: 2px solid var(--pink);
+  background: var(--pink);
+  color: #fff;
+}
+
+.welcomeSignup:hover {
+  background: #bd4a80;
+}
+
+.welcomeActions a:focus-visible {
+  outline: 3px solid #a84670;
+  outline-offset: 3px;
+}
+
+.welcomeFooter {
+  margin: 22px 0 0;
+  color: #806871;
+  font-size: 1.06rem;
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 24px 16px 50px;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    padding: 32px 24px;
+  }
+
+  .details {
+    padding: 28px 20px;
+  }
+
+  .heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .welcomeCard {
+    padding: 28px 20px;
+  }
+
+  .welcomePhoto {
+    height: 240px;
+  }
+}
