@@ -1,4 +1,11 @@
-import { IsString, IsNotEmpty, IsEnum, IsOptional, IsArray, ValidateNested } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsEnum,
+  IsOptional,
+  IsArray,
+  ValidateNested,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { TipoEntrega } from '@prisma/client';
 import { ApiProperty } from '@nestjs/swagger';
@@ -23,12 +30,18 @@ export class CreatePedidoDto {
   @IsNotEmpty()
   ciudad: string;
 
-  @ApiProperty({ description: 'Tipo de entrega (ENVIO o RETIRO)', enum: TipoEntrega })
+  @ApiProperty({
+    description: 'Tipo de entrega (ENVIO o RETIRO)',
+    enum: TipoEntrega,
+  })
   @IsEnum(TipoEntrega)
   @IsNotEmpty()
   tipoEntrega: TipoEntrega;
 
-  @ApiProperty({ description: 'Observaciones adicionales para la entrega', required: false })
+  @ApiProperty({
+    description: 'Observaciones adicionales para la entrega',
+    required: false,
+  })
   @IsString()
   @IsOptional()
   observacionesEntrega?: string;
