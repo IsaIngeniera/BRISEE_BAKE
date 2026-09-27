@@ -92,7 +92,14 @@ export class PedidosService {
   async findAll() {
     return this.prisma.pedido.findMany({
       include: {
-        cliente: true,
+        cliente: {
+          select: {
+            id: true,
+            nombre: true,
+            apellido: true,
+            correo: true,
+          },
+        },
         productos: {
           include: {
             producto: true,
@@ -114,7 +121,14 @@ export class PedidosService {
       where: { id },
       data: { estadoEntrega },
       include: {
-        cliente: true,
+        cliente: {
+          select: {
+            id: true,
+            nombre: true,
+            apellido: true,
+            correo: true,
+          },
+        },
       },
     });
   }
