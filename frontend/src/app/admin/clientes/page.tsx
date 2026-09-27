@@ -4,10 +4,7 @@ import Link from 'next/link';
 import { ArrowLeft, UsersRound } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
-import {
-  AUTH_TOKEN_KEY,
-  getSessionUser,
-} from '@/services/auth';
+import { AUTH_TOKEN_KEY, getSessionUser } from '@/services/auth';
 
 import styles from './clientes.module.css';
 
@@ -128,7 +125,17 @@ export default function ClientesAdminPage() {
   }, []);
 
   useEffect(() => {
-    void loadClientes();
+    let cancelled = false;
+
+    queueMicrotask(() => {
+      if (!cancelled) {
+        void loadClientes();
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [loadClientes]);
 
   async function handleChangeRol(
