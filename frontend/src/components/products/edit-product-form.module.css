@@ -1,21 +1,23 @@
 .formContainer {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 24px;
+  color: #513f45;
+  font-family: 'Baskerville Old Face', Baskerville, 'Times New Roman',
+    Georgia, serif;
 }
 
 .formGroup {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 9px;
 }
 
 .formGroup label,
 .fieldset legend {
   color: #513f45;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.92rem;
-  font-weight: 700;
+  font-size: 1.3rem;
+  font-weight: 600;
 }
 
 .input,
@@ -23,17 +25,16 @@
 .textarea,
 .fileInput {
   width: 100%;
-  padding: 11px 14px;
-  color: #333333;
-  background-color: #ffffff;
+  min-height: 52px;
+  padding: 11px 15px;
   border: 1px solid #edaccc;
-  border-radius: 8px;
+  border-radius: 5px;
   outline: none;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 1rem;
-  transition:
-    border-color 200ms ease,
-    box-shadow 200ms ease;
+  background: #fff;
+  color: #513f45;
+  font: 1.2rem 'Baskerville Old Face', Baskerville, 'Times New Roman',
+    Georgia, serif;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
 }
 
 .input:focus,
@@ -41,7 +42,7 @@
 .textarea:focus,
 .fileInput:focus-visible {
   border-color: #d66098;
-  box-shadow: 0 0 0 3px rgb(214 96 152 / 15%);
+  box-shadow: 0 0 0 3px rgb(228 138 189 / 20%);
 }
 
 .textarea {
@@ -60,7 +61,7 @@
   margin: 0;
   padding: 18px;
   border: 1px solid #edaccc;
-  border-radius: 10px;
+  border-radius: 5px;
 }
 
 .fieldset legend {
@@ -70,22 +71,22 @@
 .checkboxGroup {
   display: flex;
   flex-wrap: wrap;
-  gap: 14px;
+  gap: 12px 20px;
 }
 
 .checkboxLabel {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   color: #513f45;
+  font-size: 1.15rem;
   cursor: pointer;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.85rem;
 }
 
 .checkboxLabel input {
-  width: 17px;
-  height: 17px;
+  width: 18px;
+  height: 18px;
+  margin: 0;
   accent-color: #d66098;
 }
 
@@ -93,15 +94,15 @@
   width: min(100%, 360px);
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  background-color: #fff5fa;
   border: 1px solid #edaccc;
-  border-radius: 12px;
+  border-radius: 5px;
+  background: #fff5fc;
 }
 
 .imagePreview img {
+  display: block;
   width: 100%;
   height: 100%;
-  display: block;
   object-fit: cover;
 }
 
@@ -112,12 +113,12 @@
 .fileInput::file-selector-button {
   margin-right: 12px;
   padding: 8px 12px;
+  border: 1px solid #edaccc;
+  border-radius: 4px;
+  background: #fff5fc;
   color: #513f45;
-  background-color: #fbe3f1;
-  border: none;
-  border-radius: 6px;
+  font: inherit;
   cursor: pointer;
-  font-weight: 700;
 }
 
 .selectedImage {
@@ -125,131 +126,123 @@
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  color: #806971;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.85rem;
+  color: #68545c;
+  font-size: 1.1rem;
 }
 
 .selectedImage button {
-  padding: 7px 10px;
-  color: #a13c70;
-  background-color: transparent;
+  padding: 8px 12px;
   border: 1px solid #d66098;
-  border-radius: 7px;
+  border-radius: 4px;
+  background: #fff;
+  color: #a13c70;
+  font: inherit;
   cursor: pointer;
-  font-weight: 700;
 }
 
 .selectedImage button:hover {
-  color: #ffffff;
-  background-color: #d66098;
+  background: #d66098;
+  color: #fff;
 }
 
 .successMessage,
 .informationMessage,
 .loadingMessage,
 .errorContainer {
-  padding: 14px 16px;
-  border-radius: 9px;
-  font-family: Arial, Helvetica, sans-serif;
-  line-height: 1.5;
-  text-align: center;
+  margin: 0;
+  padding: 16px 18px;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  line-height: 1.45;
 }
 
 .successMessage {
-  color: #256b2a;
-  background-color: #e8f5e9;
-  border: 1px solid #a5d6a7;
+  border: 1px solid #7baa8b;
+  background: #edf8f0;
+  color: #24633b;
 }
 
 .informationMessage {
-  color: #725600;
-  background-color: #fff8df;
   border: 1px solid #efd681;
+  background: #fff8df;
+  color: #725600;
 }
 
 .loadingMessage {
-  color: #725e65;
-  background-color: #fff5fa;
+  border: 1px solid #edaccc;
+  background: #fff5fc;
+  color: #68545c;
 }
 
 .errorContainer {
-  color: #9f1f1f;
-  background-color: #ffebee;
-  border: 1px solid #ef9a9a;
+  border: 1px solid #b63159;
+  border-left: 5px solid #b63159;
+  background: #fff0f3;
+  color: #84223d;
 }
 
 .returnButton {
-  margin-top: 10px;
   display: inline-flex;
+  margin-top: 10px;
   color: #d66098;
+  font-size: 1.15rem;
   font-weight: 700;
 }
 
 .actionButtons {
-  margin-top: 8px;
   display: flex;
   justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 14px;
+  margin-top: 10px;
 }
 
 .cancelButton,
 .restoreButton,
 .submitButton {
-  min-width: 150px;
-  min-height: 46px;
-  padding: 12px 18px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.95rem;
-  font-weight: 700;
+  min-width: 155px;
+  min-height: 52px;
+  padding: 11px 18px;
+  border-radius: 5px;
+  font: 700 1.2rem 'Baskerville Old Face', Baskerville,
+    'Times New Roman', Georgia, serif;
+  text-align: center;
   text-decoration: none;
-  transition:
-    color 200ms ease,
-    background-color 200ms ease,
-    border-color 200ms ease,
-    transform 200ms ease;
+  cursor: pointer;
+  transition: background-color 200ms ease, color 200ms ease;
 }
 
 .cancelButton,
 .restoreButton {
-  color: #513f45;
-  background-color: #ffffff;
   border: 1px solid #edaccc;
-}
-
-.restoreButton {
-  cursor: pointer;
+  background: #fff;
+  color: #513f45;
 }
 
 .cancelButton:hover,
 .restoreButton:hover {
-  color: #d66098;
   border-color: #d66098;
-  transform: translateY(-2px);
+  color: #d66098;
 }
 
 .submitButton {
-  color: #000000;
-  background-color: #e48abd;
   border: 1px solid #e48abd;
-  cursor: pointer;
+  background: #e48abd;
+  color: #fff;
 }
 
 .submitButton:hover:not(:disabled) {
-  color: #ffffff;
-  background-color: #d66098;
   border-color: #d66098;
-  transform: translateY(-2px);
+  background: #d66098;
 }
 
 .submitButton:disabled {
-  color: #666666;
-  background-color: #cccccc;
-  border-color: #cccccc;
+  border-color: #c7b8c0;
+  background: #c7b8c0;
+  color: #fff;
   cursor: not-allowed;
 }
 
@@ -258,15 +251,14 @@
 .submitButton:focus-visible,
 .selectedImage button:focus-visible,
 .returnButton:focus-visible {
-  outline: 3px solid #d66098;
+  outline: 2px solid #d66098;
   outline-offset: 3px;
 }
 
 .developmentNotice {
   margin: 0;
-  color: #806971;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.8rem;
+  color: #68545c;
+  font-size: 1.05rem;
   line-height: 1.5;
   text-align: center;
 }
