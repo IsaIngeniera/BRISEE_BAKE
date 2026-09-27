@@ -12,11 +12,15 @@ import { useEffect, useState } from 'react';
 import CartItemRow from '@/components/cart/CartItemRow';
 import type { CartItem } from '@/context/CartContext';
 import { useCart } from '@/hooks/useCart';
-import { getSessionUser } from '@/services/auth';
+import {
+  AUTH_TOKEN_KEY,
+  getSessionUser,
+} from '@/services/auth';
 
 import styles from './carrito.module.css';
 
 type OrderResponse = {
+  pedidoId?: string;
   id?: string;
   numeroPedido?: string;
   codigo?: string;
@@ -49,21 +53,25 @@ function getOrderNumber(data: OrderResponse): string {
   if (data.numeroPedido) return data.numeroPedido;
   if (data.codigo) return data.codigo;
 
-  // Si el backend solamente incluye el número en el mensaje
-  // generado para WhatsApp, lo recuperamos de allí.
+  const id = data.pedidoId || data.id;
+
+  if (id) {
+    return id.split('-')[0].toUpperCase();
+  }
+
   if (data.whatsappUrl) {
     try {
       const url = new URL(data.whatsappUrl);
-      const previousMessage = url.searchParams.get('text') || '';
-      const match = previousMessage.match(/#([A-Za-z0-9-]+)/);
+      const message = url.searchParams.get('text') || '';
+      const match = message.match(/#([A-Za-z0-9-]+)/);
 
       if (match) return match[1];
     } catch {
-      // La ausencia de una URL válida se maneja en la confirmación.
+      // La confirmación puede mostrarse sin número.
     }
   }
 
-  return data.id || '';
+  return '';
 }
 
 function getCustomerName(): string {
@@ -80,6 +88,7 @@ function getCustomerName(): string {
       typeof saved.nombre === 'string'
         ? saved.nombre.trim()
         : '';
+
     const apellido =
       typeof saved.apellido === 'string'
         ? saved.apellido.trim()
@@ -100,7 +109,6 @@ function buildWhatsAppUrl(
   try {
     const url = new URL(originalUrl);
 
-    // Se conserva el número de WhatsApp enviado por el backend.
     if (
       url.protocol !== 'https:' ||
       !['wa.me', 'api.whatsapp.com'].includes(url.hostname)
@@ -109,6 +117,7 @@ function buildWhatsAppUrl(
     }
 
     const customerName = getCustomerName();
+
     const products = order.items
       .map((item) => `• ${item.nombre} × ${item.cantidad}`)
       .join('\n');
@@ -118,7 +127,9 @@ function buildWhatsAppUrl(
       customerName
         ? `Soy ${customerName} y acabo de realizar un pedido.`
         : 'Acabo de realizar un pedido.',
-      order.number ? `Mi número de pedido es #${order.number}.` : '',
+      order.number
+        ? `Mi número de pedido es #${order.number}.`
+        : '',
       '',
       'Estos son los productos que elegí:',
       products,
@@ -139,9 +150,7 @@ function buildWhatsAppUrl(
 }
 
 export default function CarritoPage() {
-  const [hasSession, setHasSession] = useState<boolean | null>(
-    null,
-  );
+  const [hasSession, setHasSession] = useState<boolean | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
   const [confirmedOrder, setConfirmedOrder] =
@@ -177,11 +186,21 @@ export default function CarritoPage() {
     setCheckoutError('');
     setIsCheckingOut(true);
 
-    // Conservamos el resumen antes de actualizar el carrito.
     const purchasedItems = items.map((item) => ({ ...item }));
     const purchasedTotal = total;
 
     try {
+      const user = getSessionUser();
+      const token =
+        sessionStorage.getItem(AUTH_TOKEN_KEY) ||
+        localStorage.getItem(AUTH_TOKEN_KEY);
+
+      if (!user || !token) {
+        throw new Error(
+          'Tu sesión terminó. Inicia sesión nuevamente.',
+        );
+      }
+
       const apiUrl =
         process.env.NEXT_PUBLIC_API_URL ||
         'http://localhost:3001';
@@ -195,6 +214,7 @@ export default function CarritoPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           direccionEntrega: 'Por definir',
@@ -231,7 +251,6 @@ export default function CarritoPage() {
           ? error.message
           : 'Hubo un problema al registrar el pedido.',
       );
-
     } finally {
       setIsCheckingOut(false);
     }
@@ -283,6 +302,7 @@ export default function CarritoPage() {
             aria-hidden="true"
             className={styles.emptyIcon}
           />
+
           <p>Tu carrito está vacío</p>
 
           <p className={styles.emptyTotal}>
@@ -361,7 +381,10 @@ export default function CarritoPage() {
             </div>
 
             {checkoutError && (
-              <p role="alert" className={styles.checkoutError}>
+              <p
+                role="alert"
+                className={styles.checkoutError}
+              >
                 {checkoutError}
               </p>
             )}

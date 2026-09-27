@@ -10,8 +10,6 @@ import HomeCarousel, {
 import ProductSearchBar from '../../components/products/ProductSearchBar';
 import { useProductFilters } from '../../hooks/useProductFilters';
 
-import { catalogCategories } from '../../data/catalogo';
-
 import styles from './catalog.module.css';
 
 const catalogSlides: CarouselSlide[] = [
@@ -29,6 +27,54 @@ const catalogSlides: CarouselSlide[] = [
     id: 3,
     image: '/images/carousel/catalogo/catalogo-3.jpg',
     alt: 'Macarons y productos de Brisée Bake',
+  },
+];
+
+const catalogCategories = [
+  {
+    name: 'Macarons',
+    slug: 'macarons',
+    description: 'Deliciosos macarons artesanales llenos de sabor y color.',
+    image: '/images/catalogo/macarons.jpg',
+    backgroundColor: '#fbe3f1',
+    titleColor: '#d66098',
+    isHealthy: false, 
+  },
+  {
+    name: 'Cookies',
+    slug: 'cookies',
+    description: 'Galletas saludables, crujientes y perfectas para cuidarte.',
+    image: '/images/catalogo/cookies.jpg',
+    backgroundColor: '#e5f1eb',
+    titleColor: '#6eaa61',
+    isHealthy: true,
+  },
+  {
+    name: 'Granolas',
+    slug: 'granolas',
+    description: 'Granolas horneadas, llenas de fibra y energía natural.',
+    image: '/images/catalogo/granolas.jpg',
+    backgroundColor: '#f9f2d2',
+    titleColor: '#d7a81f',
+    isHealthy: true,
+  },
+  {
+    name: 'Cookies congeladas',
+    slug: 'cookies-congeladas',
+    description: 'Masa lista para hornear y disfrutar galletas frescas en casa.',
+    image: '/images/catalogo/cookies-congeladas.jpg',
+    backgroundColor: '#e6eaf5',
+    titleColor: '#5a73a3',
+    isHealthy: true,
+  },
+  {
+    name: 'Cookies cookie Dough',
+    slug: 'cookie-dough',
+    description: 'Deliciosa masa cruda comestible, un antojo seguro y dulce.',
+    image: '/images/catalogo/cookie-dough.jpg',
+    backgroundColor: '#f5e6e8',
+    titleColor: '#a8616c',
+    isHealthy: true,
   },
 ];
 
@@ -53,7 +99,6 @@ function formatPrice(price: number | string): string {
   return `COP $ ${formatted}`;
 }
 
-
 export default function CatalogoPage() {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -73,8 +118,6 @@ export default function CatalogoPage() {
         setIsLoading(false);
       });
   }, []);
-
-
 
   const {
     searchTerm,
@@ -104,129 +147,140 @@ export default function CatalogoPage() {
         ) : (
           <>
             <section className={styles.heading}>
-          <h1>Elige tu favorito</h1>
+              <h1>Elige tu favorito</h1>
 
-          <div className={styles.decorativeLine} aria-hidden="true">
-            <span />
-            <span>❀</span>
-            <span />
-          </div>
+              <div className={styles.decorativeLine} aria-hidden="true">
+                <span />
+                <span>❀</span>
+                <span />
+              </div>
 
-          <p>
-            Descubre nuestras categorías y encuentra el producto
-            perfecto para cada momento.
-          </p>
-        </section>
-
-        <ProductSearchBar
-          value={searchTerm}
-          onChange={setSearchTerm}
-          placeholder="Buscar producto en todo el catálogo..."
-          activeTags={activeTags}
-          toggleTag={toggleTag}
-          clearTags={clearTags}
-          hasActiveFilters={hasActiveFilters}
-        />
-
-        {isFiltering ? (
-          filteredItems.length === 0 ? (
-            <section className={styles.noResults} role="status">
-              <p>No se encontraron productos para tu búsqueda</p>
+              <p>
+                Descubre nuestras categorías y encuentra el producto
+                perfecto para cada momento.
+              </p>
             </section>
-          ) : (
-            <section
-              className={styles.searchResultsGrid}
-              aria-label="Resultados de búsqueda"
-            >
-              {filteredItems.map((product) => (
-                <Link
-                  key={product.id}
-                  href={`/producto/${product.id}`}
-                  className={styles.searchResultCard}
+
+            <ProductSearchBar
+              value={searchTerm}
+              onChange={setSearchTerm}
+              placeholder="Buscar producto en todo el catálogo..."
+              activeTags={activeTags}
+              toggleTag={toggleTag}
+              clearTags={clearTags}
+              hasActiveFilters={hasActiveFilters}
+            />
+
+            {isFiltering ? (
+              filteredItems.length === 0 ? (
+                <section className={styles.noResults} role="status">
+                  <p>No se encontraron productos para tu búsqueda</p>
+                </section>
+              ) : (
+                <section
+                  className={styles.searchResultsGrid}
+                  aria-label="Resultados de búsqueda"
                 >
-                  <div className={styles.searchResultImageContainer}>
-                    <Image
-                      src={
-                        product.imagenes?.[0]?.urlImagen ??
-                        '/images/catalogo/producto-placeholder.jpg'
-                      }
-                      alt={product.imagenes?.[0]?.nombre ?? product.nombre}
-                      fill
-                      sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 25vw"
-                      unoptimized
-                    />
-                  </div>
+                  {filteredItems.map((product) => (
+                    <Link
+                      key={product.id}
+                      href={`/producto/${product.id}`}
+                      className={styles.searchResultCard}
+                    >
+                      <div className={styles.searchResultImageContainer}>
+                        <Image
+                          src={
+                            product.imagenes?.[0]?.urlImagen ??
+                            '/images/catalogo/producto-placeholder.jpg'
+                          }
+                          alt={product.imagenes?.[0]?.nombre ?? product.nombre}
+                          fill
+                          sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 25vw"
+                          unoptimized
+                        />
+                      </div>
 
-                  <div className={styles.searchResultInfo}>
-                    <h3>{product.nombre}</h3>
-                    <p>{formatPrice(product.precio)}</p>
-                  </div>
-                </Link>
-              ))}
-            </section>
-          )
-        ) : (
-          <section
-            className={styles.categoryGrid}
-            aria-label="Categorías del catálogo"
-          >
-            {catalogCategories.map((category) => (
-              <article
-                key={category.slug}
-                className={styles.categoryCard}
-                style={{
-                  backgroundColor: category.backgroundColor,
-                }}
+                      <div className={styles.searchResultInfo}>
+                        <h3>{product.nombre}</h3>
+                        <p>{formatPrice(product.precio)}</p>
+                      </div>
+                    </Link>
+                  ))}
+                </section>
+              )
+            ) : (
+              <section
+                className={styles.categoryGrid}
+                aria-label="Categorías del catálogo"
               >
-                <div className={styles.leafDecoration} aria-hidden="true">
-                  <span>❧</span>
-                </div>
-
-                <div className={styles.imageContainer}>
-                  <Image
-                    src={category.image}
-                    alt={`Categoría de ${category.name}`}
-                    fill
-                    className={styles.categoryImage}
-                    sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 25vw"
-                    onError={(event) => {
-                      event.currentTarget.style.display = 'none';
-                    }}
-                  />
-
-                  <div
-                    className={styles.imagePlaceholder}
-                    aria-hidden="true"
-                  >
-                    <span>Imagen de</span>
-                    <strong>{category.name}</strong>
-                  </div>
-                </div>
-
-                <div className={styles.cardContent}>
-                  <h2
+                {catalogCategories.map((category) => (
+                  <article
+                    key={category.slug}
+                    className={styles.categoryCard}
                     style={{
-                      color: category.titleColor,
+                      backgroundColor: category.backgroundColor,
                     }}
                   >
-                    {category.name}
-                  </h2>
+                    <div className={styles.leafDecoration} aria-hidden="true">
+                      <span>❧</span>
+                    </div>
 
-                  <p>{category.description}</p>
+                    {/* Contenedor de la Imagen */}
+                    <div className={styles.imageContainer}>
+                      {/* ETIQUETA SALUDABLE FLOTANTE */}
+                      {category.isHealthy && (
+                        <span className={styles.healthyBadge}>
+                          🍃 Saludable
+                        </span>
+                      )}
 
-                  <Link
-                    href={`/catalogo/${category.slug}`}
-                    className={styles.discoverButton}
-                    aria-label={`Descubrir ${category.name}`}
-                  >
-                    Descubrir
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </section>
-        )}
-              </>
+                      <Image
+                        src={category.image}
+                        alt={`Categoría de ${category.name}`}
+                        fill
+                        className={styles.categoryImage}
+                        sizes="(max-width: 700px) 100vw, (max-width: 1100px) 20vw, 20vw"
+                        onError={(event) => {
+                          event.currentTarget.style.display = 'none';
+                        }}
+                      />
+
+                      <div
+                        className={styles.imagePlaceholder}
+                        aria-hidden="true"
+                      >
+                        <span>Imagen de</span>
+                        <strong>{category.name}</strong>
+                      </div>
+                    </div>
+
+                    <div className={styles.cardContent}>
+                      {/* Contenedor del texto centrado perfectamente */}
+                      <div className={styles.textContent}>
+                        <h2
+                          style={{
+                            color: category.titleColor,
+                          }}
+                        >
+                          {category.name}
+                        </h2>
+
+                        <p>{category.description}</p>
+                      </div>
+
+                      <Link
+                        href={`/catalogo/${category.slug}`}
+                        className={styles.discoverButton}
+                        aria-label={`Descubrir ${category.name}`}
+                      >
+                        Descubrir
+                      </Link>
+                    </div>
+                  </article>
+                ))}
+              </section>
+            )}
+          </>
         )}
       </div>
     </div>

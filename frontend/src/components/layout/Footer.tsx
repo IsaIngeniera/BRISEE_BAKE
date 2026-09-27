@@ -1,5 +1,4 @@
 import Image from 'next/image';
-
 import type { ReactElement } from 'react';
 
 import {
@@ -26,7 +25,6 @@ export default function Footer(): ReactElement {
   return (
     <footer className={styles.footer}>
       <div className={styles.mainContent}>
-        {/* Logo */}
         <div className={styles.logoColumn}>
           <Image
             src="/images/logo-brisee-transparent.png"
@@ -37,7 +35,6 @@ export default function Footer(): ReactElement {
           />
         </div>
 
-        {/* Contact */}
         <section className={styles.section}>
           <h2 className={styles.title}>Contacto</h2>
 
@@ -61,7 +58,6 @@ export default function Footer(): ReactElement {
               aria-label="Abrir dirección en Google Maps"
             >
               <MapPin aria-hidden="true" />
-
               <span>
                 Tv. 34D Sur #32D-52, Zona 9,
                 <br />
@@ -80,7 +76,6 @@ export default function Footer(): ReactElement {
           </address>
         </section>
 
-        {/* Opening hours */}
         <section className={styles.section}>
           <h2 className={styles.title}>
             Horario de atención
@@ -101,7 +96,6 @@ export default function Footer(): ReactElement {
           </dl>
         </section>
 
-        {/* Google Maps */}
         <div className={styles.mapContainer}>
           <iframe
             src={GOOGLE_MAPS_URL}
@@ -114,7 +108,6 @@ export default function Footer(): ReactElement {
         </div>
       </div>
 
-      {/* Bottom bar */}
       <div className={styles.bottomBar}>
         <nav
           className={styles.socialLinks}
