@@ -99,11 +99,14 @@
 }
 
 .checkoutButton {
+  display: block;
+  text-align: center;
+  text-decoration: none;
   width: 100%;
   padding: 14px;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, var(--pink-500), var(--pink-600));
+  background: var(--pink-600);
   color: #ffffff;
   font-family: var(--font-display), serif;
   font-size: 1.1rem;
@@ -113,6 +116,10 @@
     filter 0.2s,
     transform 0.2s;
 }
+
+.checkoutButton:disabled { opacity: .65; cursor: not-allowed; }
+.checkoutButton:disabled:hover { filter: none; transform: none; }
+.checkoutNote { margin: 10px 0 0; text-align: center; color: #715b65; }
 
 .checkoutButton:hover,
 .checkoutButton:focus-visible {
@@ -162,4 +169,135 @@
 .goToCatalogButton:focus-visible {
   filter: brightness(0.93);
   transform: scale(1.03);
+}
+
+.checkoutError {
+  margin: 0 0 18px;
+  padding: 13px 16px;
+  border: 1px solid #eeb9ca;
+  background: #fff5fc;
+  color: #863b55;
+  font-size: 1.1rem;
+  line-height: 1.45;
+}
+
+.confirmationCard {
+  width: min(100%, 760px);
+  margin: 36px auto 0;
+  padding: clamp(28px, 5vw, 52px);
+  border: 1px solid #edaccc;
+  background: #fff;
+  color: #513f45;
+  font-family: 'Baskerville Old Face', Baskerville,
+    'Times New Roman', Georgia, serif;
+  text-align: center;
+}
+
+.confirmationIcon {
+  width: 48px;
+  height: 48px;
+  color: #d66098;
+}
+
+.confirmationEyebrow {
+  margin: 12px 0 8px;
+  color: #d66098;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+
+.confirmationCard h2 {
+  margin: 0 0 12px;
+  color: #d66098;
+  font-size: clamp(2.5rem, 5vw, 3.7rem);
+  font-weight: 400;
+}
+
+.confirmationIntro {
+  max-width: 540px;
+  margin: 0 auto 25px;
+  font-size: 1.25rem;
+  line-height: 1.45;
+}
+
+.orderNumber {
+  margin: 0 0 24px;
+  padding: 14px;
+  background: #fff5fc;
+  font-size: 1.4rem;
+}
+
+.orderNumber strong {
+  color: #d66098;
+}
+
+.confirmationItems {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.confirmationItems li,
+.confirmationTotal {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #f3d7e5;
+  font-size: 1.2rem;
+}
+
+.confirmationItems li span {
+  min-width: 0;
+}
+
+.confirmationItems li strong,
+.confirmationTotal strong {
+  white-space: nowrap;
+}
+
+.confirmationTotal {
+  margin: 8px 0 25px;
+  color: #d66098;
+  font-size: 1.35rem;
+}
+
+.whatsappButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 54px;
+  padding: 10px 20px;
+  border: 0;
+  background: #d66098;
+  color: #fff;
+  font: 1.3rem 'Baskerville Old Face', Baskerville,
+    'Times New Roman', Georgia, serif;
+  cursor: pointer;
+}
+
+.whatsappButton:hover {
+  background: #b94c7e;
+}
+
+.whatsappButton:focus-visible {
+  outline: 2px solid #d66098;
+  outline-offset: 3px;
+}
+
+.confirmationNote {
+  margin: 16px 0 0;
+  color: #715b65;
+  font-size: 1.05rem;
+}
+
+@media (max-width: 520px) {
+  .confirmationItems li,
+  .confirmationTotal {
+    flex-wrap: wrap;
+  }
 }

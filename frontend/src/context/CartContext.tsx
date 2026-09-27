@@ -2,9 +2,9 @@
 
 import {
   createContext,
+  useCallback,
   useEffect,
   useState,
-  useCallback,
   type ReactNode,
 } from 'react';
 
@@ -14,6 +14,11 @@ export interface CartItem {
   precio: number | string;
   imagenUrl?: string;
   cantidad: number;
+}
+
+interface CatalogProduct {
+  id: string | number;
+  estado: 'ACTIVO' | 'INACTIVO';
 }
 
 interface CartContextValue {
@@ -30,12 +35,36 @@ interface CartContextValue {
   ) => void;
   removeFromCart: (productId: CartItem['productId']) => void;
   clearCart: () => void;
-  removedItems?: string[];
-  isHydrated?: boolean;
+  removedItems: string[];
+  isHydrated: boolean;
   refreshCart: () => Promise<void>;
 }
 
+const CART_STORAGE_KEY = 'brisee_cart';
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
 export const CartContext = createContext<CartContextValue | null>(null);
+
+function readStoredCart(): CartItem[] {
+  const storedCart = localStorage.getItem(CART_STORAGE_KEY);
+
+  if (!storedCart) {
+    return [];
+  }
+
+  const parsed: unknown = JSON.parse(storedCart);
+
+  if (!Array.isArray(parsed)) {
+    throw new Error('El carrito guardado no tiene un formato válido.');
+  }
+
+  return parsed as CartItem[];
+}
+
+function saveStoredCart(items: CartItem[]): void {
+  localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+}
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -43,22 +72,56 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [loadError, setLoadError] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-
-  const fetchCart = useCallback(async () => {
+  const refreshCart = useCallback(async (): Promise<void> => {
     try {
-      if (typeof window !== 'undefined') {
-        const storedCart = localStorage.getItem('brisee_cart');
-        if (storedCart) {
-          setItems(JSON.parse(storedCart));
-        } else {
-          setItems([]);
-        }
+      const storedItems = readStoredCart();
+
+      if (storedItems.length === 0) {
+        setItems([]);
+        setRemovedItems([]);
+        setLoadError(false);
+        return;
       }
-      setRemovedItems([]); // Ya no tenemos backend para items removidos
+
+      const response = await fetch(`${API_URL}/products`, {
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        throw new Error('No se pudo consultar el catálogo.');
+      }
+
+      const data: unknown = await response.json();
+
+      if (!Array.isArray(data)) {
+        throw new Error('El catálogo no devolvió una lista válida.');
+      }
+
+      const catalog = data as CatalogProduct[];
+
+      const activeIds = new Set(
+        catalog
+          .filter((product) => product.estado === 'ACTIVO')
+          .map((product) => String(product.id)),
+      );
+
+      const availableItems = storedItems.filter((item) =>
+        activeIds.has(String(item.productId)),
+      );
+
+      const removed = storedItems
+        .filter((item) => !activeIds.has(String(item.productId)))
+        .map((item) => item.nombre);
+
+      if (removed.length > 0) {
+        saveStoredCart(availableItems);
+      }
+
+      setItems(availableItems);
+      setRemovedItems(removed);
       setLoadError(false);
     } catch (error) {
-      console.error('Error fetching cart from localStorage:', error);
+      console.error('Error al validar el carrito:', error);
       setLoadError(true);
     } finally {
       setIsHydrated(true);
@@ -67,59 +130,68 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchCart();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    void refreshCart();
+  }, [refreshCart]);
 
-  const addToCart = async (
+  const addToCart = (
     product: Omit<CartItem, 'cantidad'>,
     cantidad: number,
-  ) => {
-    setItems((prev) => {
-      const currentCart = [...prev];
-      const existingIndex = currentCart.findIndex((item) => item.productId === product.productId);
-      if (existingIndex > -1) {
-        currentCart[existingIndex].cantidad += cantidad;
-      } else {
-        currentCart.push({ ...product, cantidad });
-      }
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('brisee_cart', JSON.stringify(currentCart));
-      }
-      return currentCart;
-    });
-  };
-
-  const removeFromCart = async (productId: CartItem['productId']) => {
-    setItems((prev) => {
-      const currentCart = prev.filter((item) => item.productId !== productId);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('brisee_cart', JSON.stringify(currentCart));
-      }
-      return currentCart;
-    });
-  };
-
-  const updateQuantity = async (productId: CartItem['productId'], cantidad: number) => {
-    setItems((prev) => {
-      const currentCart = prev.map((item) =>
-        item.productId === productId ? { ...item, cantidad } : item,
+  ): void => {
+    setItems((previous) => {
+      const existingItem = previous.find(
+        (item) => String(item.productId) === String(product.productId),
       );
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('brisee_cart', JSON.stringify(currentCart));
-      }
-      return currentCart;
+
+      const updated = existingItem
+        ? previous.map((item) =>
+            String(item.productId) === String(product.productId)
+              ? { ...item, cantidad: item.cantidad + cantidad }
+              : item,
+          )
+        : [...previous, { ...product, cantidad }];
+
+      saveStoredCart(updated);
+      return updated;
     });
   };
 
-  const clearCart = () => {
-    setItems([]);
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('brisee_cart');
-    }
+  const removeFromCart = (productId: CartItem['productId']): void => {
+    setItems((previous) => {
+      const updated = previous.filter(
+        (item) => String(item.productId) !== String(productId),
+      );
+
+      saveStoredCart(updated);
+      return updated;
+    });
   };
 
-  const totalItems = items.reduce((sum, item) => sum + item.cantidad, 0);
+  const updateQuantity = (
+    productId: CartItem['productId'],
+    cantidad: number,
+  ): void => {
+    setItems((previous) => {
+      const updated = previous.map((item) =>
+        String(item.productId) === String(productId)
+          ? { ...item, cantidad }
+          : item,
+      );
+
+      saveStoredCart(updated);
+      return updated;
+    });
+  };
+
+  const clearCart = (): void => {
+    setItems([]);
+    setRemovedItems([]);
+    localStorage.removeItem(CART_STORAGE_KEY);
+  };
+
+  const totalItems = items.reduce(
+    (sum, item) => sum + item.cantidad,
+    0,
+  );
 
   return (
     <CartContext.Provider
@@ -127,13 +199,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
         items,
         totalItems,
         addToCart,
-        removeFromCart,
         updateQuantity,
+        removeFromCart,
         clearCart,
         loadError,
         removedItems,
         isHydrated,
-        refreshCart: fetchCart,
+        refreshCart,
       }}
     >
       {children}
