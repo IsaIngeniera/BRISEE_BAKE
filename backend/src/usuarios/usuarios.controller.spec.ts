@@ -1,19 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PedidosController } from './pedidos.controller';
-import { PedidosService } from './pedidos.service';
+import { UsuariosController } from './usuarios.controller';
+import { UsuariosService } from './usuarios.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 
-describe('PedidosController', () => {
-  let controller: PedidosController;
+describe('UsuariosController', () => {
+  let controller: UsuariosController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [PedidosController],
+      controllers: [UsuariosController],
       providers: [
         {
-          provide: PedidosService,
-          useValue: {}, // mock PedidosService
+          provide: UsuariosService,
+          useValue: {},
         },
       ],
     })
@@ -23,7 +23,7 @@ describe('PedidosController', () => {
       .useValue({ canActivate: () => true })
       .compile();
 
-    controller = module.get<PedidosController>(PedidosController);
+    controller = module.get<UsuariosController>(UsuariosController);
   });
 
   it('should be defined', () => {

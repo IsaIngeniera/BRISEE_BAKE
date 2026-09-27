@@ -33,7 +33,9 @@ export class PedidosController {
   ) {
     const userId = req.user?.sub;
     if (!userId) {
-      throw new UnauthorizedException('Debe iniciar sesión para hacer un pedido');
+      throw new UnauthorizedException(
+        'Debe iniciar sesión para hacer un pedido',
+      );
     }
     return this.pedidosService.createPedido(userId, createPedidoDto);
   }
