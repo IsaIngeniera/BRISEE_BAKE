@@ -40,14 +40,24 @@ interface CartContextValue {
   refreshCart: () => Promise<void>;
 }
 
-const CART_STORAGE_KEY = 'brisee_cart';
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import { getSessionUser, AUTH_CHANGE_EVENT } from '../services/auth';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+function getCartStorageKey(): string {
+  if (typeof window === 'undefined') return 'brisee_cart_guest';
+  const user = getSessionUser();
+  if (user) {
+    return `brisee_cart_${user.sub}`;
+  }
+  return 'brisee_cart_guest';
+}
 
 export const CartContext = createContext<CartContextValue | null>(null);
 
 function readStoredCart(): CartItem[] {
-  const storedCart = localStorage.getItem(CART_STORAGE_KEY);
+  const key = getCartStorageKey();
+  const storedCart = localStorage.getItem(key);
 
   if (!storedCart) {
     return [];
@@ -63,7 +73,8 @@ function readStoredCart(): CartItem[] {
 }
 
 function saveStoredCart(items: CartItem[]): void {
-  localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+  const key = getCartStorageKey();
+  localStorage.setItem(key, JSON.stringify(items));
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -131,6 +142,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void refreshCart();
+
+    const handleAuthChange = () => {
+      void refreshCart();
+    };
+
+    window.addEventListener(AUTH_CHANGE_EVENT, handleAuthChange);
+    return () => {
+      window.removeEventListener(AUTH_CHANGE_EVENT, handleAuthChange);
+    };
   }, [refreshCart]);
 
   const addToCart = (
@@ -185,7 +205,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const clearCart = (): void => {
     setItems([]);
     setRemovedItems([]);
-    localStorage.removeItem(CART_STORAGE_KEY);
+    const key = getCartStorageKey();
+    localStorage.removeItem(key);
   };
 
   const totalItems = items.reduce(
