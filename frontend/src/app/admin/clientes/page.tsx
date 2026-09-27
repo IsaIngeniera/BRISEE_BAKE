@@ -16,7 +16,6 @@ export default function ClientesAdminPage() {
         <section className={styles.empty} role="status">
           <UsersRound size={48} strokeWidth={1.5} aria-hidden="true" />
           <h2>Clientes aún no disponibles</h2>
-          <p>El listado de clientes estará disponible al conectar esta vista con el backend.</p>
         </section>
       </div>
     </main>
