@@ -24,10 +24,10 @@
 }
 
 .backButton {
-  width: fit-content;
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  width: fit-content;
   color: var(--dark-pink);
   font-size: 1rem;
   text-decoration: none;
@@ -79,11 +79,11 @@
 }
 
 .decoration {
-  margin: 15px auto 0;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 9px;
+  margin: 15px auto 0;
   color: var(--primary-pink);
 }
 
@@ -96,50 +96,46 @@
 
 .productGrid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: stretch;
-  gap: 46px 70px;
+  gap: 46px 30px;
 }
 
 .productCard {
   position: relative;
-  min-width: 0;
   display: flex;
+  min-width: 0;
   flex-direction: column;
   overflow: hidden;
-  background-color: #ffffff;
   border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  background-color: #ffffff;
+  box-shadow: 0 4px 10px rgb(0 0 0 / 5%);
   transition:
     box-shadow 220ms ease,
     transform 220ms ease;
 }
 
 .productCard:hover {
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px rgb(0 0 0 / 10%);
   transform: translateY(-4px);
 }
 
 .editButton {
   position: absolute;
+  z-index: 10;
   top: 16px;
   left: 16px;
-  z-index: 10;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   width: 50px;
   height: 50px;
   padding: 0;
-
   color: #ffffff;
   background-color: #e580bb;
   border: 2px solid #ffffff;
   border-radius: 50%;
   box-shadow: 0 5px 15px rgb(125 52 93 / 25%);
-
   cursor: pointer;
   transition:
     background-color 200ms ease,
@@ -153,55 +149,52 @@
   transform: translateY(-2px);
 }
 
-.editButton:focus-visible {
-  outline: 3px solid #d66098;
-  outline-offset: 3px;
-}
-
 .editButton svg {
   width: 24px;
   height: 24px;
 }
 
-@media (max-width: 680px) {
-  .editButton {
-    top: 12px;
-    left: 12px;
-    width: 44px;
-    height: 44px;
-  }
-
-  .editButton svg {
-    width: 21px;
-    height: 21px;
-  }
-}
-
 .productImageContainer {
   position: relative;
+  display: block;
   width: 100%;
   aspect-ratio: 1 / 1;
   overflow: hidden;
 }
 
-.productImage {
+.productImage,
+.productImageContain {
+  display: block;
   width: 100%;
   height: 100%;
-  display: block;
-  object-fit: cover;
   transition: transform 400ms ease;
 }
 
-.productCard:hover .productImage {
+.productImage {
+  object-fit: cover;
+}
+
+.productImageContain {
+  background-color: #f7f7f7;
+  object-fit: contain;
+}
+
+.productCard:hover .productImage,
+.productCard:hover .productImageContain {
   transform: scale(1.02);
 }
 
 .productInformation {
-  padding: 15px 20px 20px;
   display: flex;
   flex: 1;
   flex-direction: column;
+  padding: 15px 20px 20px;
   text-align: left;
+}
+
+.productTitleLink {
+  color: inherit;
+  text-decoration: none;
 }
 
 .productInformation h2 {
@@ -218,18 +211,19 @@
 }
 
 .description {
+  flex-grow: 1;
   margin: 0 0 15px;
   color: #7a7a7a;
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 0.85rem;
   line-height: 1.4;
-  flex-grow: 1;
 }
 
 .labels {
   display: none;
 }
 
+/* Estas clases también pueden usarlas los botones internos de productos. */
 .price {
   margin: 0 0 15px;
   color: #000000;
@@ -243,29 +237,29 @@
 }
 
 .cartButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 80%;
   min-height: 35px;
   margin: 0 auto;
   padding: 8px 15px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #000000;
-  background-color: var(--primary-pink);
   border-radius: 8px;
+  background-color: var(--primary-pink);
+  color: #000000;
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 0.95rem;
   font-weight: 600;
+  text-align: center;
   text-decoration: none;
   transition:
-    color 180ms ease,
     background-color 180ms ease,
     transform 180ms ease;
 }
 
 .cartButton:hover {
-  color: white;
   background-color: var(--dark-pink);
+  color: #ffffff;
   transform: translateY(-2px);
 }
 
@@ -275,19 +269,17 @@
 
 .disabledButton {
   pointer-events: none;
-  color: #896f78;
   background-color: #eadbe2;
+  color: #896f78;
   box-shadow: none;
 }
 
-/* Add-product card */
-
 .addProductCard {
-  min-height: 100%;
   display: flex;
-  background-color: rgb(251 227 241 / 45%);
+  min-height: 100%;
   border: 2px dashed var(--secondary-pink);
   border-radius: 13px;
+  background-color: rgb(251 227 241 / 45%);
   transition:
     background-color 180ms ease,
     border-color 180ms ease,
@@ -295,34 +287,34 @@
 }
 
 .addProductCard:hover {
-  background-color: var(--pale-pink);
   border-color: var(--dark-pink);
+  background-color: var(--pale-pink);
   transform: translateY(-6px);
 }
 
 .addProductLink {
-  width: 100%;
-  min-height: 440px;
-  padding: 35px;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  min-height: 440px;
+  flex-direction: column;
+  padding: 35px;
   color: var(--dark-pink);
   text-align: center;
   text-decoration: none;
 }
 
 .addIcon {
-  width: 72px;
-  height: 72px;
-  margin-bottom: 18px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: white;
-  background-color: var(--primary-pink);
+  width: 72px;
+  height: 72px;
+  margin-bottom: 18px;
   border-radius: 50%;
+  background-color: var(--primary-pink);
+  color: #ffffff;
   box-shadow: 0 10px 25px rgb(214 96 152 / 20%);
 }
 
@@ -348,9 +340,9 @@
   max-width: 650px;
   margin: 35px auto 0;
   padding: 18px 25px;
-  color: #806971;
-  background-color: var(--soft-pink);
   border-radius: 12px;
+  background-color: var(--soft-pink);
+  color: #806971;
   font-family: Arial, Helvetica, sans-serif;
   text-align: center;
 }
@@ -396,5 +388,17 @@
 
   .addProductLink {
     min-height: 350px;
+  }
+
+  .editButton {
+    top: 12px;
+    left: 12px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .editButton svg {
+    width: 21px;
+    height: 21px;
   }
 }

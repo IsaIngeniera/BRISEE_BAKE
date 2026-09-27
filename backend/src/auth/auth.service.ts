@@ -1,7 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma.service';
-import { Rol, EstadoUsuario } from '@prisma/client';
+import { Rol, EstadoUsuario, Prisma } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -9,6 +17,76 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
   ) {}
+
+  async register(registerDto: RegisterDto) {
+    const existingUser = await this.prisma.usuario.findUnique({
+      where: { correo: registerDto.correo },
+    });
+
+    if (existingUser) {
+      throw new BadRequestException('Este correo ya está registrado');
+    }
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(registerDto.password, saltRounds);
+
+    const newUser = await this.prisma.usuario.create({
+      data: {
+        nombre: registerDto.nombre,
+        apellido: registerDto.apellido,
+        correo: registerDto.correo,
+        password: hashedPassword,
+        rol: Rol.CLIENTE,
+        celular: registerDto.celular,
+        estado: EstadoUsuario.ACTIVO,
+        fechaNacimiento: new Date(registerDto.fechaNacimiento),
+        createdAt: new Date(),
+      },
+    });
+
+    const payload = {
+      sub: newUser.id,
+      correo: newUser.correo,
+      rol: newUser.rol,
+    };
+    return {
+      message: 'Registro exitoso',
+      access_token: await this.jwtService.signAsync(payload),
+    };
+  }
+
+  async login(loginDto: LoginDto) {
+    const user = await this.prisma.usuario.findUnique({
+      where: { correo: loginDto.correo },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException(
+        'Nombre de Usuario y/o contraseñas incorrectas',
+      );
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      loginDto.password,
+      user.password,
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException(
+        'Nombre de Usuario y/o contraseñas incorrectas',
+      );
+    }
+
+    const payload = {
+      sub: user.id,
+      correo: user.correo,
+      rol: user.rol,
+    };
+
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
+  }
 
   async loginMockAdmin() {
     // 1. Check if mock admin exists
@@ -38,5 +116,42 @@ export class AuthService {
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
+  }
+
+  async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
+    const { password, fechaNacimiento, ...rest } = updateProfileDto;
+
+    const dataToUpdate: Prisma.UsuarioUpdateInput = { ...rest };
+
+    if (fechaNacimiento) {
+      dataToUpdate.fechaNacimiento = new Date(fechaNacimiento);
+    }
+
+    if (password) {
+      const saltRounds = 10;
+      dataToUpdate.password = await bcrypt.hash(password, saltRounds);
+    }
+
+    try {
+      const updatedUser = await this.prisma.usuario.update({
+        where: { id: userId },
+        data: dataToUpdate,
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password: _password, ...userWithoutPassword } = updatedUser;
+      return {
+        message: 'Perfil actualizado exitosamente',
+        user: userWithoutPassword,
+      };
+    } catch (error: unknown) {
+      const err = error as { code?: string };
+      if (err.code === 'P2002') {
+        throw new BadRequestException(
+          'El correo ya está en uso por otro usuario',
+        );
+      }
+      throw error;
+    }
   }
 }
