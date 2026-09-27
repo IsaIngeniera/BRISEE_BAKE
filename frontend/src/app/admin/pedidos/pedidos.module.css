@@ -3,7 +3,8 @@
   padding: 42px 24px 80px;
   background: #fff;
   color: #513f45;
-  font-family: 'Baskerville Old Face', Baskerville, 'Times New Roman', Georgia, serif;
+  font-family: 'Baskerville Old Face', Baskerville, 'Times New Roman',
+    Georgia, serif;
 }
 
 .container {
@@ -34,8 +35,8 @@
   margin: 0 0 12px;
   color: #d66098;
   font-size: 1rem;
-  letter-spacing: .15em;
   font-weight: 700;
+  letter-spacing: 0.15em;
 }
 
 .heading h1 {
@@ -46,7 +47,7 @@
   line-height: 1.1;
 }
 
-.heading>p:last-child {
+.heading > p:last-child {
   margin: 0;
   font-size: 1.35rem;
   line-height: 1.45;
@@ -93,8 +94,8 @@
 
 .cardTop {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
   gap: 14px;
   padding: 22px 28px;
@@ -116,14 +117,14 @@
 .badge {
   padding: 9px 16px;
   border: 1px solid #e48abd;
-  color: #ad4175;
   background: #fff5fc;
+  color: #ad4175;
   font-size: 1.05rem;
 }
 
 .details {
   display: grid;
-  grid-template-columns: 1fr 1.3fr .8fr;
+  grid-template-columns: 1fr 1.3fr 0.8fr;
   gap: 24px;
   padding: 25px 28px;
 }
@@ -177,15 +178,41 @@
   background: #fff;
   color: #513f45;
   font: inherit;
+  cursor: pointer;
 }
 
 .cardBottom select:disabled {
-  opacity: .75;
-  cursor: not-allowed;
+  opacity: 0.75;
+  cursor: wait;
+}
+
+.error {
+  margin: 0 0 24px;
+  padding: 14px 18px;
+  border: 1px solid #eeb9ca;
+  background: #fff5fc;
+  color: #863b55;
+  font-size: 1.15rem;
+}
+
+.retryButton {
+  min-height: 44px;
+  padding: 9px 22px;
+  border: 0;
+  background: #d66098;
+  color: #fff;
+  font: inherit;
+  font-size: 1.15rem;
+  cursor: pointer;
+}
+
+.retryButton:hover {
+  background: #b94c7e;
 }
 
 .backLink:focus-visible,
-.cardBottom select:focus-visible {
+.cardBottom select:focus-visible,
+.retryButton:focus-visible {
   outline: 2px solid #d66098;
   outline-offset: 3px;
 }
@@ -200,7 +227,41 @@
     gap: 18px;
   }
 
-  .heading>p:last-child {
+  .heading > p:last-child {
     font-size: 1.2rem;
   }
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 26px;
+}
+
+.filterButton {
+  min-height: 46px;
+  padding: 9px 20px;
+  border: 1px solid #edaccc;
+  background: #fff;
+  color: #d66098;
+  font: inherit;
+  font-size: 1.18rem;
+  cursor: pointer;
+}
+
+.filterButton:hover {
+  background: #fff5fc;
+}
+
+.filterActive,
+.filterActive:hover {
+  border-color: #d66098;
+  background: #d66098;
+  color: #fff;
+}
+
+.filterButton:focus-visible {
+  outline: 2px solid #d66098;
+  outline-offset: 3px;
 }
