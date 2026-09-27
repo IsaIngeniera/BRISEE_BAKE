@@ -53,7 +53,6 @@ export default function PedidosAdminPage() {
           <section className={styles.empty} role="status">
             <ClipboardList size={48} strokeWidth={1.5} aria-hidden="true" />
             <h2>Pedidos aún no disponibles</h2>
-            <p>El listado estará disponible al conectar esta vista con el backend de pedidos.</p>
           </section>
         ) : pedidos.length === 0 ? (
           <section className={styles.empty} role="status">
