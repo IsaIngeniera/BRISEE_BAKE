@@ -75,6 +75,7 @@ const catalogCategories = [
     backgroundColor: '#f5e6e8',
     titleColor: '#a8616c',
     isHealthy: true,
+    objectFit: 'contain' as const,
   },
 ];
 
@@ -239,6 +240,7 @@ export default function CatalogoPage() {
                         alt={`Categoría de ${category.name}`}
                         fill
                         className={styles.categoryImage}
+                        style={{ objectFit: ('objectFit' in category ? category.objectFit : 'cover') as React.CSSProperties['objectFit'] }}
                         sizes="(max-width: 700px) 100vw, (max-width: 1100px) 20vw, 20vw"
                         onError={(event) => {
                           event.currentTarget.style.display = 'none';
