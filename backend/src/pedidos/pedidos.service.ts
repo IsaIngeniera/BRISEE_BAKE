@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { Prisma } from '@prisma/client';
@@ -18,27 +18,33 @@ export class PedidosService {
     // 1. Obtener los productos desde la base de datos para calcular el total real
     const productosDb = await this.prisma.producto.findMany({
       where: {
-        id: { in: createPedidoDto.items.map(item => item.idProducto) },
-        estado: 'ACTIVO'
-      }
+        id: { in: createPedidoDto.items.map((item) => item.idProducto) },
+        estado: 'ACTIVO',
+      },
     });
 
     if (productosDb.length === 0) {
-      throw new BadRequestException('No hay productos disponibles en el carrito.');
+      throw new BadRequestException(
+        'No hay productos disponibles en el carrito.',
+      );
     }
 
     // 2. Calcular total
     let total = new Prisma.Decimal(0);
-    const validItems: { idProducto: string, cantidad: number, precioUnitario: Prisma.Decimal }[] = [];
+    const validItems: {
+      idProducto: string;
+      cantidad: number;
+      precioUnitario: Prisma.Decimal;
+    }[] = [];
 
     for (const item of createPedidoDto.items) {
-      const productoDb = productosDb.find(p => p.id === item.idProducto);
+      const productoDb = productosDb.find((p) => p.id === item.idProducto);
       if (productoDb) {
         total = total.add(productoDb.precio.mul(item.cantidad));
         validItems.push({
           idProducto: item.idProducto,
           cantidad: item.cantidad,
-          precioUnitario: productoDb.precio
+          precioUnitario: productoDb.precio,
         });
       }
     }
@@ -57,7 +63,7 @@ export class PedidosService {
         },
       });
 
-      const orderProducts = validItems.map(item => ({
+      const orderProducts = validItems.map((item) => ({
         idPedido: nuevoPedido.id,
         idProducto: item.idProducto,
         cantidad: item.cantidad,

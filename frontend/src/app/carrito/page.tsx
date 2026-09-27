@@ -83,8 +83,9 @@ export default function CarritoPage() {
       } else {
         refreshCart();
       }
-    } catch (error: any) {
-      alert(`Hubo un problema procesando tu compra: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      alert(`Hubo un problema procesando tu compra: ${errorMessage}`);
     } finally {
       setIsCheckingOut(false);
     }
