@@ -20,6 +20,7 @@ function formatPrice(price: number | string): string {
 
 export default function CarritoPage() {
   const [hasSession, setHasSession] = useState<boolean | null>(null);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const {
     items,
     loadError,
@@ -43,6 +44,51 @@ export default function CarritoPage() {
     (sum, item) => sum + Number(item.precio) * item.cantidad,
     0,
   );
+
+  async function handleCheckout() {
+    setIsCheckingOut(true);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+      const payloadItems = items.map(item => ({
+        idProducto: item.productId,
+        cantidad: item.cantidad
+      }));
+
+      const response = await fetch(`${apiUrl}/pedidos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          direccionEntrega: 'Por definir',
+          ciudad: 'Por definir',
+          tipoEntrega: 'RETIRO',
+          observacionesEntrega: 'Generado desde el carrito',
+          items: payloadItems
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Error al procesar el pedido');
+      }
+
+      const userConfirmed = window.confirm(
+        '¡Pago exitoso!\n\nRevisa la información de tu compra. Selecciona OK para redireccionar a WhatsApp y organizar los detalles de la entrega.'
+      );
+
+      if (userConfirmed && data.whatsappUrl) {
+        refreshCart();
+        window.location.href = data.whatsappUrl;
+      } else {
+        refreshCart();
+      }
+    } catch (error: any) {
+      alert(`Hubo un problema procesando tu compra: ${error.message}`);
+    } finally {
+      setIsCheckingOut(false);
+    }
+  }
 
   // Evita mostrar "carrito vacío" un instante antes de que llegue la
   // respuesta real del backend.
@@ -131,8 +177,13 @@ export default function CarritoPage() {
 
         {hasSession === null ? null : hasSession ? (
           <>
-            <button type="button" className={styles.checkoutButton}>
-              Continuar con la compra
+            <button
+              type="button"
+              className={styles.checkoutButton}
+              onClick={handleCheckout}
+              disabled={isCheckingOut}
+            >
+              {isCheckingOut ? 'Procesando...' : 'Continuar con la compra'}
             </button>
           </>
         ) : (
