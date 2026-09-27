@@ -12,7 +12,7 @@ describe('PedidosService', () => {
         {
           provide: PrismaService,
           useValue: {}, // mock PrismaService
-        }
+        },
       ],
     }).compile();
 

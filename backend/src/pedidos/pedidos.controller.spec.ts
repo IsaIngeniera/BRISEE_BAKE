@@ -12,7 +12,7 @@ describe('PedidosController', () => {
         {
           provide: PedidosService,
           useValue: {}, // mock PedidosService
-        }
+        },
       ],
     }).compile();
 
