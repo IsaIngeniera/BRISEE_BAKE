@@ -46,6 +46,13 @@ export class CreatePedidoDto {
   @IsOptional()
   observacionesEntrega?: string;
 
+  @ApiProperty({
+    description: 'Fecha esperada o deseada para la entrega del pedido',
+  })
+  @IsString()
+  @IsNotEmpty()
+  fechaEsperada: string;
+
   @ApiProperty({ description: 'Items del carrito' })
   @IsArray()
   @ValidateNested({ each: true })

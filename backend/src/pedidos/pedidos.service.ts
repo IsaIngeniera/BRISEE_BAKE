@@ -53,13 +53,27 @@ export class PedidosService {
       }
     }
 
+    // Validación de fecha esperada (Mínimo 3 días)
+    const fechaEsperadaDate = new Date(createPedidoDto.fechaEsperada);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const minValidDate = new Date(today);
+    minValidDate.setDate(today.getDate() + 3);
+
+    if (fechaEsperadaDate < minValidDate) {
+      throw new BadRequestException(
+        'La fecha de entrega debe ser al menos 3 días después de la fecha actual.',
+      );
+    }
+
     // 3. Crear el Pedido y los PedidoProductos
     const pedido = await this.prisma.$transaction(async (tx) => {
       const nuevoPedido = await tx.pedido.create({
         data: {
-          idCliente: userId, // Dummy user for now
+          idCliente: userId,
           estadoEntrega: 'PENDIENTE',
           total: total,
+          fechaEsperada: fechaEsperadaDate,
           direccionEntrega: createPedidoDto.direccionEntrega,
           ciudad: createPedidoDto.ciudad,
           tipoEntrega: createPedidoDto.tipoEntrega,
