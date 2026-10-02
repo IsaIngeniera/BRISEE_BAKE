@@ -106,7 +106,7 @@ export class PedidosService {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     const amountInCents = Math.round(Number(total) * 100);
     const reference = pedido.id;
-    const redirectUrl = `${frontendUrl}/finalizar-compra?status=APPROVED&reference=${reference}`;
+    const redirectUrl = `${frontendUrl}/cuenta?status=APPROVED&reference=${reference}`;
 
     let signatureStr = '';
     if (integritySecret) {
