@@ -6,44 +6,53 @@ import {
   Delete,
   Body,
   Param,
+  Req,
   ParseUUIDPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { CarritoService } from './carrito.service';
 import { AddItemDto } from './dto/add-item.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 @ApiTags('carrito')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('carrito')
 export class CarritoController {
   constructor(private readonly carritoService: CarritoService) {}
 
-  // Usuario simulado para pruebas de desarrollo sin Auth (mismo que HU-7)
-  private readonly dummyUserId = '00000000-0000-0000-0000-000000000000';
-
   @Get()
-  getCart() {
-    return this.carritoService.getCart(this.dummyUserId);
+  getCart(@Req() req: { user: { sub: string } }) {
+    return this.carritoService.getCart(req.user.sub);
   }
 
   @Post('items')
-  addItem(@Body() addItemDto: AddItemDto) {
-    return this.carritoService.addItem(this.dummyUserId, addItemDto);
+  addItem(
+    @Req() req: { user: { sub: string } },
+    @Body() addItemDto: AddItemDto,
+  ) {
+    return this.carritoService.addItem(req.user.sub, addItemDto);
   }
 
   @Patch('items/:productId')
   updateItemQuantity(
+    @Req() req: { user: { sub: string } },
     @Param('productId', ParseUUIDPipe) productId: string,
     @Body('cantidad') cantidad: number,
   ) {
     return this.carritoService.updateItemQuantity(
-      this.dummyUserId,
+      req.user.sub,
       productId,
       cantidad,
     );
   }
 
   @Delete('items/:productId')
-  removeItem(@Param('productId', ParseUUIDPipe) productId: string) {
-    return this.carritoService.removeItem(this.dummyUserId, productId);
+  removeItem(
+    @Req() req: { user: { sub: string } },
+    @Param('productId', ParseUUIDPipe) productId: string,
+  ) {
+    return this.carritoService.removeItem(req.user.sub, productId);
   }
 }

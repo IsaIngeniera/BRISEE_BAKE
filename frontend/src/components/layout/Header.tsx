@@ -3,14 +3,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
 import {
   useEffect,
   useState,
   useSyncExternalStore,
   type ReactElement,
 } from 'react';
-
 import {
   ChevronDown,
   Menu,
@@ -19,6 +17,13 @@ import {
   UserRound,
   X,
 } from 'lucide-react';
+
+import icon from '@/app/icon.png';
+
+import {
+  AUTH_CHANGE_EVENT,
+  getSessionUser,
+} from '@/services/auth';
 
 import styles from './header.module.css';
 
@@ -29,49 +34,21 @@ interface NavigationItem {
 
 type ViewMode = 'CLIENT' | 'ADMIN';
 
-const VIEW_MODE_STORAGE_KEY = 'brisee_view_mode';
-const VIEW_MODE_CHANGE_EVENT =
-  'brisee:view-mode-change';
-
 const NAVIGATION_LINKS: readonly NavigationItem[] = [
-  {
-    label: 'Bienvenido',
-    href: '/',
-  },
-  {
-    label: 'Catálogo',
-    href: '/catalogo',
-  },
-  {
-    label: 'Contactos',
-    href: '/contacto',
-  },
+  { label: 'Bienvenido', href: '/' },
+  { label: 'Catálogo', href: '/catalogo' },
+  { label: 'Contactos', href: '/contacto' },
 ];
 
-const ANALYTICS_LINKS: readonly NavigationItem[] = [
-  {
-    label: 'Resumen',
-    href: '/analitica',
-  },
-  {
-    label: 'Administrar productos',
-    href: '/admin/productos',
-  },
-  {
-    label: 'Crear producto',
-    href: '/admin/productos/crear',
-  },
+const ADMIN_LINKS: readonly NavigationItem[] = [
+  { label: 'Administrar productos', href: '/admin/productos' },
+  { label: 'Crear producto', href: '/admin/productos/crear' },
+  { label: 'Administrar pedidos', href: '/admin/pedidos' },
+  { label: 'Administrar clientes', href: '/admin/clientes' },
 ];
 
 function getViewModeSnapshot(): ViewMode {
-  // const savedViewMode = localStorage.getItem(
-  //   VIEW_MODE_STORAGE_KEY,
-  // );
-
-  // return savedViewMode === 'ADMIN'
-  //   ? 'ADMIN'
-  //   : 'CLIENT';
-  return 'CLIENT'; // Oculto y forzado a cliente
+  return getSessionUser()?.rol === 'ADMIN' ? 'ADMIN' : 'CLIENT';
 }
 
 function getServerViewModeSnapshot(): ViewMode {
@@ -81,24 +58,16 @@ function getServerViewModeSnapshot(): ViewMode {
 function subscribeToViewMode(
   notifyViewModeChange: () => void,
 ): () => void {
+  window.addEventListener('storage', notifyViewModeChange);
   window.addEventListener(
-    'storage',
-    notifyViewModeChange,
-  );
-
-  window.addEventListener(
-    VIEW_MODE_CHANGE_EVENT,
+    AUTH_CHANGE_EVENT,
     notifyViewModeChange,
   );
 
   return () => {
+    window.removeEventListener('storage', notifyViewModeChange);
     window.removeEventListener(
-      'storage',
-      notifyViewModeChange,
-    );
-
-    window.removeEventListener(
-      VIEW_MODE_CHANGE_EVENT,
+      AUTH_CHANGE_EVENT,
       notifyViewModeChange,
     );
   };
@@ -109,8 +78,7 @@ export default function Header(): ReactElement {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] =
     useState(false);
-
-  const [isAnalyticsMenuOpen, setIsAnalyticsMenuOpen] =
+  const [isAdminMenuOpen, setIsAdminMenuOpen] =
     useState(false);
 
   const viewMode = useSyncExternalStore(
@@ -126,30 +94,12 @@ export default function Header(): ReactElement {
     );
   }, [viewMode]);
 
-  function toggleViewMode(): void {
-    const newViewMode: ViewMode =
-      viewMode === 'CLIENT' ? 'ADMIN' : 'CLIENT';
-
-    localStorage.setItem(
-      VIEW_MODE_STORAGE_KEY,
-      newViewMode,
-    );
-
-    window.dispatchEvent(
-      new Event(VIEW_MODE_CHANGE_EVENT),
-    );
-  }
-
   function closeMenus(): void {
     setIsMobileMenuOpen(false);
-    setIsAnalyticsMenuOpen(false);
+    setIsAdminMenuOpen(false);
   }
 
   function handleSaveChanges(): void {
-    /*
-     * This action will be connected later to the active
-     * administration form.
-     */
     window.dispatchEvent(
       new CustomEvent('brisee:save-changes'),
     );
@@ -170,7 +120,7 @@ export default function Header(): ReactElement {
     );
   }
 
-  const isAnalyticsActive = ANALYTICS_LINKS.some(
+  const isAdminSectionActive = ADMIN_LINKS.some(
     (item) => isActiveLink(item.href),
   );
 
@@ -221,7 +171,7 @@ export default function Header(): ReactElement {
             aria-label="Ir al inicio de Brisée Bake"
           >
             <Image
-              src="/images/logo-header-transparent.png"
+              src={icon}
               alt="Brisée Bake - Handmade with love"
               width={330}
               height={115}
@@ -243,6 +193,7 @@ export default function Header(): ReactElement {
                     ? styles.activeLink
                     : ''
                 }`}
+                onClick={closeMenus}
               >
                 {item.label}
               </Link>
@@ -255,42 +206,38 @@ export default function Header(): ReactElement {
                   className={`${styles.navigationLink} ${
                     styles.dropdownButton
                   } ${
-                    isAnalyticsActive
+                    isAdminSectionActive
                       ? styles.activeLink
                       : ''
                   }`}
-                  onClick={() => {
-                    setIsAnalyticsMenuOpen(
-                      (isOpen) => !isOpen,
-                    );
-                  }}
-                  aria-expanded={isAnalyticsMenuOpen}
-                  aria-controls="analytics-menu"
+                  onClick={() =>
+                    setIsAdminMenuOpen((isOpen) => !isOpen)
+                  }
+                  aria-expanded={isAdminMenuOpen}
+                  aria-controls="admin-navigation-menu"
                 >
-                  Analítica
+                  Administración
 
                   <ChevronDown
                     aria-hidden="true"
                     className={
-                      isAnalyticsMenuOpen
+                      isAdminMenuOpen
                         ? styles.rotatedChevron
                         : styles.chevron
                     }
                   />
                 </button>
 
-                {isAnalyticsMenuOpen && (
+                {isAdminMenuOpen && (
                   <div
-                    id="analytics-menu"
+                    id="admin-navigation-menu"
                     className={styles.dropdownMenu}
                   >
-                    {ANALYTICS_LINKS.map((item) => (
+                    {ADMIN_LINKS.map((item) => (
                       <Link
                         key={item.href}
                         href={item.href}
-                        className={
-                          styles.dropdownLink
-                        }
+                        className={styles.dropdownLink}
                         onClick={closeMenus}
                       >
                         {item.label}
@@ -303,20 +250,32 @@ export default function Header(): ReactElement {
           </nav>
 
           <div className={styles.userActions}>
-            <Link
-              href="/carrito"
-              className={styles.iconButton}
-              aria-label="Abrir carrito de compras"
-              title="Carrito"
-            >
-              <ShoppingCart aria-hidden="true" />
-            </Link>
+            {viewMode === 'ADMIN' ? (
+              <button
+                type="button"
+                className={styles.iconButton}
+                aria-label="Carrito del administrador"
+                title="Carrito del administrador"
+              >
+                <ShoppingCart aria-hidden="true" />
+              </button>
+            ) : (
+              <Link
+                href="/carrito"
+                className={styles.iconButton}
+                aria-label="Abrir carrito de compras"
+                title="Carrito"
+              >
+                <ShoppingCart aria-hidden="true" />
+              </Link>
+            )}
 
             <Link
-              href="/login"
+              href="/cuenta"
               className={styles.iconButton}
-              aria-label="Iniciar sesión o abrir perfil"
+              aria-label="Abrir mi cuenta"
               title="Mi cuenta"
+              onClick={closeMenus}
             >
               <UserRound aria-hidden="true" />
             </Link>
@@ -324,11 +283,9 @@ export default function Header(): ReactElement {
             <button
               type="button"
               className={styles.mobileMenuButton}
-              onClick={() => {
-                setIsMobileMenuOpen(
-                  (isOpen) => !isOpen,
-                );
-              }}
+              onClick={() =>
+                setIsMobileMenuOpen((isOpen) => !isOpen)
+              }
               aria-label={
                 isMobileMenuOpen
                   ? 'Cerrar menú de navegación'
@@ -369,39 +326,33 @@ export default function Header(): ReactElement {
               <>
                 <button
                   type="button"
-                  className={`${styles.mobileLink} ${styles.mobileDropdownButton}`}
-                  onClick={() => {
-                    setIsAnalyticsMenuOpen(
-                      (isOpen) => !isOpen,
-                    );
-                  }}
-                  aria-expanded={isAnalyticsMenuOpen}
+                  className={`${styles.mobileLink} ${
+                    styles.mobileDropdownButton
+                  }`}
+                  onClick={() =>
+                    setIsAdminMenuOpen((isOpen) => !isOpen)
+                  }
+                  aria-expanded={isAdminMenuOpen}
                 >
-                  Analítica
+                  Administración
 
                   <ChevronDown
                     aria-hidden="true"
                     className={
-                      isAnalyticsMenuOpen
+                      isAdminMenuOpen
                         ? styles.rotatedChevron
                         : styles.chevron
                     }
                   />
                 </button>
 
-                {isAnalyticsMenuOpen && (
-                  <div
-                    className={
-                      styles.mobileDropdown
-                    }
-                  >
-                    {ANALYTICS_LINKS.map((item) => (
+                {isAdminMenuOpen && (
+                  <div className={styles.mobileDropdown}>
+                    {ADMIN_LINKS.map((item) => (
                       <Link
                         key={item.href}
                         href={item.href}
-                        className={
-                          styles.mobileDropdownLink
-                        }
+                        className={styles.mobileDropdownLink}
                         onClick={closeMenus}
                       >
                         {item.label}
@@ -412,59 +363,36 @@ export default function Header(): ReactElement {
               </>
             )}
 
-            <Link
-              href="/carrito"
-              className={styles.mobileLink}
-              onClick={closeMenus}
-            >
-              Carrito de compras
-            </Link>
+            {viewMode === 'ADMIN' ? (
+              <Link
+                href="/cuenta"
+                className={styles.mobileLink}
+                onClick={closeMenus}
+              >
+                Mi cuenta
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/carrito"
+                  className={styles.mobileLink}
+                  onClick={closeMenus}
+                >
+                  Carrito de compras
+                </Link>
 
-            <Link
-              href="/login"
-              className={styles.mobileLink}
-              onClick={closeMenus}
-            >
-              Iniciar sesión
-            </Link>
+                <Link
+                  href="/cuenta"
+                  className={styles.mobileLink}
+                  onClick={closeMenus}
+                >
+                  Mi cuenta
+                </Link>
+              </>
+            )}
           </nav>
         )}
       </div>
-
-      <button
-        type="button"
-        onClick={toggleViewMode}
-        aria-label={
-          viewMode === 'ADMIN'
-            ? 'Cambiar a vista de cliente'
-            : 'Cambiar a vista de administrador'
-        }
-        style={{
-          display: 'none', // Ocultamos el botón como solicitaste
-          position: 'fixed',
-          right: '20px',
-          bottom: '20px',
-          zIndex: 9999,
-          padding: '10px 20px',
-          color: '#ffffff',
-          backgroundColor:
-            viewMode === 'ADMIN'
-              ? '#d66098'
-              : '#f26f71',
-          border: 'none',
-          borderRadius: '30px',
-          boxShadow:
-            '0 4px 12px rgb(0 0 0 / 15%)',
-          fontFamily: 'Arial, sans-serif',
-          fontWeight: 'bold',
-          cursor: 'pointer',
-        }}
-      >
-        Vista:{' '}
-        {viewMode === 'ADMIN'
-          ? 'Administrador'
-          : 'Cliente'}
-      </button>
     </header>
   );
 }
