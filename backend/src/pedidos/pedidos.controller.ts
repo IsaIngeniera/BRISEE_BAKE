@@ -8,8 +8,10 @@ import {
   UseGuards,
   Req,
   UnauthorizedException,
+  Res,
+  Query,
 } from '@nestjs/common';
-import { Request } from 'express';
+import type { Request, Response } from 'express';
 import { PedidosService } from './pedidos.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { UpdateEstadoPedidoDto } from './dto/update-estado-pedido.dto';
@@ -70,5 +72,36 @@ export class PedidosController {
     @Body() updateEstadoDto: UpdateEstadoPedidoDto,
   ) {
     return this.pedidosService.updateEstado(id, updateEstadoDto.estadoEntrega);
+  }
+
+  @Get('verificar-pago/:transactionId')
+  verificarPago(@Param('transactionId') transactionId: string) {
+    return this.pedidosService.verificarPagoWompi(transactionId);
+  }
+
+  @Get('retorno-wompi')
+  async retornoWompi(
+    @Query('id') id: string,
+    @Query('reference') reference: string,
+    @Query('frontendUrl') frontendUrl: string,
+    @Res() res: Response,
+  ) {
+    const defaultFrontend = 'http://127.0.0.1:3000';
+    const base = frontendUrl || defaultFrontend;
+    
+    if (!id) {
+      return res.redirect(`${base}/carrito?error=pago_rechazado`);
+    }
+
+    try {
+      const pago = await this.pedidosService.verificarPagoWompi(id);
+      if (pago.status === 'APPROVED') {
+        return res.redirect(`${base}/finalizar-compra?status=APPROVED&reference=${reference}&id=${id}`);
+      } else {
+        return res.redirect(`${base}/carrito?error=pago_rechazado`);
+      }
+    } catch (error) {
+      return res.redirect(`${base}/carrito?error=pago_rechazado`);
+    }
   }
 }

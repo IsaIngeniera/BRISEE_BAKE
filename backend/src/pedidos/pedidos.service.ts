@@ -106,7 +106,8 @@ export class PedidosService {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     const amountInCents = Math.round(Number(total) * 100);
     const reference = pedido.id;
-    const redirectUrl = `${frontendUrl}/cuenta?status=APPROVED&reference=${reference}`;
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3001';
+    const redirectUrl = `${backendUrl}/pedidos/retorno-wompi?reference=${reference}&frontendUrl=${encodeURIComponent(frontendUrl)}`;
 
     let signatureStr = '';
     if (integritySecret) {
@@ -195,5 +196,23 @@ export class PedidosService {
         },
       },
     });
+  }
+
+  async verificarPagoWompi(transactionId: string) {
+    try {
+      // Usamos sandbox para entorno de pruebas
+      const response = await fetch(`https://sandbox.wompi.co/v1/transactions/${transactionId}`);
+      if (!response.ok) {
+        throw new Error('No se pudo verificar la transacción');
+      }
+      const data = await response.json();
+      return {
+        status: data.data.status,
+        reference: data.data.reference,
+        amount: data.data.amount_in_cents / 100,
+      };
+    } catch (error) {
+      throw new Error('Error de conexión con Wompi al verificar el pago');
+    }
   }
 }
