@@ -1,17 +1,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { ArrowLeft, Pencil, Plus } from 'lucide-react';
 
-import {
-  ArrowLeft,
-  Pencil,
-  Plus,
-} from 'lucide-react';
 import ExpandableDescription from '@/components/products/ExpandableDescription';
 import ProductCatalogGrid from '@/components/products/ProductCatalogGrid';
-import { normalizeText } from '@/utils/normalize-text';
-
-import styles from './linea-saludable.module.css';
 import ProductCardActions from '@/components/products/ProductCardActions';
+import { normalizeText } from '@/utils/normalize-text';
 
 interface ProductImage {
   id: string;
@@ -38,19 +32,32 @@ interface Product {
   imagenes?: ProductImage[];
 }
 
-function isSaludableProduct(product: Product): boolean {
-  const productName = normalizeText(product.nombre);
-  const categoryName = normalizeText(
-    product.categoria?.nombre ?? '',
-  );
-
-  return (
-    productName.includes('saludable') ||
-    categoryName.includes('saludable')
-  );
+interface CookieCategoryPageProps {
+  title: string;
+  subtitle: string;
+  categoryNames: string[];
+  searchPlaceholder: string;
+  createCategory: string;
+  placeholderImage: string;
+  styles: Record<string, string>;
+  containImages?: boolean;
 }
 
-async function getSaludableProducts(): Promise<Product[]> {
+function formatPrice(price: number | string): string {
+  const value = Number(price);
+
+  if (Number.isNaN(value)) {
+    return 'COP $ 0';
+  }
+
+  return `COP $ ${value.toLocaleString('es-CO', {
+    maximumFractionDigits: 0,
+  })}`;
+}
+
+async function getProducts(
+  categoryNames: string[],
+): Promise<Product[]> {
   try {
     const apiUrl =
       process.env.INTERNAL_API_URL ?? 'http://backend:3001';
@@ -61,57 +68,59 @@ async function getSaludableProducts(): Promise<Product[]> {
 
     if (!response.ok) {
       console.error(
-        `Error fetching healthy products. Status: ${response.status}`,
+        `Error fetching cookie products: ${response.status}`,
       );
-
       return [];
     }
 
     const products: Product[] = await response.json();
+    const acceptedCategories =
+      categoryNames.map(normalizeText);
 
-    return products.filter(
-      (product) =>
+    return products.filter((product) => {
+      const categoryName = normalizeText(
+        product.categoria?.nombre ?? '',
+      );
+
+      return (
         product.estado !== 'INACTIVO' &&
-        isSaludableProduct(product),
-    );
+        acceptedCategories.includes(categoryName)
+      );
+    });
   } catch (error) {
-    console.error('Error fetching healthy products:', error);
-
+    console.error('Error fetching cookie products:', error);
     return [];
   }
 }
 
-function formatPrice(price: number | string): string {
-  const numericPrice = Number(price);
-
-  if (Number.isNaN(numericPrice)) {
-    return 'COP $ 0';
-  }
-
-  const formatted = numericPrice.toLocaleString('es-CO', {
-    maximumFractionDigits: 0,
-  });
-  
-  return `COP $ ${formatted}`;
-}
-
-export default async function LineaSaludablePage() {
-  const products = await getSaludableProducts();
+export default async function CookieCategoryPage({
+  title,
+  subtitle,
+  categoryNames,
+  searchPlaceholder,
+  createCategory,
+  placeholderImage,
+  styles,
+  containImages = false,
+}: CookieCategoryPageProps) {
+  const products = await getProducts(categoryNames);
 
   const items = products.map((product) => {
-    const productImageUrl =
+    const imageUrl =
       product.imagenes?.[0]?.urlImagen ??
-      '/images/catalogo/linea-saludable-placeholder.jpg';
+      placeholderImage;
 
-    const productImageAlt =
+    const imageAlt =
       product.imagenes?.[0]?.nombre ??
       `Imagen de ${product.nombre}`;
 
     return {
       product,
       node: (
-        <article key={product.id} className={styles.productCard}>
-          {/* Admin edit button */}
+        <article
+          key={product.id}
+          className={styles.productCard}
+        >
           <Link
             href={`/admin/productos/${product.id}/editar`}
             className={`${styles.editButton} admin-only`}
@@ -121,26 +130,28 @@ export default async function LineaSaludablePage() {
             <Pencil aria-hidden="true" />
           </Link>
 
-          {/* Product image */}
           <Link
             href={`/producto/${product.id}`}
             className={styles.productImageContainer}
           >
             <Image
-              src={productImageUrl}
-              alt={productImageAlt}
-              className={styles.productImage}
+              src={imageUrl}
+              alt={imageAlt}
+              className={
+                containImages
+                  ? styles.productImageContain
+                  : styles.productImage
+              }
               fill
               sizes="(max-width: 680px) 100vw, (max-width: 1100px) 50vw, 33vw"
               unoptimized
             />
           </Link>
 
-          {/* Product information */}
           <div className={styles.productInformation}>
             <Link
               href={`/producto/${product.id}`}
-              style={{ textDecoration: 'none', color: 'inherit' }}
+              className={styles.productTitleLink}
             >
               <h2>{product.nombre}</h2>
             </Link>
@@ -174,7 +185,7 @@ export default async function LineaSaludablePage() {
               productId={product.id}
               nombre={product.nombre}
               precio={product.precio}
-              imagenUrl={productImageUrl}
+              imagenUrl={imageUrl}
               existencias={product.existencias}
               formattedPrice={formatPrice(product.precio)}
             />
@@ -186,24 +197,30 @@ export default async function LineaSaludablePage() {
 
   return (
     <div className={styles.page}>
-      {/* Page header */}
       <section className={styles.pageHeading}>
-        <Link href="/catalogo" className={styles.backButton}>
+        <Link
+          href="/catalogo"
+          className={styles.backButton}
+        >
           <ArrowLeft aria-hidden="true" />
           Volver al catálogo
         </Link>
 
         <div className={styles.titleContainer}>
-          <p className={styles.eyebrow}>Catálogo Brisée Bake</p>
-
-          <h1>Línea Saludable</h1>
-
-          <p className={styles.subtitle}>
-            Opciones deliciosas pensadas para diferentes estilos
-            de alimentación, sin perder el sabor artesanal.
+          <p className={styles.eyebrow}>
+            Catálogo Brisée Bake
           </p>
 
-          <div className={styles.decoration} aria-hidden="true">
+          <h1>{title}</h1>
+
+          <p className={styles.subtitle}>
+            {subtitle}
+          </p>
+
+          <div
+            className={styles.decoration}
+            aria-hidden="true"
+          >
             <span />
             <span>❀</span>
             <span />
@@ -211,26 +228,27 @@ export default async function LineaSaludablePage() {
         </div>
       </section>
 
-      {/* Búsqueda + grid de productos */}
       <ProductCatalogGrid
         items={items}
-        searchPlaceholder="Buscar producto..."
+        searchPlaceholder={searchPlaceholder}
         gridClassName={styles.productGrid}
-        gridAriaLabel="Productos de línea saludable"
+        gridAriaLabel={`Productos de ${title}`}
         emptyCategoryClassName={styles.emptyMessage}
         emptyCategoryMessage={
           <p>
-            Aún no hay productos saludables registrados. Utiliza
-            la tarjeta &quot;Añadir producto&quot; para crear el
-            primero.
+            Aún no hay productos registrados en esta
+            categoría.
           </p>
         }
         renderExtra={
-          <article key="add-product-extra" className={`${styles.addProductCard} admin-only`}>
+          <article
+            key="add-product-extra"
+            className={`${styles.addProductCard} admin-only`}
+          >
             <Link
-              href="/admin/productos/crear?categoria=linea_saludable"
+              href={`/admin/productos/crear?categoria=${createCategory}`}
               className={styles.addProductLink}
-              aria-label="Crear producto de línea saludable"
+              aria-label={`Añadir producto a ${title}`}
             >
               <span className={styles.addIcon}>
                 <Plus aria-hidden="true" />
@@ -241,7 +259,7 @@ export default async function LineaSaludablePage() {
               </span>
 
               <span className={styles.addDescription}>
-                Crea un producto saludable nuevo y agrégalo al
+                Crea un producto nuevo y agrégalo al
                 catálogo.
               </span>
             </Link>

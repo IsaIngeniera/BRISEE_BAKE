@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -53,7 +55,7 @@ const benefits: Benefit[] = [
     description:
       'Combinamos ingredientes de calidad con recetas cuidadosamente elaboradas para ofrecer un sabor delicioso.',
     icon: Heart,
-    backgroundColor: '#fbe3f1',
+    backgroundColor: '#fbe3f1', /* Fondo rosado original */
     iconBackground: '#f3b7d4',
     color: '#d66098',
     editPath: '/admin/inicio/beneficios/1',
@@ -64,7 +66,7 @@ const benefits: Benefit[] = [
     description:
       'Combinamos ingredientes de calidad con recetas cuidadosamente elaboradas para ofrecer un sabor delicioso.',
     icon: Leaf,
-    backgroundColor: '#e5f1eb',
+    backgroundColor: '#e5f1eb', /* Fondo verde original */
     iconBackground: '#cce5bc',
     color: '#6eaa61',
     editPath: '/admin/inicio/beneficios/2',
@@ -75,7 +77,7 @@ const benefits: Benefit[] = [
     description:
       'Elaboramos cada producto con dedicación y atención al detalle, cuidando desde la preparación hasta la presentación.',
     icon: Sparkles,
-    backgroundColor: '#f9f2d2',
+    backgroundColor: '#f9f2d2', /* Fondo amarillo original */
     iconBackground: '#f5df9a',
     color: '#d7a81f',
     editPath: '/admin/inicio/beneficios/3',
@@ -132,7 +134,6 @@ export default function HomePage(): ReactElement {
             className={styles.aboutImage}
             sizes="(max-width: 800px) 100vw, 50vw"
           />
-
         </div>
       </section>
 

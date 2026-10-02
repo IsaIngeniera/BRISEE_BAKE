@@ -33,11 +33,25 @@ async function main() {
     }
   });
 
+  const adminUser = await prisma.usuario.create({
+    data: {
+      id: '99999999-9999-9999-9999-999999999999',
+      nombre: 'Admin',
+      apellido: 'Principal',
+      fechaNacimiento: new Date('1990-01-01'),
+      correo: 'admin@briseebake.com',
+      rol: 'ADMIN',
+      password: '$2b$10$14eZEX/ZfRWkC/Ffo5Z0tup/FlKyk0I3RVKlEs/gzmPoLSOs3sGbi', // admin123
+      celular: '3000000000',
+      estado: 'ACTIVO',
+    }
+  });
+
   console.log('Creando categorias...');
-  const catGranolas = await prisma.categoria.create({ data: { nombre: 'Granolas' } });
-  const catGalletas = await prisma.categoria.create({ data: { nombre: 'Galletas' } });
-  const catGalletasCongeladas = await prisma.categoria.create({ data: { nombre: 'Galletas congeladas' } });
-  const catMacarons = await prisma.categoria.create({ data: { nombre: 'Macarons' } });
+  const catGranolas = await prisma.categoria.create({ data: { id: '11111111-1111-1111-1111-111111111111', nombre: 'Granolas' } });
+  const catGalletas = await prisma.categoria.create({ data: { id: '22222222-2222-2222-2222-222222222222', nombre: 'Galletas' } });
+  const catGalletasCongeladas = await prisma.categoria.create({ data: { id: '33333333-3333-3333-3333-333333333333', nombre: 'Galletas congeladas' } });
+  const catMacarons = await prisma.categoria.create({ data: { id: '44444444-4444-4444-4444-444444444444', nombre: 'Macarons' } });
 
   console.log('Creando productos...');
 

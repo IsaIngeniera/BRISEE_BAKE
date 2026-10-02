@@ -11,7 +11,7 @@
   min-height: calc(100vh - 120px);
   padding: 40px 20px 80px;
   background-color: var(--background);
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--font-body);
   color: var(--text);
 }
 
@@ -26,7 +26,7 @@
   gap: 8px;
   margin-bottom: 30px;
   color: var(--dark-pink);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
   font-size: 0.95rem;
   font-weight: 600;
   text-decoration: none;
@@ -72,7 +72,7 @@
 .category {
   margin: 0 0 10px;
   color: var(--primary-pink);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
   font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -89,8 +89,8 @@
 
 .price {
   margin: 0 0 25px;
-  color: var(--coral);
-  font-family: Arial, Helvetica, sans-serif;
+  color: #000000;
+  font-family: var(--font-body);
   font-size: 1.8rem;
   font-weight: 700;
 }
@@ -105,7 +105,7 @@
 
 .description {
   margin: 0 0 25px;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
   font-size: 1.05rem;
   line-height: 1.7;
   color: #56474c;
@@ -113,7 +113,7 @@
 
 .presentation {
   margin: 0 0 15px;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
   font-size: 0.95rem;
   color: #56474c;
 }
@@ -134,7 +134,7 @@
   padding: 6px 14px;
   color: var(--dark-pink);
   background-color: var(--pale-pink);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
   font-size: 0.8rem;
   font-weight: 700;
   border-radius: 20px;
@@ -151,7 +151,7 @@
 
 .stock {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
   font-size: 0.9rem;
   font-weight: 600;
   color: #8c9b93;
@@ -165,7 +165,7 @@
   padding: 14px 30px;
   color: white;
   background: linear-gradient(135deg, var(--coral) 0%, var(--dark-pink) 100%);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
   font-size: 1.05rem;
   font-weight: 600;
   border: none;

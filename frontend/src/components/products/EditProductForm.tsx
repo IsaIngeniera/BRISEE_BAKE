@@ -319,7 +319,7 @@ export default function EditProductForm({
         ...formData,
         precio: Number.parseFloat(formData.precio),
         existencias: Number.parseInt(formData.existencias, 10),
-        idCategoria: Number.parseInt(formData.idCategoria, 10),
+        idCategoria: formData.idCategoria,
       };
 
       const response = await fetch(`${apiUrl}/products/${productId}`, {
