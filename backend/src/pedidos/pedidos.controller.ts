@@ -88,7 +88,7 @@ export class PedidosController {
   ) {
     const defaultFrontend = 'http://127.0.0.1:3000';
     const base = frontendUrl || defaultFrontend;
-    
+
     if (!id) {
       return res.redirect(`${base}/carrito?error=pago_rechazado`);
     }
@@ -96,11 +96,13 @@ export class PedidosController {
     try {
       const pago = await this.pedidosService.verificarPagoWompi(id);
       if (pago.status === 'APPROVED') {
-        return res.redirect(`${base}/finalizar-compra?status=APPROVED&reference=${reference}&id=${id}`);
+        return res.redirect(
+          `${base}/finalizar-compra?status=APPROVED&reference=${reference}&id=${id}`,
+        );
       } else {
         return res.redirect(`${base}/carrito?error=pago_rechazado`);
       }
-    } catch (error) {
+    } catch {
       return res.redirect(`${base}/carrito?error=pago_rechazado`);
     }
   }

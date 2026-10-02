@@ -93,6 +93,15 @@ export class PedidosService {
         data: orderProducts,
       });
 
+      await tx.pago.create({
+        data: {
+          idPedido: nuevoPedido.id,
+          estado: 'PENDIENTE',
+          metodo: 'WOMPI',
+          total: total,
+        },
+      });
+
       return nuevoPedido;
     });
 
@@ -199,18 +208,53 @@ export class PedidosService {
 
   async verificarPagoWompi(transactionId: string) {
     try {
-      // Usamos sandbox para entorno de pruebas
-      const response = await fetch(`https://sandbox.wompi.co/v1/transactions/${transactionId}`);
+      const response = await fetch(
+        `https://sandbox.wompi.co/v1/transactions/${transactionId}`,
+      );
       if (!response.ok) {
         throw new Error('No se pudo verificar la transacción');
       }
-      const data = await response.json();
+
+      interface WompiTransactionResponse {
+        data: {
+          status: string;
+          reference: string;
+          amount_in_cents: number;
+        };
+      }
+      const data = (await response.json()) as WompiTransactionResponse;
+
+      const status = data.data.status;
+      const reference = data.data.reference;
+
+      let nuevoEstado: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO' | 'CANCELADO' =
+        'PENDIENTE';
+      if (status === 'APPROVED') {
+        nuevoEstado = 'APROBADO';
+      } else if (status === 'DECLINED' || status === 'ERROR') {
+        nuevoEstado = 'RECHAZADO';
+      } else if (status === 'VOIDED') {
+        nuevoEstado = 'CANCELADO';
+      }
+
+      await this.prisma.pago
+        .update({
+          where: { idPedido: reference },
+          data: {
+            estado: nuevoEstado,
+            transaccionId: transactionId,
+          },
+        })
+        .catch((err) =>
+          console.error('No se pudo actualizar la tabla Pago:', err),
+        );
+
       return {
-        status: data.data.status,
-        reference: data.data.reference,
+        status: status,
+        reference: reference,
         amount: data.data.amount_in_cents / 100,
       };
-    } catch (error) {
+    } catch {
       throw new Error('Error de conexión con Wompi al verificar el pago');
     }
   }

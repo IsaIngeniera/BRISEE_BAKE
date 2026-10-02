@@ -19,7 +19,9 @@ import {
 
 import styles from './finalizar-compra.module.css';
 
-export default function SuccessfulPaymentPage() {
+import { Suspense } from 'react';
+
+function SuccessfulPaymentContent() {
   const searchParams = useSearchParams();
   const { clearCart } = useCart();
   const wompiStatus = searchParams.get('status')?.toUpperCase();
@@ -164,5 +166,19 @@ export default function SuccessfulPaymentPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function SuccessfulPaymentPage() {
+  return (
+    <Suspense fallback={
+      <main className={styles.page}>
+        <p className={styles.loading} role="status">
+          Cargando...
+        </p>
+      </main>
+    }>
+      <SuccessfulPaymentContent />
+    </Suspense>
   );
 }
