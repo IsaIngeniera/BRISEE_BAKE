@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import CartItemRow from '@/components/cart/CartItemRow';
 import type { CartItem } from '@/context/CartContext';
 import { useCart } from '@/hooks/useCart';
+import { saveOrderToHistory } from '@/utils/order-history';
 import {
   AUTH_TOKEN_KEY,
   getSessionUser,
@@ -303,9 +304,30 @@ export default function CarritoPage() {
       }
 
       if (data.wompiUrl) {
+        saveOrderToHistory(user.sub, {
+          number: getOrderNumber(data),
+          reference: data.pedidoId || data.id,
+          createdAt: new Date().toISOString(),
+          items: purchasedItems,
+          total: purchasedTotal,
+          deliveryMethod: deliveryMethod,
+          deliveryDate,
+          status: 'PENDIENTE DE PAGO',
+        });
         window.location.assign(data.wompiUrl);
         return;
       }
+
+      saveOrderToHistory(user.sub, {
+        number: getOrderNumber(data),
+        reference: data.pedidoId || data.id,
+        createdAt: new Date().toISOString(),
+        items: purchasedItems,
+        total: purchasedTotal,
+        deliveryMethod,
+        deliveryDate,
+        status: 'PAGO EXITOSO',
+      });
 
       setConfirmedOrder({
         number: getOrderNumber(data),

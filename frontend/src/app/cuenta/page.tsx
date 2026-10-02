@@ -20,6 +20,9 @@ import {
   getSessionUser,
   type SessionUser,
 } from '@/services/auth';
+import {
+  updateOrderStatus,
+} from '@/utils/order-history';
 
 import styles from './cuenta.module.css';
 
@@ -69,6 +72,9 @@ export default function CuentaPage() {
   const [draft, setDraft] = useState<Profile>(emptyProfile);
   const [isEditing, setIsEditing] = useState(false);
   const [message, setMessage] = useState('');
+  const [paymentStatus, setPaymentStatus] = useState<
+    'DECLINED' | null
+  >(null);
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -79,9 +85,34 @@ export default function CuentaPage() {
       const saved = readLocalProfile(sessionUser.sub);
       setProfile(saved);
       setDraft(saved);
+
+      const queryParameters = new URLSearchParams(window.location.search);
+      const wompiStatus = queryParameters.get('status')?.toUpperCase();
+      const orderReference = queryParameters.get('reference');
+
+      if (wompiStatus === 'APPROVED') {
+        router.replace(
+          `/finalizar-compra?${queryParameters.toString()}`,
+        );
+        return;
+      } else if (
+        wompiStatus === 'DECLINED' ||
+        wompiStatus === 'VOIDED' ||
+        wompiStatus === 'ERROR'
+      ) {
+        setPaymentStatus('DECLINED');
+
+        if (orderReference) {
+          updateOrderStatus(
+            sessionUser.sub,
+            orderReference,
+            'PAGO NO APROBADO',
+          );
+        }
+      }
     }
     /* eslint-enable react-hooks/set-state-in-effect */
-  }, []);
+  }, [router]);
 
   function updateField(field: keyof Profile, value: string) {
     setDraft((current) => ({
@@ -242,6 +273,17 @@ export default function CuentaPage() {
               </div>
 
               <Link
+                href="/cuenta/pedidos"
+                className={`${styles.cartLink} ${styles.ordersLink}`}
+              >
+                <ShoppingBag
+                  size={18}
+                  aria-hidden="true"
+                />
+                Mis pedidos
+              </Link>
+
+              <Link
                 href="/carrito"
                 className={styles.cartLink}
               >
@@ -263,6 +305,13 @@ export default function CuentaPage() {
             </aside>
 
             <div className={styles.details}>
+              {paymentStatus === 'DECLINED' && (
+                <p className={styles.paymentError} role="alert">
+                  El pago no fue aprobado. Puedes intentarlo nuevamente desde
+                  tu carrito.
+                </p>
+              )}
+
               <div className={styles.heading}>
                 <div>
                   <p className={styles.eyebrow}>

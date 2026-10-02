@@ -112,9 +112,53 @@
   background: #fff;
 }
 
+.ordersLink {
+  margin-bottom: 14px;
+}
+
 .details {
   padding: clamp(26px, 4vw, 48px);
 }
+
+.paymentSuccess {
+  margin-bottom: 28px;
+  padding: 22px;
+  border: 1px solid var(--pink);
+  border-radius: 12px;
+  background: var(--soft);
+  text-align: center;
+}
+
+.paymentSuccessEyebrow {
+  margin: 0 0 8px;
+  color: var(--pink);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.paymentSuccess h2 {
+  margin: 0 0 8px;
+  color: var(--pink);
+  font-family: var(--font-title);
+  font-size: 2rem;
+  font-weight: 400;
+}
+
+.paymentSuccess p:last-child {
+  margin: 0;
+  color: #715b65;
+}
+
+.paymentError {
+  margin: 0 0 24px;
+  padding: 13px 15px;
+  border: 1px solid #e8bfd3;
+  border-radius: 8px;
+  background: #fff5fa;
+  color: #82465f;
+}
+
 
 .heading {
   display: flex;
