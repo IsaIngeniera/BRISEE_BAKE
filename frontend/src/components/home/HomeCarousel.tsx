@@ -15,6 +15,8 @@ import {
   Plus,
 } from 'lucide-react';
 
+import icon from '@/app/icon.png';
+
 import styles from './home-carousel.module.css';
 
 export interface CarouselSlide {
@@ -163,7 +165,7 @@ export default function HomeCarousel({
 
       <div className={styles.logoContainer}>
         <Image
-          src="/images/logo-brisee-transparent.png"
+          src={icon}
           alt="Brisée Bake - Handmade with love"
           width={400}
           height={400}

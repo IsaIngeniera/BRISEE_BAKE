@@ -3,8 +3,7 @@
   padding: 42px 24px 80px;
   background: #fff;
   color: #513f45;
-  font-family: 'Baskerville Old Face', Baskerville,
-    'Times New Roman', Georgia, serif;
+  font-family: var(--font-body);
 }
 
 .container {
@@ -103,8 +102,7 @@
   border: 0;
   background: #d66098;
   color: #fff;
-  font: 1.2rem 'Baskerville Old Face', Baskerville,
-    'Times New Roman', Georgia, serif;
+  font: 1.2rem var(--font-body);
   cursor: pointer;
 }
 
@@ -143,8 +141,7 @@
   width: 100%;
   min-width: 870px;
   border-collapse: collapse;
-  font-family: 'Baskerville Old Face', Baskerville,
-    'Times New Roman', Georgia, serif;
+  font-family: var(--font-body);
 }
 
 .table th {
@@ -203,8 +200,7 @@
   border: 1px solid #edaccc;
   background: #fff;
   color: #513f45;
-  font: 1.08rem 'Baskerville Old Face', Baskerville,
-    'Times New Roman', Georgia, serif;
+  font: 1.08rem var(--font-body);
   cursor: pointer;
 }
 

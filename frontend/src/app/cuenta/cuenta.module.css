@@ -6,7 +6,7 @@
   padding: 38px 20px 80px;
   background: #fff;
   color: #513f45;
-  font-family: 'Baskerville Old Face', Baskerville, Georgia, serif;
+  font-family: var(--font-body);
 }
 
 .container {
@@ -204,7 +204,7 @@
   border-radius: 7px;
   background: #fff;
   color: #513f45;
-  font: 1rem 'Baskerville Old Face', Baskerville, Georgia, serif;
+  font: 1rem var(--font-body);
 }
 
 .form input:focus-visible,
@@ -242,7 +242,7 @@
   border-radius: 7px;
   background: var(--pink);
   color: #fff;
-  font: 700 1rem 'Baskerville Old Face', Baskerville, Georgia, serif;
+  font: 700 1rem var(--font-body);
   cursor: pointer;
 }
 
@@ -304,7 +304,7 @@
   border-radius: 7px;
   background: #fff;
   color: #a84670;
-  font: 700 1rem 'Baskerville Old Face', Baskerville, Georgia, serif;
+  font: 700 1rem var(--font-body);
   cursor: pointer;
 }
 

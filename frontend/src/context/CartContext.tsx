@@ -13,6 +13,7 @@ export interface CartItem {
   nombre: string;
   precio: number | string;
   imagenUrl?: string;
+  tematica?: string;
   cantidad: number;
 }
 

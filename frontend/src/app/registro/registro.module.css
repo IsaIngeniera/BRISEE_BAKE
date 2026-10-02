@@ -4,14 +4,13 @@
   --brand-border: #e48abd;
   --brand-pale: #fbe3f1;
   --brand-soft: #fff5fa;
-  --brand-font: 'Baskerville Old Face', Baskerville,
-    'Times New Roman', Georgia, serif;
+  --brand-font: var(--font-body);
 
   min-height: calc(100vh - 120px);
   padding: 44px 24px 70px;
   background: #fff;
   color: #513f45;
-  font-family: var(--brand-font);
+  font-family: var(--font-body);
 }
 
 .accountCard,
@@ -131,7 +130,7 @@
   outline: 0;
   background: transparent;
   color: #513f45;
-  font: 1.14rem var(--brand-font);
+  font: 1.14rem var(--font-body);
 }
 
 .inputBox input::placeholder {
@@ -181,7 +180,7 @@
   border-radius: 0;
   background: var(--brand-pink);
   color: #fff;
-  font: 1.35rem var(--brand-font);
+  font: 1.35rem var(--font-body);
   cursor: pointer;
 }
 

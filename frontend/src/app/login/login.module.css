@@ -1,14 +1,13 @@
 .page {
   --brand-pink: #e184b9;
   --border-pink: #ec9dca;
-  --brand-font: 'Baskerville Old Face', Baskerville,
-    'Times New Roman', Georgia, serif;
+  --brand-font: var(--font-body);
 
   min-height: 760px;
   padding: 44px 24px 62px;
   background: #fff;
   color: #2b2228;
-  font-family: var(--brand-font);
+  font-family: var(--font-body);
 }
 
 .backRow {
@@ -22,7 +21,7 @@
   gap: 14px;
   width: fit-content;
   color: #e48abd;
-  font-family: var(--brand-font);
+  font-family: var(--font-body);
   font-size: clamp 1.5rem;
   font-weight: 400;
   line-height: 1;
@@ -143,7 +142,7 @@
   outline: 0;
   background: transparent;
   color: #2b2228;
-  font: 1.25rem var(--brand-font);
+  font: 1.25rem var(--font-body);
 }
 
 .inputBox input::placeholder {
@@ -225,7 +224,7 @@
   border-radius: 4px;
   background: var(--brand-pink);
   color: #fff;
-  font: 1.4rem var(--brand-font);
+  font: 1.4rem var(--font-body);
   cursor: pointer;
 }
 
@@ -265,12 +264,12 @@
   border-radius: 4px;
   background: #fff;
   color: var(--brand-pink);
-  font: 1.25rem var(--brand-font);
+  font: 1.25rem var(--font-body);
   cursor: not-allowed;
 }
 
 .googleMark {
-  font: 700 1.8rem Arial, sans-serif;
+  font: 700 1.8rem var(--font-body);
   background: conic-gradient(
     #4285f4 0 90deg,
     #34a853 90deg 180deg,

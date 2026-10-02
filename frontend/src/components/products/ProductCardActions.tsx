@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import QuantitySelector from '@/components/products/QuantitySelector';
 import AddToCartButton from '@/components/products/AddToCartButton';
 import styles from './product-card-actions.module.css';
@@ -12,6 +13,7 @@ interface ProductCardActionsProps {
   imagenUrl: string;
   existencias: number;
   formattedPrice: string;
+  requiresOptions?: boolean;
 }
 
 export default function ProductCardActions({
@@ -21,6 +23,7 @@ export default function ProductCardActions({
   imagenUrl,
   existencias,
   formattedPrice,
+  requiresOptions = false,
 }: ProductCardActionsProps) {
   const [quantity, setQuantity] = useState(1);
   const [isQuantityValid, setIsQuantityValid] = useState(true);
@@ -31,7 +34,7 @@ export default function ProductCardActions({
       {/* Contenedor Flex para alinear precio a la izquierda y selector de cantidad a la derecha */}
       <div className={styles.priceRow}>
         <p className={styles.price}>{formattedPrice}</p>
-        {!isSoldOut && (
+        {!isSoldOut && !requiresOptions && (
           <QuantitySelector
             value={quantity}
             onChange={setQuantity}
@@ -48,15 +51,24 @@ export default function ProductCardActions({
           : 'Producto agotado'}
       </p>
 
-      <AddToCartButton
-        productId={productId}
-        nombre={nombre}
-        precio={precio}
-        imagenUrl={imagenUrl}
-        quantity={quantity}
-        disabled={isSoldOut || !isQuantityValid}
-      />
+      {requiresOptions ? (
+        <Link
+          href={`/producto/${productId}`}
+          className={styles.optionsButton}
+          aria-label={`Seleccionar opciones para ${nombre}`}
+        >
+          Seleccionar opciones
+        </Link>
+      ) : (
+        <AddToCartButton
+          productId={productId}
+          nombre={nombre}
+          precio={precio}
+          imagenUrl={imagenUrl}
+          quantity={quantity}
+          disabled={isSoldOut || !isQuantityValid}
+        />
+      )}
     </div>
   );
 }
-

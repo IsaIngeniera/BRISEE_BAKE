@@ -10,12 +10,12 @@
   --gold: #c69e73;
   --text: #513f45;
   --border-pink: #ec9dca;
-  --brand-font: 'Baskerville Old Face', Baskerville, 'Times New Roman', Georgia, serif;
+  --brand-font: var(--font-body);
 
   width: min(100%, 1500px);
   margin: 0 auto;
   color: var(--text);
-  font-family: var(--brand-font);
+  font-family: var(--font-body);
 }
 
 .aboutSection {

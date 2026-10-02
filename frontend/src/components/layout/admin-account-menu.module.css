@@ -59,7 +59,7 @@
   border-radius: 3px;
   background: #fff;
   color: #513f45;
-  font: 1.08rem 'Baskerville Old Face', Baskerville, Georgia, serif;
+  font: 1.08rem var(--font-body);
   text-align: left;
   text-decoration: none;
   white-space: nowrap;

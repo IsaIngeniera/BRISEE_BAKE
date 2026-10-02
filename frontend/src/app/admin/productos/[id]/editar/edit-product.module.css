@@ -3,8 +3,7 @@
   padding: 42px 24px 80px;
   background: #fff;
   color: #513f45;
-  font-family: 'Baskerville Old Face', Baskerville, 'Times New Roman',
-    Georgia, serif;
+  font-family: var(--font-body);
 }
 
 .container {

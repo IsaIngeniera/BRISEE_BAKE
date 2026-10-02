@@ -4,6 +4,11 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import styles from './product-detail.module.css';
 import ProductDetailActions from '@/components/products/ProductDetailActions';
+import {
+  getProductVariantGroupKey,
+  isDecoratedMacaron,
+  sortProductVariants,
+} from '@/utils/product-variants';
 
 interface ProductImage {
   id: string;
@@ -28,6 +33,15 @@ interface Product {
   etiquetas: string[];
   categoria?: ProductCategory;
   imagenes?: ProductImage[];
+}
+
+interface ProductVariant {
+  id: string;
+  nombre: string;
+  precio: number | string;
+  presentacion: string;
+  existencias: number;
+  imagenUrl: string;
 }
 
 function formatPrice(price: number | string): string {
@@ -71,6 +85,50 @@ async function getProduct(id: string): Promise<Product | null> {
   }
 }
 
+async function getProductVariants(product: Product): Promise<ProductVariant[]> {
+  const groupKey = getProductVariantGroupKey(product.nombre);
+
+  if (!groupKey) {
+    return [];
+  }
+
+  try {
+    const apiUrl =
+      process.env.INTERNAL_API_URL ?? 'http://backend:3001';
+    const response = await fetch(`${apiUrl}/products`, {
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch product variants ${product.id}`);
+    }
+
+    const products: Product[] = await response.json();
+
+    return sortProductVariants(
+      products
+        .filter(
+          (variant) =>
+            variant.estado !== 'INACTIVO' &&
+            getProductVariantGroupKey(variant.nombre) === groupKey,
+        )
+        .map((variant) => ({
+          id: variant.id,
+          nombre: variant.nombre,
+          precio: variant.precio,
+          presentacion: variant.presentacion,
+          existencias: variant.existencias,
+          imagenUrl:
+            variant.imagenes?.[0]?.urlImagen ??
+            '/images/catalogo/macarons-placeholder.jpg',
+        })),
+    );
+  } catch (error) {
+    console.error('Error fetching product variants:', error);
+    return [];
+  }
+}
+
 interface ProductPageProps {
   params: Promise<{
     id: string;
@@ -93,6 +151,8 @@ export default async function ProductDetailPage({
 
   const productImageAlt =
     product.imagenes?.[0]?.nombre ?? `Imagen de ${product.nombre}`;
+  const variants = await getProductVariants(product);
+  const hasVariants = variants.length > 1;
 
   return (
     <main className={styles.page}>
@@ -121,7 +181,9 @@ export default async function ProductDetailPage({
             
             <h1 className={styles.title}>{product.nombre}</h1>
             
-            <p className={styles.price}>{formatPrice(product.precio)}</p>
+            {!hasVariants && (
+              <p className={styles.price}>{formatPrice(product.precio)}</p>
+            )}
             
             <hr className={styles.divider} />
             
@@ -131,14 +193,6 @@ export default async function ProductDetailPage({
               <p className={styles.presentation}>
                 <span>Presentación:</span> {product.presentacion}
               </p>
-            )}
-
-            {product.etiquetas.length > 0 && (
-              <div className={styles.labels} aria-label="Etiquetas dietéticas">
-                {product.etiquetas.map((label) => (
-                  <span key={label}>{label.replaceAll('_', ' ')}</span>
-                ))}
-              </div>
             )}
 
             <div className={styles.actions}>  
@@ -154,8 +208,18 @@ export default async function ProductDetailPage({
                 precio={product.precio}
                 imagenUrl={productImageUrl}
                 existencias={product.existencias}
+                variants={variants}
+                requiresTheme={isDecoratedMacaron(product.nombre)}
               />
             </div>
+
+            {product.etiquetas.length > 0 && (
+              <div className={styles.labels} aria-label="Etiquetas dietéticas">
+                {product.etiquetas.map((label) => (
+                  <span key={label}>{label.replaceAll('_', ' ')}</span>
+                ))}
+              </div>
+            )}
           </div>
         </article>
       </div>

@@ -1,8 +1,12 @@
 .catalogLayout {
-  --brand-font: 'Baskerville Old Face', Baskerville, 'Times New Roman', Georgia, serif;
+  /* Usamos la misma fuente de títulos global */
+  --brand-font: var(--font-title, 'Baskerville Display PT', 'Libre Baskerville', serif);
+  /* Usamos la fuente de cuerpo global para descripciones limpias */
+  --body-font: var(--font-body, 'Canva Sans', 'Plus Jakarta Sans', sans-serif);
+  
   width: min(100%, 1500px);
   margin: 0 auto;
-  font-family: var(--brand-font);
+  font-family: var(--body-font);
   background-color: #ffffff;
 }
 
@@ -35,6 +39,7 @@
   font-weight: 400;
   line-height: 1.1;
   font-family: var(--brand-font);
+  text-transform: none; /* Respeta las mayúsculas/minúsculas naturales */
 }
 
 .heading p {
@@ -43,6 +48,7 @@
   color: #765f67;
   font-size: 1.2rem;
   line-height: 1.6;
+  font-family: var(--body-font);
 }
 
 .decorativeLine {
@@ -125,6 +131,7 @@
   font-size: 0.95rem;
   text-align: center;
   padding: 10px;
+  font-family: var(--body-font);
 }
 
 .imagePlaceholder strong {
@@ -144,7 +151,7 @@
   color: #6eaa61;
   padding: 4px 10px;
   border-radius: 20px;
-  font-family: Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: 0.75rem;
   font-weight: bold;
   border: 1px solid #cce5bc;
@@ -160,13 +167,12 @@
   flex-direction: column;
 }
 
-/* CENTRADO PERFECTO DE LOS TEXTOS */
 .textContent {
   display: flex;
-  flex: 1; /* Esto hace que ocupe todo el espacio sobrante antes del botón */
+  flex: 1;
   flex-direction: column;
-  align-items: center; /* Centra izquierda a derecha */
-  justify-content: center; /* Centra arriba a abajo */
+  align-items: center;
+  justify-content: center;
   text-align: center;
 }
 
@@ -181,7 +187,7 @@
 .textContent p {
   margin: 0; 
   color: #4f4146;
-  font-family: var(--brand-font);
+  font-family: var(--body-font); /* Usamos fuente de cuerpo legible */
   font-size: 1.05rem; 
   line-height: 1.35;
 }
@@ -210,7 +216,6 @@
   outline-offset: 4px;
 }
 
-/* Responsividad: Para que no se dañen si la pantalla es más pequeña */
 @media (max-width: 1100px) {
   .categoryGrid {
     grid-template-columns: repeat(3, 1fr); 
@@ -240,7 +245,7 @@
   border-radius: 12px;
   background-color: #fff5fa;
   color: var(--dark-pink);
-  font-family: var(--brand-font);
+  font-family: var(--body-font);
   font-size: 1.2rem;
   text-align: center;
   border: 1px solid var(--secondary-pink);
@@ -296,7 +301,7 @@
 
 .searchResultInfo p {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: var(--body-font);
   color: #513f45;
   font-weight: 600;
   font-size: 0.95rem;

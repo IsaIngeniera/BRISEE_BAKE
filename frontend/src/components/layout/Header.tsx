@@ -18,6 +18,8 @@ import {
   X,
 } from 'lucide-react';
 
+import icon from '@/app/icon.png';
+
 import {
   AUTH_CHANGE_EVENT,
   getSessionUser,
@@ -169,7 +171,7 @@ export default function Header(): ReactElement {
             aria-label="Ir al inicio de Brisée Bake"
           >
             <Image
-              src="/images/logo-header-transparent.png"
+              src={icon}
               alt="Brisée Bake - Handmade with love"
               width={330}
               height={115}

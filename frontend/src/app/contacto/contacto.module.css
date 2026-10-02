@@ -23,7 +23,7 @@
 .formCard h1 {
   margin: 0 0 6px;
   color: var(--pink-500);
-  font-family: var(--font-display), serif;
+  font-family: var(--font-title);
   font-size: 2.2rem;
   font-weight: 500;
 }
@@ -58,7 +58,7 @@
 .infoItem h2 {
   margin: 0 0 4px;
   color: var(--rose-text);
-  font-family: var(--font-display), serif;
+  font-family: var(--font-title);
   font-size: 1.2rem;
   font-weight: 500;
 }
@@ -91,7 +91,7 @@
   border-radius: 8px;
   background-color: #ffffff;
   color: var(--cocoa);
-  font-family: var(--font-body), sans-serif;
+  font-family: var(--font-body);
   font-size: 0.9rem;
   resize: vertical;
 }

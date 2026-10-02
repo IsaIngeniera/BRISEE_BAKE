@@ -35,6 +35,9 @@ type ConfirmedOrder = {
   whatsappUrl: string | null;
 };
 
+type DeliveryMethod = 'DOMICILIO' | 'RETIRO';
+type CheckoutStep = 'METHOD' | 'DATE';
+
 function formatPrice(price: number | string): string {
   const numericPrice = Number(price);
 
@@ -98,6 +101,19 @@ function getCustomerName(): string {
   } catch {
     return '';
   }
+
+}
+
+function getMinimumDeliveryDate(): string {
+  const minimumDate = new Date();
+  minimumDate.setHours(0, 0, 0, 0);
+  minimumDate.setDate(minimumDate.getDate() + 3);
+
+  const year = minimumDate.getFullYear();
+  const month = String(minimumDate.getMonth() + 1).padStart(2, '0');
+  const day = String(minimumDate.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
 }
 
 function buildWhatsAppUrl(
@@ -153,6 +169,14 @@ export default function CarritoPage() {
   const [hasSession, setHasSession] = useState<boolean | null>(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
+  const [isDeliveryModalOpen, setIsDeliveryModalOpen] = useState(false);
+  const [checkoutStep, setCheckoutStep] =
+    useState<CheckoutStep>('METHOD');
+  const [deliveryMethod, setDeliveryMethod] =
+    useState<DeliveryMethod | null>(null);
+  const [deliveryDate, setDeliveryDate] = useState('');
+  const [agreedToDeliveryNotice, setAgreedToDeliveryNotice] =
+    useState(false);
   const [confirmedOrder, setConfirmedOrder] =
     useState<ConfirmedOrder | null>(null);
 
@@ -180,8 +204,44 @@ export default function CarritoPage() {
     0,
   );
 
+  function openDeliveryMethodSelection() {
+    if (isCheckingOut || confirmedOrder) return;
+
+    setCheckoutError('');
+    setCheckoutStep('METHOD');
+    setDeliveryMethod(null);
+    setDeliveryDate('');
+    setAgreedToDeliveryNotice(false);
+    setIsDeliveryModalOpen(true);
+  }
+
+  function continueWithDeliveryMethod() {
+    if (!deliveryMethod) {
+      setCheckoutError('Selecciona un método de entrega para continuar.');
+      return;
+    }
+
+    if (
+      deliveryMethod === 'DOMICILIO' &&
+      !agreedToDeliveryNotice
+    ) {
+      setCheckoutError(
+        'Confirma que estás de acuerdo con el pago del domicilio por WhatsApp.',
+      );
+      return;
+    }
+
+    setCheckoutError('');
+    setCheckoutStep('DATE');
+  }
+
   async function handleCheckout() {
     if (isCheckingOut || confirmedOrder) return;
+
+    if (!deliveryMethod || !deliveryDate) {
+      setIsDeliveryModalOpen(true);
+      return;
+    }
 
     setCheckoutError('');
     setIsCheckingOut(true);
@@ -219,8 +279,13 @@ export default function CarritoPage() {
         body: JSON.stringify({
           direccionEntrega: 'Por definir',
           ciudad: 'Por definir',
-          tipoEntrega: 'RETIRO',
-          observacionesEntrega: 'Generado desde el carrito',
+          tipoEntrega:
+            deliveryMethod === 'DOMICILIO' ? 'ENVIO' : 'RETIRO',
+          fechaEsperada: deliveryDate,
+          observacionesEntrega:
+            deliveryMethod === 'DOMICILIO'
+              ? `Domicilio por WhatsApp. Fecha: ${deliveryDate}`
+              : `Recogida en tienda. Fecha: ${deliveryDate}`,
           items: payloadItems,
         }),
       });
@@ -244,6 +309,7 @@ export default function CarritoPage() {
         whatsappUrl: data.whatsappUrl || null,
       });
 
+      setIsDeliveryModalOpen(false);
       void refreshCart();
     } catch (error) {
       setCheckoutError(
@@ -393,7 +459,7 @@ export default function CarritoPage() {
               <button
                 type="button"
                 className={styles.checkoutButton}
-                onClick={handleCheckout}
+                onClick={openDeliveryMethodSelection}
                 disabled={isCheckingOut}
               >
                 {isCheckingOut
@@ -410,6 +476,160 @@ export default function CarritoPage() {
             )}
           </section>
         </>
+      )}
+
+      {isDeliveryModalOpen && (
+        <div
+          className={styles.deliveryModalOverlay}
+          role="presentation"
+        >
+          <section
+            className={styles.deliveryModal}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delivery-modal-title"
+          >
+            <div className={styles.deliveryModalHeader}>
+              <p className={styles.deliveryEyebrow}>Antes de pagar</p>
+              <h2 id="delivery-modal-title">
+                {checkoutStep === 'METHOD'
+                  ? '¿Cómo quieres recibir tu pedido?'
+                  : '¿Cuándo deseas recibirlo?'}
+              </h2>
+              <button
+                type="button"
+                className={styles.closeModalButton}
+                onClick={() => setIsDeliveryModalOpen(false)}
+                aria-label="Cerrar selección de entrega"
+              >
+                ×
+              </button>
+            </div>
+
+            {checkoutStep === 'METHOD' ? (
+              <div className={styles.deliveryForm}>
+                <fieldset className={styles.deliveryOptions}>
+                  <legend>Método de entrega</legend>
+                  <label
+                    className={
+                      deliveryMethod === 'RETIRO'
+                        ? styles.deliveryOptionSelected
+                        : styles.deliveryOption
+                    }
+                  >
+                    <input
+                      type="radio"
+                      name="delivery-method"
+                      value="RETIRO"
+                      checked={deliveryMethod === 'RETIRO'}
+                      onChange={() => {
+                        setDeliveryMethod('RETIRO');
+                        setAgreedToDeliveryNotice(false);
+                        setCheckoutError('');
+                      }}
+                    />
+                    <span>
+                      <strong>Recogida en tienda</strong>
+                      <small>Retira tu pedido en Brisée Bake.</small>
+                    </span>
+                  </label>
+
+                  <label
+                    className={
+                      deliveryMethod === 'DOMICILIO'
+                        ? styles.deliveryOptionSelected
+                        : styles.deliveryOption
+                    }
+                  >
+                    <input
+                      type="radio"
+                      name="delivery-method"
+                      value="DOMICILIO"
+                      checked={deliveryMethod === 'DOMICILIO'}
+                      onChange={() => {
+                        setDeliveryMethod('DOMICILIO');
+                        setCheckoutError('');
+                      }}
+                    />
+                    <span>
+                      <strong>Envío a domicilio</strong>
+                      <small>El costo del domicilio se coordina aparte.</small>
+                    </span>
+                  </label>
+                </fieldset>
+
+                {deliveryMethod === 'DOMICILIO' && (
+                  <label className={styles.deliveryNotice}>
+                    <input
+                      type="checkbox"
+                      checked={agreedToDeliveryNotice}
+                      onChange={(event) =>
+                        setAgreedToDeliveryNotice(event.target.checked)
+                      }
+                    />
+                    <span>
+                      Entiendo que el pago del domicilio se realiza por
+                      WhatsApp de Brisée Bake después de pagar el producto.
+                    </span>
+                  </label>
+                )}
+
+                {checkoutError && (
+                  <p className={styles.checkoutError} role="alert">
+                    {checkoutError}
+                  </p>
+                )}
+
+                <button
+                  type="button"
+                  className={styles.checkoutButton}
+                  onClick={continueWithDeliveryMethod}
+                >
+                  Continuar
+                </button>
+              </div>
+            ) : (
+              <div className={styles.deliveryForm}>
+                <p className={styles.dateDescription}>
+                  Selecciona la fecha en la que deseas tu producto.
+                </p>
+                <label className={styles.dateField}>
+                  Fecha solicitada
+                  <input
+                    type="date"
+                    value={deliveryDate}
+                    min={getMinimumDeliveryDate()}
+                    onChange={(event) => setDeliveryDate(event.target.value)}
+                    required
+                  />
+                </label>
+
+                {checkoutError && (
+                  <p className={styles.checkoutError} role="alert">
+                    {checkoutError}
+                  </p>
+                )}
+
+                <button
+                  type="button"
+                  className={styles.checkoutButton}
+                  onClick={() => {
+                    if (!deliveryDate) {
+                      setCheckoutError('Selecciona una fecha para continuar.');
+                      return;
+                    }
+
+                    setCheckoutError('');
+                    void handleCheckout();
+                  }}
+                  disabled={isCheckingOut}
+                >
+                  {isCheckingOut ? 'Procesando...' : 'Confirmar y pagar'}
+                </button>
+              </div>
+            )}
+          </section>
+        </div>
       )}
 
       {confirmedOrder && (

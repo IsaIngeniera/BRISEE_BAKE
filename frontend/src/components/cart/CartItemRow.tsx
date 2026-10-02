@@ -65,6 +65,9 @@ export default function CartItemRow({
 
         <div className={styles.info}>
           <h3>{item.nombre}</h3>
+          {item.tematica && (
+            <p className={styles.theme}>Temática: {item.tematica}</p>
+          )}
           <p className={styles.unitPrice}>{formatPrice(item.precio)}</p>
         </div>
 

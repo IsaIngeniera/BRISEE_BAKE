@@ -14,6 +14,8 @@ import {
   FaWhatsapp,
 } from 'react-icons/fa6';
 
+import icon from '@/app/icon.png';
+
 import styles from './footer.module.css';
 
 const GOOGLE_MAPS_URL =
@@ -27,7 +29,7 @@ export default function Footer(): ReactElement {
       <div className={styles.mainContent}>
         <div className={styles.logoColumn}>
           <Image
-            src="/images/logo-brisee-transparent.png"
+            src={icon}
             alt="Logo de Brisée Bake"
             width={230}
             height={230}

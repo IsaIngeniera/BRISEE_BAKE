@@ -3,8 +3,7 @@
   flex-direction: column;
   gap: 24px;
   color: #513f45;
-  font-family: 'Baskerville Old Face', Baskerville, 'Times New Roman',
-    Georgia, serif;
+  font-family: var(--font-body);
 }
 
 .formGroup {
@@ -30,8 +29,7 @@
   outline: none;
   background: #fff;
   color: #513f45;
-  font: 1.2rem 'Baskerville Old Face', Baskerville, 'Times New Roman',
-    Georgia, serif;
+  font: 1.2rem var(--font-body);
   transition: border-color 200ms ease, box-shadow 200ms ease;
 }
 
@@ -77,8 +75,7 @@
   border-radius: 5px;
   background: #e48abd;
   color: #fff;
-  font: 700 1.35rem 'Baskerville Old Face', Baskerville,
-    'Times New Roman', Georgia, serif;
+  font: 700 1.35rem var(--font-body);
   cursor: pointer;
   transition: background-color 200ms ease;
 }
