@@ -460,6 +460,100 @@
   font-size: 1.06rem;
 }
 
+.successBanner {
+  background: #dff0e4;
+  color: #2b6a43;
+  border: 1px solid #c4e3cf;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.successBanner h3 {
+  margin: 0 0 8px;
+  font-size: 1.5rem;
+  color: #1e4e31;
+}
+
+.successBanner p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.ordersSection {
+  margin-top: 20px;
+}
+
+.ordersList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.orderCard {
+  border: 1px solid #f1d9e4;
+  border-radius: 8px;
+  padding: 18px;
+  background: #fffafd;
+}
+
+.orderHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 12px;
+}
+
+.orderHeader p {
+  margin: 0;
+  font-size: 1rem;
+  color: #513f45;
+}
+
+.orderHeader strong {
+  color: #826c75;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.orderDetails {
+  border-top: 1px dashed #e8bfd3;
+  padding-top: 12px;
+}
+
+.orderDetails summary {
+  cursor: pointer;
+  color: var(--pink);
+  font-weight: 700;
+  outline: none;
+}
+
+.orderDetails summary:hover {
+  text-decoration: underline;
+}
+
+.orderDetails ul {
+  margin: 12px 0 0;
+  padding-left: 20px;
+  font-size: 0.95rem;
+  color: #513f45;
+}
+
+.orderDetails li {
+  margin-bottom: 6px;
+}
+
+.emptyOrders {
+  color: #715b65;
+  font-style: italic;
+  font-size: 1.05rem;
+  margin-top: 10px;
+}
+
 @media (max-width: 760px) {
   .page {
     padding: 24px 16px 50px;

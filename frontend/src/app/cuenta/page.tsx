@@ -20,6 +20,7 @@ import {
   getSessionUser,
   type SessionUser,
 } from '@/services/auth';
+import { useCart } from '@/hooks/useCart';
 
 import styles from './cuenta.module.css';
 
@@ -69,8 +70,32 @@ export default function CuentaPage() {
   const [draft, setDraft] = useState<Profile>(emptyProfile);
   const [isEditing, setIsEditing] = useState(false);
   const [message, setMessage] = useState('');
+  const [transactionId, setTransactionId] = useState<string | null>(null);
+  const [orders, setOrders] = useState<any[] | null>(null);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+
+  const { clearCart } = useCart();
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      if (window.location.hostname === 'localtest.me') {
+        const search = window.location.search;
+        window.location.replace(`http://localhost:3000/cuenta${search}`);
+        return;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const idParam = params.get('id');
+      const statusParam = params.get('status');
+      
+      // Si Wompi aprueba la transaccion, vaciamos el carrito
+      if (idParam && statusParam === 'APPROVED') {
+        setTransactionId(idParam);
+        clearCart();
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+
     /* eslint-disable react-hooks/set-state-in-effect */
     const sessionUser = getSessionUser();
     setUser(sessionUser);
@@ -79,9 +104,25 @@ export default function CuentaPage() {
       const saved = readLocalProfile(sessionUser.sub);
       setProfile(saved);
       setDraft(saved);
+      
+      // Fetch orders
+      const token = localStorage.getItem('brisee_token');
+      if (token) {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/pedidos/mis-pedidos`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        .then(res => res.ok ? res.json() : [])
+        .then(data => setOrders(data))
+        .catch(() => setOrders([]))
+        .finally(() => setLoadingOrders(false));
+      } else {
+        setLoadingOrders(false);
+      }
+    } else {
+      setLoadingOrders(false);
     }
     /* eslint-enable react-hooks/set-state-in-effect */
-  }, []);
+  }, [clearCart]);
 
   function updateField(field: keyof Profile, value: string) {
     setDraft((current) => ({
@@ -263,6 +304,13 @@ export default function CuentaPage() {
             </aside>
 
             <div className={styles.details}>
+              {transactionId && (
+                <div className={styles.successBanner}>
+                  <h3>¡Pago exitoso!</h3>
+                  <p>Tu transacción ha sido aprobada. Número de referencia: <strong>{transactionId}</strong></p>
+                </div>
+              )}
+
               <div className={styles.heading}>
                 <div>
                   <p className={styles.eyebrow}>
@@ -447,6 +495,41 @@ export default function CuentaPage() {
                   </div>
                 </div>
               )}
+
+              <div className={styles.ordersSection}>
+                <div className={styles.heading} style={{ marginTop: '3rem' }}>
+                  <div>
+                    <p className={styles.eyebrow}>HISTORIAL</p>
+                    <h2>Mis pedidos</h2>
+                  </div>
+                </div>
+                
+                {loadingOrders ? (
+                  <p>Cargando pedidos...</p>
+                ) : orders && orders.length > 0 ? (
+                  <ul className={styles.ordersList}>
+                    {orders.map((o) => (
+                      <li key={o.id} className={styles.orderCard}>
+                        <div className={styles.orderHeader}>
+                          <p><strong>Fecha:</strong> {new Date(o.createdAt).toLocaleDateString()}</p>
+                          <p><strong>Total:</strong> ${Number(o.total).toLocaleString('es-CO')}</p>
+                          <p><strong>Estado:</strong> {o.estadoEntrega}</p>
+                        </div>
+                        <details className={styles.orderDetails}>
+                          <summary>Ver productos</summary>
+                          <ul>
+                            {o.productos.map((p: any) => (
+                              <li key={p.producto.id}>{p.cantidad}x {p.producto.nombre}</li>
+                            ))}
+                          </ul>
+                        </details>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className={styles.emptyOrders}>Aún no tienes pedidos.</p>
+                )}
+              </div>
             </div>
           </div>
         )}
