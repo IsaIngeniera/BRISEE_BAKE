@@ -7,6 +7,8 @@ import { PrismaService } from '../prisma.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { Prisma, EstadoEntrega } from '@prisma/client';
 import * as crypto from 'crypto';
+import * as nodemailer from 'nodemailer';
+
 @Injectable()
 export class PedidosService {
   private readonly WHATSAPP_NUMBER = '573003685556';
@@ -125,8 +127,16 @@ export class PedidosService {
     }
 
     let finalRedirectUrl = redirectUrl;
-    if (finalRedirectUrl.includes('localhost')) {
-      finalRedirectUrl = finalRedirectUrl.replace('localhost', 'localtest.me');
+    if (
+      finalRedirectUrl.includes('localhost') ||
+      finalRedirectUrl.includes('127.0.0.1')
+    ) {
+      // NOTA: Para producción, cambiar 'localtest.me' a 'https://brisee-bake-frontend.vercel.app'
+      // (O usar la variable FRONTEND_URL directamente desde el .env y quitar este IF)
+      finalRedirectUrl = finalRedirectUrl.replace(
+        /localhost|127\.0\.0\.1/g,
+        'localtest.me',
+      );
     }
     const redirectStr = `&redirect-url=${encodeURIComponent(finalRedirectUrl)}`;
 
@@ -249,6 +259,10 @@ export class PedidosService {
           console.error('No se pudo actualizar la tabla Pago:', err),
         );
 
+      if (nuevoEstado === 'APROBADO') {
+        this.sendAdminNotification(reference).catch(console.error);
+      }
+
       return {
         status: status,
         reference: reference,
@@ -256,6 +270,72 @@ export class PedidosService {
       };
     } catch {
       throw new Error('Error de conexión con Wompi al verificar el pago');
+    }
+  }
+
+  private async sendAdminNotification(pedidoId: string) {
+    const pedido = await this.prisma.pedido.findUnique({
+      where: { id: pedidoId },
+      include: {
+        cliente: true,
+        productos: {
+          include: {
+            producto: true,
+          },
+        },
+      },
+    });
+
+    if (!pedido) return;
+
+    // Configurar el transporter (Debe configurarse con variables de entorno en producción)
+    const transporter = nodemailer.createTransport({
+      service: 'gmail', // o el servicio que utilicen
+      auth: {
+        user: process.env.EMAIL_USER || 'tu-correo@gmail.com',
+        pass: process.env.EMAIL_PASS || 'tu-contraseña-de-aplicacion',
+      },
+    });
+
+    let productosHtml = '';
+    pedido.productos.forEach((p) => {
+      productosHtml += `<li>${p.cantidad}x ${p.producto.nombre} - $${p.precioUnitario.toString()}</li>`;
+    });
+
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@briseebake.com';
+
+    const mailOptions = {
+      from: '"Brisee Bake" <no-reply@briseebake.com>',
+      to: adminEmail,
+      subject: `🚨 Nuevo Pago Recibido - Pedido #${pedidoId.split('-')[0].toUpperCase()}`,
+      html: `
+        <h2>¡Nuevo pago confirmado!</h2>
+        <p>El cliente <strong>${pedido.cliente.nombre} ${pedido.cliente.apellido}</strong> ha completado el pago de un pedido.</p>
+        
+        <h3>Detalles de Entrega:</h3>
+        <ul>
+          <li><strong>Dirección:</strong> ${pedido.direccionEntrega}</li>
+          <li><strong>Ciudad:</strong> ${pedido.ciudad}</li>
+          <li><strong>Tipo de entrega:</strong> ${pedido.tipoEntrega}</li>
+          <li><strong>Observaciones:</strong> ${pedido.observacionesEntrega || 'N/A'}</li>
+          <li><strong>Fecha Esperada:</strong> ${pedido.fechaEsperada.toLocaleDateString()}</li>
+        </ul>
+
+        <h3>Productos:</h3>
+        <ul>
+          ${productosHtml}
+        </ul>
+        <br/>
+        <p><strong>Total pagado:</strong> $${pedido.total.toString()}</p>
+        <p>Inicia la preparación lo antes posible.</p>
+      `,
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log(`Notificación enviada al admin para el pedido ${pedidoId}`);
+    } catch (error) {
+      console.error('Error enviando correo al admin:', error);
     }
   }
 }

@@ -24,41 +24,55 @@ import { Suspense } from 'react';
 function SuccessfulPaymentContent() {
   const searchParams = useSearchParams();
   const { clearCart } = useCart();
-  const wompiStatus = searchParams.get('status')?.toUpperCase();
-  const orderReference = searchParams.get('reference');
+  const wompiTransactionId = searchParams.get('id');
   const paymentError = searchParams.get('error');
-  const hasPaymentResult =
-    Boolean(wompiStatus) || paymentError !== null;
-  const [user, setUser] = useState<SessionUser | null | undefined>(
-    undefined,
-  );
-  const [isApproved, setIsApproved] = useState<boolean | null>(
-    null,
-  );
+  const [wompiStatus, setWompiStatus] = useState<string | null>(searchParams.get('status'));
+  const orderReference = searchParams.get('reference');
+  
+  const hasPaymentResult = Boolean(wompiStatus) || paymentError !== null || Boolean(wompiTransactionId);
+  const [user, setUser] = useState<SessionUser | null | undefined>(undefined);
+  const [isApproved, setIsApproved] = useState<boolean | null>(null);
   const [order, setOrder] = useState<CustomerOrder | null>(null);
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
     const sessionUser = getSessionUser();
     setUser(sessionUser);
-    const approved = wompiStatus === 'APPROVED';
-    setIsApproved(approved);
 
-    if (sessionUser && approved) {
-      clearCart();
-
-      if (orderReference) {
-        setOrder(
-          updateOrderStatus(
-            sessionUser.sub,
-            orderReference,
-            'PAGO EXITOSO',
-          ),
-        );
+    const verifyPayment = async () => {
+      if (wompiTransactionId) {
+        try {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/pedidos/verificar-pago/${wompiTransactionId}`);
+          if (res.ok) {
+            const data = await res.json();
+            setWompiStatus(data.status);
+            if (data.status === 'APPROVED' && sessionUser) {
+              setIsApproved(true);
+              clearCart();
+              if (data.reference || orderReference) {
+                setOrder(updateOrderStatus(sessionUser.sub, data.reference || orderReference, 'PAGO EXITOSO'));
+              }
+            } else {
+              setIsApproved(false);
+            }
+          } else {
+            console.error("Backend devolvió error:", await res.text());
+            setIsApproved(false);
+          }
+        } catch (err) {
+          console.error("Error verificando pago:", err);
+          setIsApproved(false);
+        }
+      } else if (wompiStatus) {
+        // ERROR: El usuario llegó a la página sin un ID de transacción Wompi.
+        // No podemos aprobar el pago de mentiras sin ir al backend.
+        console.error("Falta el ID de transacción de Wompi en la URL.");
+        setIsApproved(false);
       }
-    }
-    /* eslint-enable react-hooks/set-state-in-effect */
-  }, [clearCart, orderReference, wompiStatus]);
+    };
+
+    verifyPayment();
+  }, [clearCart, orderReference, wompiTransactionId, wompiStatus]);
 
   if (user === undefined) {
     return (
