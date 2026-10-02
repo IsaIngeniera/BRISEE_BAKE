@@ -106,7 +106,7 @@ export class PedidosService {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     const amountInCents = Math.round(Number(total) * 100);
     const reference = pedido.id;
-    const redirectUrl = `${frontendUrl}/finalizar-compra?status=APPROVED&reference=${reference}`;
+    const redirectUrl = `${frontendUrl}/cuenta?status=APPROVED&reference=${reference}`;
 
     let signatureStr = '';
     if (integritySecret) {
@@ -117,7 +117,7 @@ export class PedidosService {
 
     let finalRedirectUrl = redirectUrl;
     if (finalRedirectUrl.includes('localhost')) {
-      finalRedirectUrl = finalRedirectUrl.replace('localhost', 'localtest.me');
+      finalRedirectUrl = finalRedirectUrl.replace('localhost', '127.0.0.1');
     }
     const redirectStr = `&redirect-url=${encodeURIComponent(finalRedirectUrl)}`;
 

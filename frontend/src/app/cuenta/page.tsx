@@ -62,6 +62,24 @@ function readLocalProfile(userId: string): Profile {
   }
 }
 
+interface OrderProduct {
+  cantidad: number;
+  precioUnitario: number;
+  producto: {
+    id: string;
+    nombre: string;
+    categoria: string;
+  };
+}
+
+interface Order {
+  id: string;
+  createdAt: string;
+  total: number;
+  estadoEntrega: string;
+  productos: OrderProduct[];
+}
+
 export default function CuentaPage() {
   const router = useRouter();
 
@@ -77,9 +95,31 @@ export default function CuentaPage() {
   >(null);
 
   useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      if (hostname === '127.0.0.1' || hostname === 'localtest.me' || hostname === 'lvh.me') {
+        const search = window.location.search;
+        window.location.replace(`http://localhost:3000/cuenta${search}`);
+        return;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const idParam = params.get('id');
+      const statusParam = params.get('status');
+      
+      // Si Wompi aprueba la transaccion, vaciamos el carrito
+      if (idParam && statusParam === 'APPROVED') {
+        setTimeout(() => {
+          setTransactionId(idParam);
+          clearCart();
+        }, 0);
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+
     const sessionUser = getSessionUser();
-    setUser(sessionUser);
+    setTimeout(() => {
+      setUser(sessionUser);
 
     if (sessionUser) {
       const saved = readLocalProfile(sessionUser.sub);
@@ -496,6 +536,41 @@ export default function CuentaPage() {
                   </div>
                 </div>
               )}
+
+              <div className={styles.ordersSection}>
+                <div className={styles.heading} style={{ marginTop: '3rem' }}>
+                  <div>
+                    <p className={styles.eyebrow}>HISTORIAL</p>
+                    <h2>Mis pedidos</h2>
+                  </div>
+                </div>
+                
+                {loadingOrders ? (
+                  <p>Cargando pedidos...</p>
+                ) : orders && orders.length > 0 ? (
+                  <ul className={styles.ordersList}>
+                    {orders.map((o) => (
+                      <li key={o.id} className={styles.orderCard}>
+                        <div className={styles.orderHeader}>
+                          <p><strong>Fecha:</strong> {new Date(o.createdAt).toLocaleDateString()}</p>
+                          <p><strong>Total:</strong> ${Number(o.total).toLocaleString('es-CO')}</p>
+                          <p><strong>Estado:</strong> {o.estadoEntrega}</p>
+                        </div>
+                        <details className={styles.orderDetails}>
+                          <summary>Ver productos</summary>
+                          <ul>
+                            {o.productos.map((p) => (
+                              <li key={p.producto.id}>{p.cantidad}x {p.producto.nombre}</li>
+                            ))}
+                          </ul>
+                        </details>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className={styles.emptyOrders}>Aún no tienes pedidos.</p>
+                )}
+              </div>
             </div>
           </div>
         )}
