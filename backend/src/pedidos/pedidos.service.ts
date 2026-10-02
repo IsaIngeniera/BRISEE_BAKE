@@ -54,7 +54,9 @@ export class PedidosService {
     }
 
     // Validación de fecha esperada (Mínimo 3 días)
-    const fechaEsperadaDate = new Date(createPedidoDto.fechaEsperada);
+    const [year, month, day] = createPedidoDto.fechaEsperada.split('-');
+    const fechaEsperadaDate = new Date(Number(year), Number(month) - 1, Number(day));
+    
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const minValidDate = new Date(today);
