@@ -22,7 +22,7 @@ import { Rol } from '@prisma/client';
 @ApiTags('pedidos')
 @Controller('pedidos')
 export class PedidosController {
-  constructor(private readonly pedidosService: PedidosService) {}
+  constructor(private readonly pedidosService: PedidosService) { }
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -38,6 +38,17 @@ export class PedidosController {
       );
     }
     return this.pedidosService.createPedido(userId, createPedidoDto);
+  }
+
+  @Get('mis-pedidos')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  findMisPedidos(@Req() req: Request & { user?: { sub: string } }) {
+    const userId = req.user?.sub;
+    if (!userId) {
+      throw new UnauthorizedException('Debe iniciar sesión para ver sus pedidos');
+    }
+    return this.pedidosService.findByUser(userId);
   }
 
   @Get()
