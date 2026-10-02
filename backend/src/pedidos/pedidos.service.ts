@@ -117,7 +117,7 @@ export class PedidosService {
 
     let finalRedirectUrl = redirectUrl;
     if (finalRedirectUrl.includes('localhost')) {
-      finalRedirectUrl = finalRedirectUrl.replace('localhost', 'localtest.me');
+      finalRedirectUrl = finalRedirectUrl.replace('localhost', '127.0.0.1');
     }
     const redirectStr = `&redirect-url=${encodeURIComponent(finalRedirectUrl)}`;
 

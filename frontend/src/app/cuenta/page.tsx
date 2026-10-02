@@ -60,6 +60,24 @@ function readLocalProfile(userId: string): Profile {
   }
 }
 
+interface OrderProduct {
+  cantidad: number;
+  precioUnitario: number;
+  producto: {
+    id: string;
+    nombre: string;
+    categoria: string;
+  };
+}
+
+interface Order {
+  id: string;
+  createdAt: string;
+  total: number;
+  estadoEntrega: string;
+  productos: OrderProduct[];
+}
+
 export default function CuentaPage() {
   const router = useRouter();
 
@@ -71,14 +89,15 @@ export default function CuentaPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [message, setMessage] = useState('');
   const [transactionId, setTransactionId] = useState<string | null>(null);
-  const [orders, setOrders] = useState<any[] | null>(null);
+  const [orders, setOrders] = useState<Order[] | null>(null);
   const [loadingOrders, setLoadingOrders] = useState(true);
 
   const { clearCart } = useCart();
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      if (window.location.hostname === 'localtest.me') {
+      const hostname = window.location.hostname;
+      if (hostname === '127.0.0.1' || hostname === 'localtest.me' || hostname === 'lvh.me') {
         const search = window.location.search;
         window.location.replace(`http://localhost:3000/cuenta${search}`);
         return;
@@ -90,38 +109,38 @@ export default function CuentaPage() {
       
       // Si Wompi aprueba la transaccion, vaciamos el carrito
       if (idParam && statusParam === 'APPROVED') {
-        setTransactionId(idParam);
-        clearCart();
+        setTimeout(() => {
+          setTransactionId(idParam);
+          clearCart();
+        }, 0);
         window.history.replaceState({}, document.title, window.location.pathname);
       }
     }
 
-    /* eslint-disable react-hooks/set-state-in-effect */
     const sessionUser = getSessionUser();
-    setUser(sessionUser);
+    setTimeout(() => {
+      setUser(sessionUser);
 
-    if (sessionUser) {
-      const saved = readLocalProfile(sessionUser.sub);
-      setProfile(saved);
-      setDraft(saved);
-      
-      // Fetch orders
-      const token = localStorage.getItem('brisee_token');
-      if (token) {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/pedidos/mis-pedidos`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-        .then(res => res.ok ? res.json() : [])
-        .then(data => setOrders(data))
-        .catch(() => setOrders([]))
-        .finally(() => setLoadingOrders(false));
-      } else {
-        setLoadingOrders(false);
+      if (sessionUser) {
+        const saved = readLocalProfile(sessionUser.sub);
+        setProfile(saved);
+        setDraft(saved);
       }
+    }, 0);
+
+    // Fetch orders
+    const token = localStorage.getItem('brisee_token');
+    if (token) {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/pedidos/mis-pedidos`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then(res => res.ok ? res.json() : [])
+      .then((data: Order[]) => setOrders(data))
+      .catch(() => setOrders([]))
+      .finally(() => setLoadingOrders(false));
     } else {
-      setLoadingOrders(false);
+      setTimeout(() => setLoadingOrders(false), 0);
     }
-    /* eslint-enable react-hooks/set-state-in-effect */
   }, [clearCart]);
 
   function updateField(field: keyof Profile, value: string) {
@@ -518,7 +537,7 @@ export default function CuentaPage() {
                         <details className={styles.orderDetails}>
                           <summary>Ver productos</summary>
                           <ul>
-                            {o.productos.map((p: any) => (
+                            {o.productos.map((p) => (
                               <li key={p.producto.id}>{p.cantidad}x {p.producto.nombre}</li>
                             ))}
                           </ul>
