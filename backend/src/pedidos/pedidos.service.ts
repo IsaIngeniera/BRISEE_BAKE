@@ -6,10 +6,9 @@ import {
 import { PrismaService } from '../prisma.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { Prisma, EstadoEntrega } from '@prisma/client';
-
+import * as crypto from 'crypto';
 @Injectable()
 export class PedidosService {
-  // Número oficial de WhatsApp de la empresa
   private readonly WHATSAPP_NUMBER = '573003685556';
 
   constructor(private readonly prisma: PrismaService) {}
@@ -19,7 +18,6 @@ export class PedidosService {
       throw new BadRequestException('El carrito está vacío o no existe.');
     }
 
-    // 1. Obtener los productos desde la base de datos para calcular el total real
     const productosDb = await this.prisma.producto.findMany({
       where: {
         id: { in: createPedidoDto.items.map((item) => item.idProducto) },
@@ -33,7 +31,6 @@ export class PedidosService {
       );
     }
 
-    // 2. Calcular total
     let total = new Prisma.Decimal(0);
     const validItems: {
       idProducto: string;
@@ -53,7 +50,6 @@ export class PedidosService {
       }
     }
 
-    // Validación de fecha esperada (Mínimo 3 días)
     const [year, month, day] = createPedidoDto.fechaEsperada.split('-');
     const fechaEsperadaDate = new Date(
       Number(year),
@@ -72,7 +68,6 @@ export class PedidosService {
       );
     }
 
-    // 3. Crear el Pedido y los PedidoProductos
     const pedido = await this.prisma.$transaction(async (tx) => {
       const nuevoPedido = await tx.pedido.create({
         data: {
@@ -101,15 +96,40 @@ export class PedidosService {
       return nuevoPedido;
     });
 
-    // 4. Formatear el mensaje y URL de WhatsApp
     const shortId = pedido.id.split('-')[0].toUpperCase();
     const mensaje = `Hola, acabo de realizar el pedido #${shortId}, escribo para coordinar la entrega`;
     const whatsappUrl = `https://wa.me/${this.WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
+
+    const wompiPublicKey =
+      process.env.WOMPI_PUBLIC_KEY || 'pub_test_placeholder';
+    const integritySecret = process.env.WOMPI_INTEGRITY_SECRET || '';
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const amountInCents = Math.round(Number(total) * 100);
+    const reference = pedido.id;
+    const redirectUrl = `${frontendUrl}/cuenta`;
+
+    let signatureStr = '';
+    if (integritySecret) {
+      const concatStr = `${reference}${amountInCents}COP${integritySecret}`;
+      const hash = crypto.createHash('sha256').update(concatStr).digest('hex');
+      signatureStr = `&signature%3Aintegrity=${hash}`;
+    }
+
+    let finalRedirectUrl = redirectUrl;
+    if (finalRedirectUrl.includes('localhost')) {
+      // Reemplazamos localhost por localtest.me (un dominio real que apunta a 127.0.0.1)
+      // Esto engaña al Firewall de Amazon (AWS WAF) para que no nos bloquee por SSRF
+      finalRedirectUrl = finalRedirectUrl.replace('localhost', 'localtest.me');
+    }
+    const redirectStr = `&redirect-url=${encodeURIComponent(finalRedirectUrl)}`;
+
+    const wompiUrl = `https://checkout.wompi.co/p/?public-key=${wompiPublicKey}&currency=COP&amount-in-cents=${amountInCents}&reference=${reference}${signatureStr}${redirectStr}`;
 
     return {
       message: 'Pedido creado exitosamente',
       pedidoId: pedido.id,
       whatsappUrl,
+      wompiUrl,
     };
   }
 

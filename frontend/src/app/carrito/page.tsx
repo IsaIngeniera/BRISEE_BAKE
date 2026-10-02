@@ -25,6 +25,7 @@ type OrderResponse = {
   numeroPedido?: string;
   codigo?: string;
   whatsappUrl?: string;
+  wompiUrl?: string;
   message?: string | string[];
 };
 
@@ -70,7 +71,6 @@ function getOrderNumber(data: OrderResponse): string {
 
       if (match) return match[1];
     } catch {
-      // La confirmación puede mostrarse sin número.
     }
   }
 
@@ -300,6 +300,11 @@ export default function CarritoPage() {
         throw new Error(
           message || 'No fue posible registrar el pedido.',
         );
+      }
+
+      if (data.wompiUrl) {
+        window.location.assign(data.wompiUrl);
+        return;
       }
 
       setConfirmedOrder({
