@@ -117,8 +117,6 @@ export class PedidosService {
 
     let finalRedirectUrl = redirectUrl;
     if (finalRedirectUrl.includes('localhost')) {
-      // Reemplazamos localhost por localtest.me (un dominio real que apunta a 127.0.0.1)
-      // Esto engaña al Firewall de Amazon (AWS WAF) para que no nos bloquee por SSRF
       finalRedirectUrl = finalRedirectUrl.replace('localhost', 'localtest.me');
     }
     const redirectStr = `&redirect-url=${encodeURIComponent(finalRedirectUrl)}`;
@@ -135,22 +133,23 @@ export class PedidosService {
 
   async findByUser(userId: string) {
     return this.prisma.pedido.findMany({
-      where: { clienteId: userId },
+      where: { idCliente: userId },
       include: {
         productos: {
-          include: {
+          select: {
+            cantidad: true,
+            precioUnitario: true,
             producto: {
               select: {
                 id: true,
                 nombre: true,
-                precioUnitario: true,
                 categoria: true,
               },
             },
           },
         },
       },
-      orderBy: { fecha: 'desc' },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
