@@ -203,12 +203,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const clearCart = (): void => {
+  const clearCart = useCallback((): void => {
     setItems([]);
     setRemovedItems([]);
     const key = getCartStorageKey();
     localStorage.removeItem(key);
-  };
+  }, []);
 
   const totalItems = items.reduce(
     (sum, item) => sum + item.cantidad,

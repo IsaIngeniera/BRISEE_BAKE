@@ -1,7 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { CheckCircle2, ShoppingBag } from 'lucide-react';
+import {
+  CheckCircle2,
+  ShoppingBag,
+  ShoppingCart,
+  XCircle,
+} from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -17,6 +22,11 @@ import styles from './finalizar-compra.module.css';
 export default function SuccessfulPaymentPage() {
   const searchParams = useSearchParams();
   const { clearCart } = useCart();
+  const wompiStatus = searchParams.get('status')?.toUpperCase();
+  const orderReference = searchParams.get('reference');
+  const paymentError = searchParams.get('error');
+  const hasPaymentResult =
+    Boolean(wompiStatus) || paymentError !== null;
   const [user, setUser] = useState<SessionUser | null | undefined>(
     undefined,
   );
@@ -29,26 +39,24 @@ export default function SuccessfulPaymentPage() {
     /* eslint-disable react-hooks/set-state-in-effect */
     const sessionUser = getSessionUser();
     setUser(sessionUser);
-    const wompiStatus = searchParams.get('status')?.toUpperCase();
     const approved = wompiStatus === 'APPROVED';
     setIsApproved(approved);
 
     if (sessionUser && approved) {
       clearCart();
 
-      const reference = searchParams.get('reference');
-      if (reference) {
+      if (orderReference) {
         setOrder(
           updateOrderStatus(
             sessionUser.sub,
-            reference,
+            orderReference,
             'PAGO EXITOSO',
           ),
         );
       }
     }
     /* eslint-enable react-hooks/set-state-in-effect */
-  }, [clearCart, searchParams]);
+  }, [clearCart, orderReference, wompiStatus]);
 
   if (user === undefined) {
     return (
@@ -56,6 +64,38 @@ export default function SuccessfulPaymentPage() {
         <p className={styles.loading} role="status">
           Confirmando tu pago...
         </p>
+      </main>
+    );
+  }
+
+  if (isApproved !== true && hasPaymentResult) {
+    return (
+      <main className={styles.page}>
+        <section className={styles.card} role="alert">
+          <XCircle
+            className={styles.errorIcon}
+            size={56}
+            strokeWidth={1.5}
+            aria-hidden="true"
+          />
+          <p className={styles.eyebrow}>BRISÉE BAKE</p>
+          <h1>Pago no procesado</h1>
+          <p>
+            No fue posible procesar tu pago. Tus productos siguen
+            reservados en el carrito para que puedas intentarlo
+            nuevamente con otro método.
+          </p>
+
+          <div className={styles.actions}>
+            <Link href="/carrito" className={styles.primaryLink}>
+              <ShoppingCart size={18} aria-hidden="true" />
+              Volver al carrito
+            </Link>
+            <Link href="/cuenta" className={styles.secondaryLink}>
+              Ir a mi cuenta
+            </Link>
+          </div>
+        </section>
       </main>
     );
   }

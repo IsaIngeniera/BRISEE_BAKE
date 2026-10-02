@@ -23,6 +23,11 @@
   color: var(--pink-500);
 }
 
+.errorIcon {
+  margin-bottom: 18px;
+  color: var(--pink-600);
+}
+
 .eyebrow {
   margin: 0 0 8px;
   color: var(--pink-600);

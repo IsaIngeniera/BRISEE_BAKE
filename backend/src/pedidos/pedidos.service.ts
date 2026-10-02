@@ -106,8 +106,7 @@ export class PedidosService {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     const amountInCents = Math.round(Number(total) * 100);
     const reference = pedido.id;
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:3001';
-    const redirectUrl = `${backendUrl}/pedidos/retorno-wompi?reference=${reference}&frontendUrl=${encodeURIComponent(frontendUrl)}`;
+    const redirectUrl = `${frontendUrl}/finalizar-compra?status=APPROVED&reference=${reference}`;
 
     let signatureStr = '';
     if (integritySecret) {
@@ -118,7 +117,7 @@ export class PedidosService {
 
     let finalRedirectUrl = redirectUrl;
     if (finalRedirectUrl.includes('localhost')) {
-      finalRedirectUrl = finalRedirectUrl.replace('localhost', '127.0.0.1');
+      finalRedirectUrl = finalRedirectUrl.replace('localhost', 'localtest.me');
     }
     const redirectStr = `&redirect-url=${encodeURIComponent(finalRedirectUrl)}`;
 
