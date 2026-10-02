@@ -115,11 +115,7 @@ export class PedidosService {
       signatureStr = `&signature%3Aintegrity=${hash}`;
     }
 
-    let finalRedirectUrl = redirectUrl;
-    if (finalRedirectUrl.includes('localhost')) {
-      finalRedirectUrl = finalRedirectUrl.replace('localhost', 'localtest.me');
-    }
-    const redirectStr = `&redirect-url=${encodeURIComponent(finalRedirectUrl)}`;
+    const redirectStr = `&redirect-url=${encodeURIComponent(redirectUrl)}`;
 
     const wompiUrl = `https://checkout.wompi.co/p/?public-key=${wompiPublicKey}&currency=COP&amount-in-cents=${amountInCents}&reference=${reference}${signatureStr}${redirectStr}`;
 
