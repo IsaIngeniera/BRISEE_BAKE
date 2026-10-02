@@ -9,6 +9,13 @@ import {
 import ExpandableDescription from '@/components/products/ExpandableDescription';
 import ProductCatalogGrid from '@/components/products/ProductCatalogGrid';
 import { normalizeText } from '@/utils/normalize-text';
+import {
+  formatProductPriceRange,
+  getProductDisplayName,
+  getProductVariantGroupKey,
+  requiresProductOptions,
+  sortProductVariants,
+} from '@/utils/product-variants';
 
 import styles from './macarons.module.css';
 import ProductCardActions from '@/components/products/ProductCardActions';
@@ -81,24 +88,25 @@ async function getMacaronProducts(): Promise<Product[]> {
   }
 }
 
-function formatPrice(price: number | string): string {
-  const numericPrice = Number(price);
-
-  if (Number.isNaN(numericPrice)) {
-    return 'COP $ 0';
-  }
-
-  const formatted = numericPrice.toLocaleString('es-CO', {
-    maximumFractionDigits: 0,
-  });
-  
-  return `COP $ ${formatted}`;
-}
-
 export default async function MacaronsPage() {
   const products = await getMacaronProducts();
+  const groupedProducts = Array.from(
+    products.reduce((groups, product) => {
+      const key = getProductVariantGroupKey(product.nombre) ?? `${product.id}`;
+      const group = groups.get(key) ?? [];
+      group.push(product);
+      groups.set(key, group);
+      return groups;
+    }, new Map<string, Product[]>()),
+  ).map(([, group]) => sortProductVariants(group)[0]);
 
-  const items = products.map((product) => {
+  const items = groupedProducts.map((product) => {
+    const groupKey = getProductVariantGroupKey(product.nombre);
+    const productVariants = products.filter(
+      (variant) =>
+        (getProductVariantGroupKey(variant.nombre) ?? `${variant.id}`) ===
+        (groupKey ?? `${product.id}`),
+    );
     const productImageUrl =
       product.imagenes?.[0]?.urlImagen ??
       '/images/catalogo/macarons-placeholder.jpg';
@@ -142,7 +150,7 @@ export default async function MacaronsPage() {
               href={`/producto/${product.id}`}
               style={{ textDecoration: 'none', color: 'inherit' }}
             >
-              <h2>{product.nombre}</h2>
+              <h2>{getProductDisplayName(product.nombre)}</h2>
             </Link>
 
             {product.presentacion && (
@@ -172,11 +180,17 @@ export default async function MacaronsPage() {
 
             <ProductCardActions
               productId={product.id}
-              nombre={product.nombre}
+              nombre={
+                getProductVariantGroupKey(product.nombre) ===
+                'caja de macarons'
+                  ? 'Caja de Macarons'
+                  : product.nombre
+              }
               precio={product.precio}
               imagenUrl={productImageUrl}
               existencias={product.existencias}
-              formattedPrice={formatPrice(product.precio)}
+              formattedPrice={formatProductPriceRange(productVariants)}
+              requiresOptions={requiresProductOptions(product.nombre)}
             />
           </div>
         </article>
