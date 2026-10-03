@@ -22,28 +22,35 @@
 }
 .info h3 {
   margin: 0 0 4px;
-  font-family: var(--font-display), serif;
+  font-family: var(--font-title);
   font-size: 1.1rem;
 }
 
 .unitPrice {
   margin: 0;
-  font-family: var(--font-display), serif;
+  font-family: var(--font-title);
   font-size: 0.9rem;
   opacity: 0.75;
+}
+
+.theme {
+  margin: 4px 0 0;
+  color: #715b65;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
 }
 
 .quantityColumn {
   display: flex;
   justify-content: center;
-  font-family: var(--font-display), serif;
+  font-family: var(--font-title);
 }
 
 .subtotalColumn {
   min-width: 90px;
   text-align: right;
   font-weight: 600;
-  font-family: var(--font-display), serif;
+  font-family: var(--font-title);
 }
 
 .subtotalColumn p {
@@ -126,7 +133,7 @@
 .modalContent h2 {
   margin: 0 0 1rem;
   color: #d66098;
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--font-title);
 }
 
 .modalContent p {

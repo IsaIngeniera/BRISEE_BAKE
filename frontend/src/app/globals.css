@@ -1,8 +1,21 @@
 @import 'tailwindcss';
 
 :root {
-  --font-display: Georgia, 'Times New Roman', serif;
-  --font-body: Arial, Helvetica, sans-serif;
+  /* Títulos principales H1 – Baskerville Display PT con respaldo en Libre Baskerville */
+  --font-title: 'Baskerville Display PT', 'Libre Baskerville', 'Baskerville Old Face', Baskerville,
+    'Book Antiqua', 'Times New Roman', Georgia, serif;
+
+  /* Subtítulos H2, H3 – Antique Olive con respaldo en Chivo */
+  --font-subtitle: 'Antique Olive', 'Chivo', 'Gill Sans', 'Gill Sans MT', Optima,
+    Verdana, Geneva, sans-serif;
+
+  /* Cuerpo / descripciones – Canva Sans con respaldo en Plus Jakarta Sans e Inter */
+  --font-body: 'Canva Sans', 'Plus Jakarta Sans', 'Inter', 'Helvetica Neue',
+    Arial, Helvetica, sans-serif;
+
+  --font-display: var(--font-title);
+ 
+
   --pink-50: #fff7fa;
   --pink-100: #fdebf2;
   --pink-200: #f8d4e3;
@@ -29,7 +42,33 @@ body {
   margin: 0;
   background: var(--pink-50);
   color: var(--cocoa);
-  font-family: var(--font-body), Arial, sans-serif;
+  /* Descripciones / cuerpo: Canva Sans */
+  font-family: var(--font-body);
+}
+
+/* ─── Tipografía global ────────────────────────────────────────── */
+/* H1: Baskerville Display PT — uppercase, grande */
+h1 {
+  font-family: var(--font-title);
+ text-transform: capitalize;
+  letter-spacing: 0.04em;
+  font-weight: 400;
+}
+
+/* H2, H3: Antique Olive — subtítulos */
+h2,
+h3 {
+  font-family: var(--font-subtitle);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+/* Párrafos y texto de descripción: Canva Sans */
+p,
+li,
+span,
+label {
+  font-family: var(--font-body);
 }
 
 button,
