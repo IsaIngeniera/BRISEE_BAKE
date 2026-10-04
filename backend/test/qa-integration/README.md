@@ -38,7 +38,8 @@ test/qa-integration/
 ├── helpers/
 │   ├── test-app.ts           ← Construye la app NestJS para tests
 │   ├── test-db.ts            ← Limpia tablas entre tests
-│   └── test-fixtures.ts      ← Factories (usuarios, productos, fechas)
+│   ├── test-fixtures.ts      ← Factories (usuarios, productos, fechas)
+│   └── assert-test-db.ts     ← Guard: valida que DATABASE_URL sea de pruebas
 ├── auth/
 │   ├── registro.integration.qa-spec.ts
 │   └── login.integration.qa-spec.ts

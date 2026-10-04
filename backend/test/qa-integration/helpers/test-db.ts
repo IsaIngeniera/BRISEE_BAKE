@@ -9,6 +9,7 @@
  */
 
 import { PrismaService } from '../../../src/prisma.service';
+import { assertIsTestDatabase } from './assert-test-db';
 
 /**
  * Orden importa por las foreign keys (de hijos a padres).
@@ -27,6 +28,11 @@ const TABLAS_A_LIMPIAR = [
 ] as const;
 
 export async function cleanDatabase(prisma: PrismaService): Promise<void> {
+  // Defense in depth: aunque el globalSetup ya validó la URL, verificamos
+  // de nuevo aquí. Si alguien reusa este helper desde un contexto donde
+  // DATABASE_URL fue sobreescrita, no vamos a hacer TRUNCATE contra dev.
+  assertIsTestDatabase(process.env.DATABASE_URL);
+
   // Usamos un solo TRUNCATE con todas las tablas para que CASCADE funcione
   // de forma atómica. Importante: entre comillas dobles por el casing.
   const tablas = TABLAS_A_LIMPIAR.map((t) => `"${t}"`).join(', ');

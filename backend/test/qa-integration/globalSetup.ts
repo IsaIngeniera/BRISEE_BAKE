@@ -11,6 +11,7 @@ import { config as loadDotenv } from 'dotenv';
 import { execSync } from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
+import { assertIsTestDatabase } from './helpers/assert-test-db';
 
 export default async function globalSetup(): Promise<void> {
   const envPath = path.resolve(__dirname, '../../.env.test');
@@ -25,23 +26,10 @@ export default async function globalSetup(): Promise<void> {
 
   loadDotenv({ path: envPath });
 
-  if (!process.env.DATABASE_URL) {
-    throw new Error(
-      '❌ DATABASE_URL no está definida en .env.test',
-    );
-  }
-
-  // Protección: no permitir correr migraciones destructivas contra la BD de dev.
-  if (
-    !process.env.DATABASE_URL.includes('_test') &&
-    !process.env.DATABASE_URL.includes('test_')
-  ) {
-    throw new Error(
-      `\n❌ DATABASE_URL no parece apuntar a una BD de pruebas.\n` +
-        `   URL actual: ${process.env.DATABASE_URL}\n` +
-        `   La BD de pruebas debe tener "_test" en el nombre.\n`,
-    );
-  }
+  // Guard: parsea la URL y exige que el NOMBRE de la BD termine en _test/_e2e.
+  // Es más seguro que un `.includes()` sobre toda la URL (que podía matchear
+  // user, password o host).
+  assertIsTestDatabase(process.env.DATABASE_URL);
 
   // eslint-disable-next-line no-console
   console.log('\n🔧 [integration] Aplicando migraciones a la BD de pruebas...');
