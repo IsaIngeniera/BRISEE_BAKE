@@ -23,7 +23,6 @@ frontend/test/qa-unit/
 │   ├── DietaryFilterChips.qa-spec.tsx
 │   └── ProductSearchBar.qa-spec.tsx
 ├── README.md                    # Este archivo
-└── RESUMEN.md                   # Resumen de métricas
 ```
 
 ## Convenciones
