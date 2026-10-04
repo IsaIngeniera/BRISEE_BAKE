@@ -93,7 +93,7 @@ test.describe('HU-26 Historial de pedidos [E2E]', () => {
     const fecha = fechaEsperada.toISOString().slice(0, 10);
 
     // Pedido del cliente 1 (debe verse)
-    await request.post(`${apiUrl}/pedidos`, {
+    const res1 = await request.post(`${apiUrl}/pedidos`, {
       headers: { Authorization: `Bearer ${token1}` },
       data: {
         direccionEntrega: 'A',
@@ -104,9 +104,13 @@ test.describe('HU-26 Historial de pedidos [E2E]', () => {
         items: [{ idProducto: producto.id, cantidad: 1 }],
       },
     });
+    // Si la creación falla (ej. por BUG-001), el test aborta aquí con
+    // mensaje claro en vez de continuar y fallar luego en la UI con
+    // "aún no tienes pedidos", lo que ocultaría la causa real.
+    expect(res1.status(), `POST /pedidos (cliente1) devolvio ${res1.status()}: ${await res1.text()}`).toBe(201);
 
     // Pedido del cliente 2 (NO debe verse en el historial del cliente 1)
-    await request.post(`${apiUrl}/pedidos`, {
+    const res2 = await request.post(`${apiUrl}/pedidos`, {
       headers: { Authorization: `Bearer ${token2}` },
       data: {
         direccionEntrega: 'C',
@@ -117,6 +121,7 @@ test.describe('HU-26 Historial de pedidos [E2E]', () => {
         items: [{ idProducto: productoOculto.id, cantidad: 1 }],
       },
     });
+    expect(res2.status(), `POST /pedidos (cliente2) devolvio ${res2.status()}: ${await res2.text()}`).toBe(201);
 
     await setAuthToken(page, token1);
     await page.goto('/cuenta/pedidos');
@@ -139,7 +144,7 @@ test.describe('HU-26 Historial de pedidos [E2E]', () => {
     fechaEsperada.setDate(fechaEsperada.getDate() + 5);
     const fecha = fechaEsperada.toISOString().slice(0, 10);
 
-    await request.post(`${apiUrl}/pedidos`, {
+    const createRes = await request.post(`${apiUrl}/pedidos`, {
       headers: { Authorization: `Bearer ${tokenCliente}` },
       data: {
         direccionEntrega: 'Cra 1',
@@ -150,6 +155,7 @@ test.describe('HU-26 Historial de pedidos [E2E]', () => {
         items: [{ idProducto: producto.id, cantidad: 1 }],
       },
     });
+    expect(createRes.status(), `POST /pedidos devolvio ${createRes.status()}: ${await createRes.text()}`).toBe(201);
 
     const admin = await seedAdminUser('admin-view@e2e.test.com');
     const tokenAdmin = await loginViaAPI(admin.correo, admin.password);
@@ -188,6 +194,7 @@ test.describe('HU-26 Historial de pedidos [E2E]', () => {
         items: [{ idProducto: producto.id, cantidad: 1 }],
       },
     });
+    expect(createRes.status(), `POST /pedidos devolvio ${createRes.status()}: ${await createRes.text()}`).toBe(201);
     const createBody = (await createRes.json()) as { pedidoId: string };
 
     const admin = await seedAdminUser('admin-estado@e2e.test.com');
@@ -197,10 +204,20 @@ test.describe('HU-26 Historial de pedidos [E2E]', () => {
     await page.goto('/admin/pedidos');
 
     const selectId = `#estado-${createBody.pedidoId}`;
-    await page.locator(selectId).selectOption('PREPARANDO');
 
-    // Verificamos en BD que el estado se actualizó.
-    await page.waitForTimeout(500); // da un respiro al PATCH
+    // Esperamos la respuesta del PATCH en vez de usar un sleep fijo.
+    // Un waitForTimeout(N) es fragil: puede fallar en equipos lentos
+    // o esperar de mas en equipos rapidos.
+    const patchResponsePromise = page.waitForResponse(
+      (res) =>
+        res.url().includes(`/pedidos/${createBody.pedidoId}/estado`) &&
+        res.request().method() === 'PATCH',
+    );
+    await page.locator(selectId).selectOption('PREPARANDO');
+    const patchResponse = await patchResponsePromise;
+    expect(patchResponse.status()).toBe(200);
+
+    // Verificamos en BD que el estado se persistio realmente.
     const pedidoBd = await getPrisma().pedido.findUnique({
       where: { id: createBody.pedidoId },
     });

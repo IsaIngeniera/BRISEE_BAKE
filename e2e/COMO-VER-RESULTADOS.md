@@ -1,9 +1,3 @@
-# Cómo ver los resultados de las pruebas E2E
-
-> Guía paso a paso para correr las pruebas end-to-end del Sprint 2 y analizar sus resultados.
-
----
-
 ## 📦 0. Pre-requisitos (solo la primera vez)
 
 Antes de correr las pruebas por primera vez, verifica que el entorno esté listo:

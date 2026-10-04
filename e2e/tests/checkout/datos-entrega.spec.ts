@@ -151,7 +151,7 @@ test.describe('HU-19 Datos de entrega [E2E]', () => {
     expect(minAttr).toBe(fechaEnDias(3));
   });
 
-  test('RETIRO con fecha válida intenta crear el pedido', async ({
+  test('RETIRO con fecha válida crea el pedido y recibe wompiUrl', async ({
     page,
   }) => {
     const user = buildUserData({ correo: 'entrega4@e2e.test.com' });
@@ -172,11 +172,13 @@ test.describe('HU-19 Datos de entrega [E2E]', () => {
       },
     ]);
 
-    // Interceptamos POST /pedidos para capturar el payload sin depender
-    // de que el backend realmente lo acepte (BUG-001 lo rompe).
-    const pedidoRequest = page.waitForRequest(
-      (req) =>
-        req.url().endsWith('/pedidos') && req.method() === 'POST',
+    // Esperamos tanto el REQUEST (para inspeccionar el payload) como la
+    // RESPONSE (para verificar que el backend aceptó la operación).
+    // Si BUG-001 u otro defecto hace fallar el POST, el test lo reporta
+    // explícitamente — no lo oculta como pasaba antes.
+    const pedidoResponsePromise = page.waitForResponse(
+      (res) =>
+        res.url().endsWith('/pedidos') && res.request().method() === 'POST',
     );
 
     await page.goto('/carrito');
@@ -192,13 +194,28 @@ test.describe('HU-19 Datos de entrega [E2E]', () => {
       .getByRole('button', { name: /confirmar y pagar/i })
       .click();
 
-    const request = await pedidoRequest;
-    const body = JSON.parse(request.postData() ?? '{}');
+    const response = await pedidoResponsePromise;
 
-    expect(body.tipoEntrega).toBe('RETIRO');
-    expect(body.fechaEsperada).toBe(fechaEnDias(5));
-    expect(body.items).toHaveLength(1);
-    expect(body.items[0].idProducto).toBe(producto.id);
-    expect(body.items[0].cantidad).toBe(1);
+    // 1. Payload enviado correcto
+    const requestBody = JSON.parse(response.request().postData() ?? '{}');
+    expect(requestBody.tipoEntrega).toBe('RETIRO');
+    expect(requestBody.fechaEsperada).toBe(fechaEnDias(5));
+    expect(requestBody.items).toHaveLength(1);
+    expect(requestBody.items[0].idProducto).toBe(producto.id);
+    expect(requestBody.items[0].cantidad).toBe(1);
+
+    // 2. El backend aceptó el pedido (201 Created)
+    expect(response.status()).toBe(201);
+
+    // 3. La respuesta trae los campos que el frontend necesita para
+    //    continuar al pago en Wompi
+    const responseBody = (await response.json()) as {
+      pedidoId: string;
+      wompiUrl: string;
+      whatsappUrl: string;
+    };
+    expect(responseBody.pedidoId).toBeTruthy();
+    expect(responseBody.wompiUrl).toContain('checkout.wompi.co');
+    expect(responseBody.whatsappUrl).toContain('wa.me');
   });
 });

@@ -100,6 +100,13 @@ export default defineConfig({
       stdout: 'pipe',
       stderr: 'pipe',
       env: {
+        // Varias páginas del frontend hacen fetch en SSR a `INTERNAL_API_URL`
+        // (ver `frontend/src/app/catalogo/*/page.tsx`, `/producto/[id]`, etc.).
+        // Si falta, caen al fallback `http://backend:3001` que es el nombre
+        // del container de Docker — no resuelve desde el host y las páginas
+        // fallan silenciosamente.
+        INTERNAL_API_URL: process.env.NEXT_PUBLIC_API_URL!,
+        // Al navegador: la URL del backend accesible desde fuera.
         NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL!,
         PORT: FRONTEND_PORT,
       },
