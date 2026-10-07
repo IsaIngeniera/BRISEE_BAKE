@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * PRUEBAS UNITARIAS QA - services/auth.ts
  *

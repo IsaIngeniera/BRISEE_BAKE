@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * PRUEBAS UNITARIAS QA - HU-27: Página de Contacto
  *
@@ -12,7 +13,7 @@
  * - Limpieza del formulario tras envío
  */
 
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ContactoPage from '@/app/contacto/page';
 

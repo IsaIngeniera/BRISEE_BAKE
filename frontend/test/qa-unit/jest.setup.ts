@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Jest setup file - runs before each test file.
  * Agrega matchers de React Testing Library.
