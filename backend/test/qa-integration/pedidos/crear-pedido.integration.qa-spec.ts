@@ -25,11 +25,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../../src/prisma.service';
 import { createTestApp } from '../helpers/test-app';
 import { cleanDatabase } from '../helpers/test-db';
-import {
-  seedUser,
-  seedProduct,
-  fechaEnDias,
-} from '../helpers/test-fixtures';
+import { seedUser, seedProduct, fechaEnDias } from '../helpers/test-fixtures';
 import { EstadoProducto } from '@prisma/client';
 
 describe('Crear pedido [Integración] (HU-19, HU-20, HU-25)', () => {

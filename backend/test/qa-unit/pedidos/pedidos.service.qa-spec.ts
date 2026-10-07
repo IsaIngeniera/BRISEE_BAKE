@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * PRUEBAS UNITARIAS QA - PedidosService
  *
@@ -12,10 +13,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PedidosService } from '../../../src/pedidos/pedidos.service';
 import { PrismaService } from '../../../src/prisma.service';
-import {
-  BadRequestException,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Prisma, EstadoEntrega, TipoEntrega } from '@prisma/client';
 import * as nodemailer from 'nodemailer';
 
@@ -150,9 +148,9 @@ describe('PedidosService [QA]', () => {
     it('debe lanzar BadRequestException si items es undefined', async () => {
       const dtoSinItems = { ...createPedidoDto, items: undefined } as any;
 
-      await expect(
-        service.createPedido(userId, dtoSinItems),
-      ).rejects.toThrow('El carrito está vacío o no existe.');
+      await expect(service.createPedido(userId, dtoSinItems)).rejects.toThrow(
+        'El carrito está vacío o no existe.',
+      );
     });
 
     it('debe lanzar BadRequestException si no hay productos ACTIVOS', async () => {

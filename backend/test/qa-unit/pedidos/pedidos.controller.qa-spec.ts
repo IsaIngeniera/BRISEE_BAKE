@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * PRUEBAS UNITARIAS QA - PedidosController
  *
@@ -231,9 +232,7 @@ describe('PedidosController [QA]', () => {
 
       const result = await controller.verificarPago('tx-123');
 
-      expect(pedidosService.verificarPagoWompi).toHaveBeenCalledWith(
-        'tx-123',
-      );
+      expect(pedidosService.verificarPagoWompi).toHaveBeenCalledWith('tx-123');
       expect(result).toEqual(expectedResponse);
     });
   });

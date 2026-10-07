@@ -24,9 +24,7 @@ export function assertIsTestDatabase(databaseUrl: string | undefined): void {
     const parsed = new URL(databaseUrl);
     dbName = parsed.pathname.replace(/^\//, '');
   } catch {
-    throw new Error(
-      `❌ DATABASE_URL no es una URL válida: "${databaseUrl}"`,
-    );
+    throw new Error(`❌ DATABASE_URL no es una URL válida: "${databaseUrl}"`);
   }
 
   if (!dbName) {

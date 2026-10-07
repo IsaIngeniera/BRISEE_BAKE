@@ -44,8 +44,7 @@ jest.mock('nodemailer', () => ({
  * Lo necesitamos porque `sendAdminNotification` se dispara en modo
  * fire-and-forget desde el service (`.catch(console.error)` sin await).
  */
-const flushPromises = () =>
-  new Promise((resolve) => setImmediate(resolve));
+const flushPromises = () => new Promise((resolve) => setImmediate(resolve));
 
 describe('Verificar pago [Integración] (HU-21, HU-22, HU-24)', () => {
   let app: INestApplication;
@@ -153,7 +152,7 @@ describe('Verificar pago [Integración] (HU-21, HU-22, HU-24)', () => {
           amount_in_cents: args.amountInCents ?? 1600000,
         },
       }),
-    } as unknown as Response);
+    });
   }
 
   // ==============================================================

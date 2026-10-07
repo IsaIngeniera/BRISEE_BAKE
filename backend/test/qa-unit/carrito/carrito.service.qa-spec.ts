@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * PRUEBAS UNITARIAS QA - CarritoService
  *
@@ -11,10 +12,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CarritoService } from '../../../src/carrito/carrito.service';
 import { PrismaService } from '../../../src/prisma.service';
-import {
-  BadRequestException,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('CarritoService [QA]', () => {
   let service: CarritoService;
@@ -184,9 +182,15 @@ describe('CarritoService [QA]', () => {
         producto: mockProducto,
       });
 
-      const result = await service.addItem(userId, { idProducto: 'prod-123', cantidad: 2 });
+      const result = await service.addItem(userId, {
+        idProducto: 'prod-123',
+        cantidad: 2,
+      });
 
-      expect(result).toHaveProperty('message', 'Cantidad actualizada en el carrito');
+      expect(result).toHaveProperty(
+        'message',
+        'Cantidad actualizada en el carrito',
+      );
       expect(prismaService.itemCarrito.update).toHaveBeenCalledWith({
         where: { id: mockItem.id },
         data: { cantidad: 5 },

@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * PRUEBAS UNITARIAS QA - AuthController
  *
@@ -82,9 +83,7 @@ describe('AuthController [QA]', () => {
     });
 
     it('debe propagar errores del servicio al controlador', async () => {
-      authService.register.mockRejectedValue(
-        new Error('Correo ya registrado'),
-      );
+      authService.register.mockRejectedValue(new Error('Correo ya registrado'));
 
       await expect(controller.register(registerDto)).rejects.toThrow(
         'Correo ya registrado',

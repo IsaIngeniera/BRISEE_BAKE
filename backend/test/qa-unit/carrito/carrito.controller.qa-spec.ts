@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * PRUEBAS UNITARIAS QA - CarritoController
  *
@@ -132,11 +133,7 @@ describe('CarritoController [QA]', () => {
       };
       carritoService.updateItemQuantity.mockResolvedValue(expectedResponse);
 
-      const result = await controller.updateItemQuantity(
-        req,
-        'prod-123',
-        5,
-      );
+      const result = await controller.updateItemQuantity(req, 'prod-123', 5);
 
       expect(carritoService.updateItemQuantity).toHaveBeenCalledWith(
         'user-123',

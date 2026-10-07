@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * PRUEBAS UNITARIAS QA - AuthService
  *
@@ -12,10 +13,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from '../../../src/auth/auth.service';
 import { PrismaService } from '../../../src/prisma.service';
 import { JwtService } from '@nestjs/jwt';
-import {
-  BadRequestException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { Rol, EstadoUsuario } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 

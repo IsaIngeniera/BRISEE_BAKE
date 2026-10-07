@@ -31,7 +31,6 @@ export default async function globalSetup(): Promise<void> {
   // user, password o host).
   assertIsTestDatabase(process.env.DATABASE_URL);
 
-  // eslint-disable-next-line no-console
   console.log('\n🔧 [integration] Aplicando migraciones a la BD de pruebas...');
 
   // IMPORTANTE: usamos `prisma migrate deploy` (NO `db push`) a propósito.
@@ -45,7 +44,7 @@ export default async function globalSetup(): Promise<void> {
       stdio: 'pipe',
       env: { ...process.env },
     });
-    // eslint-disable-next-line no-console
+
     console.log('✅ [integration] Migraciones aplicadas.\n');
   } catch (error) {
     const err = error as { stdout?: Buffer; stderr?: Buffer; message: string };

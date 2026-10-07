@@ -36,7 +36,9 @@ export async function seedUser(
   jwt: JwtService,
   overrides: SeedUserInput = {},
 ): Promise<SeedUserResult> {
-  const correo = overrides.correo ?? `user-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@test.com`;
+  const correo =
+    overrides.correo ??
+    `user-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@test.com`;
   const passwordPlano = overrides.password ?? 'Password123!';
   const hash = await bcrypt.hash(passwordPlano, 10);
 

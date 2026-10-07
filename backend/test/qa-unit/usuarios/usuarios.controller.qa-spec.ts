@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * PRUEBAS UNITARIAS QA - UsuariosController
  *
@@ -120,9 +121,7 @@ describe('UsuariosController [QA]', () => {
         fail('Debería haber lanzado BadRequestException');
       } catch (error: any) {
         expect(error).toBeInstanceOf(BadRequestException);
-        expect(error.message).toBe(
-          'No puedes cambiar tus propios permisos.',
-        );
+        expect(error.message).toBe('No puedes cambiar tus propios permisos.');
       }
 
       expect(usuariosService.updateRol).not.toHaveBeenCalled();

@@ -173,7 +173,9 @@ export class PedidosService {
         orderBy: { createdAt: 'desc' },
       });
     } catch (error) {
-      throw new InternalServerErrorException('Error al obtener el historial de pedidos');
+      throw new InternalServerErrorException(
+        'Error al obtener el historial de pedidos',
+      );
     }
   }
 
@@ -200,7 +202,9 @@ export class PedidosService {
         },
       });
     } catch (error) {
-      throw new InternalServerErrorException('Error al obtener la lista de pedidos');
+      throw new InternalServerErrorException(
+        'Error al obtener la lista de pedidos',
+      );
     }
   }
 

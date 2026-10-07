@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * PRUEBAS UNITARIAS QA - ProductsService
  *
@@ -12,10 +13,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductsService } from '../../../src/products/products.service';
 import { PrismaService } from '../../../src/prisma.service';
-import {
-  BadRequestException,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { EstadoProducto, EtiquetaDietetica } from '@prisma/client';
 
 describe('ProductsService [QA]', () => {
@@ -184,10 +182,7 @@ describe('ProductsService [QA]', () => {
     it('debe guardar etiquetas dietéticas si se proporcionan', async () => {
       const dtoConEtiquetas = {
         ...createDto,
-        etiquetas: [
-          EtiquetaDietetica.SIN_AZUCAR,
-          EtiquetaDietetica.SIN_GLUTEN,
-        ],
+        etiquetas: [EtiquetaDietetica.SIN_AZUCAR, EtiquetaDietetica.SIN_GLUTEN],
       };
       prismaService.producto.findMany.mockResolvedValue([]);
       prismaService.producto.create.mockResolvedValue(mockProduct);
@@ -274,10 +269,7 @@ describe('ProductsService [QA]', () => {
     it('debe filtrar productos por múltiples etiquetas (AND)', async () => {
       prismaService.producto.findMany.mockResolvedValue(products);
 
-      const result = await service.findAll(
-        undefined,
-        'SIN_AZUCAR,SIN_GLUTEN',
-      );
+      const result = await service.findAll(undefined, 'SIN_AZUCAR,SIN_GLUTEN');
 
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe('p3');
