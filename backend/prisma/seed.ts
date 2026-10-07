@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcrypt';
 import { PrismaClient, EstadoProducto } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
@@ -19,6 +20,7 @@ async function main() {
   await prisma.usuario.deleteMany();
 
   console.log('Creando usuario de prueba...');
+  const clientePasswordHash = await bcrypt.hash('cliente123', 10);
   const dummyUser = await prisma.usuario.create({
     data: {
       id: '00000000-0000-0000-0000-000000000000',
@@ -27,7 +29,7 @@ async function main() {
       fechaNacimiento: new Date('1990-01-01'),
       correo: 'cliente@prueba.com',
       rol: 'CLIENTE',
-      password: 'hash_falso',
+      password: clientePasswordHash,
       celular: '3000000000',
       estado: 'ACTIVO',
     }

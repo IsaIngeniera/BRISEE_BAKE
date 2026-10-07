@@ -176,10 +176,29 @@ test.describe('HU-19 Datos de entrega [E2E]', () => {
     // RESPONSE (para verificar que el backend aceptó la operación).
     // Si BUG-001 u otro defecto hace fallar el POST, el test lo reporta
     // explícitamente — no lo oculta como pasaba antes.
-    const pedidoResponsePromise = page.waitForResponse(
-      (res) =>
-        res.url().endsWith('/pedidos') && res.request().method() === 'POST',
-    );
+    let requestBody: any = {};
+    let responseBody: any = {};
+    let responseStatus = 0;
+
+    await page.route('**/pedidos', async (route) => {
+      if (route.request().method() === 'POST') {
+        requestBody = JSON.parse(route.request().postData() ?? '{}');
+        const response = await route.fetch();
+        responseStatus = response.status();
+        const text = await response.text();
+        responseBody = JSON.parse(text);
+        
+        // Block the frontend from actually navigating away by returning a mock response
+        // but we still let the backend process the real request and we capture the real response.
+        await route.fulfill({
+          status: responseStatus,
+          contentType: 'application/json',
+          body: text,
+        });
+      } else {
+        await route.continue();
+      }
+    });
 
     await page.goto('/carrito');
     await page
@@ -190,14 +209,19 @@ test.describe('HU-19 Datos de entrega [E2E]', () => {
       .check();
     await page.getByRole('button', { name: /^continuar$/i }).click();
     await page.locator('input[type="date"]').fill(fechaEnDias(5));
+    
+    // We mock Wompi to catch the navigation and prevent the test from leaving the app
+    const { mockWompi } = await import('../../helpers/wompi-mock');
+    await mockWompi(page, { status: 'PENDING' });
+
     await page
       .getByRole('button', { name: /confirmar y pagar/i })
       .click();
 
-    const response = await pedidoResponsePromise;
+    // Esperamos a que la ruta de pedidos sea llamada y capturada
+    await page.waitForResponse(res => res.url().endsWith('/pedidos') && res.request().method() === 'POST');
 
     // 1. Payload enviado correcto
-    const requestBody = JSON.parse(response.request().postData() ?? '{}');
     expect(requestBody.tipoEntrega).toBe('RETIRO');
     expect(requestBody.fechaEsperada).toBe(fechaEnDias(5));
     expect(requestBody.items).toHaveLength(1);
@@ -205,15 +229,10 @@ test.describe('HU-19 Datos de entrega [E2E]', () => {
     expect(requestBody.items[0].cantidad).toBe(1);
 
     // 2. El backend aceptó el pedido (201 Created)
-    expect(response.status()).toBe(201);
+    expect(responseStatus).toBe(201);
 
     // 3. La respuesta trae los campos que el frontend necesita para
     //    continuar al pago en Wompi
-    const responseBody = (await response.json()) as {
-      pedidoId: string;
-      wompiUrl: string;
-      whatsappUrl: string;
-    };
     expect(responseBody.pedidoId).toBeTruthy();
     expect(responseBody.wompiUrl).toContain('checkout.wompi.co');
     expect(responseBody.whatsappUrl).toContain('wa.me');

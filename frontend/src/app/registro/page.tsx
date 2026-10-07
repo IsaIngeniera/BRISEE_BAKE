@@ -220,7 +220,7 @@ function RegistroContent() {
                     maxLength={20}
                     value={form.celular}
                     onChange={(event) =>
-                      updateField('celular', event.target.value)
+                      updateField('celular', event.target.value.replace(/\D/g, ''))
                     }
                     required
                   />

@@ -6,6 +6,7 @@ import {
   ShoppingBag,
   ShoppingCart,
   XCircle,
+  MessageCircle,
 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -33,6 +34,25 @@ function SuccessfulPaymentContent() {
   const [user, setUser] = useState<SessionUser | null | undefined>(undefined);
   const [isApproved, setIsApproved] = useState<boolean | null>(null);
   const [order, setOrder] = useState<CustomerOrder | null>(null);
+
+  function openWhatsApp() {
+    if (!order) return;
+    const userName = (() => {
+      try {
+        if (!user) return '';
+        const saved = JSON.parse(localStorage.getItem(`brisee_profile_${user.sub}`) || '{}');
+        const nombre = typeof saved.nombre === 'string' ? saved.nombre.trim() : '';
+        const apellido = typeof saved.apellido === 'string' ? saved.apellido.trim() : '';
+        return [nombre, apellido].filter(Boolean).join(' ');
+      } catch {
+        return '';
+      }
+    })();
+    const products = order.items.map((item) => `• ${item.nombre} × ${item.cantidad}`).join('\n');
+    const totalFormat = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(order.total);
+    const message = `¡Hola, Brisée Bake!\n${userName ? `Soy ${userName} y acabo de realizar un pedido.` : 'Acabo de realizar un pedido.'}\nMi número de pedido es #${order.number}.\n\nEstos son los productos que elegí:\n${products}\n\nTotal del pedido: ${totalFormat}\n\n¿Podemos coordinar los detalles de la entrega? ¡Muchas gracias!`;
+    window.open(`https://wa.me/573003685556?text=${encodeURIComponent(message)}`, '_blank');
+  }
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -158,15 +178,38 @@ function SuccessfulPaymentContent() {
         </p>
 
         {order && (
-          <div className={styles.orderSummary}>
-            <strong>Orden #{order.number}</strong>
-            <span>
-              Total: COP ${' '}
-              {order.total.toLocaleString('es-CO', {
-                maximumFractionDigits: 0,
-              })}
-            </span>
-          </div>
+          <>
+            <div className={styles.orderSummary}>
+              <strong>Orden #{order.number}</strong>
+              <ul style={{ listStyle: 'none', padding: 0, margin: '1rem 0' }}>
+                {order.items?.map((item) => (
+                  <li key={item.productId} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                    <span>{item.cantidad}x {item.nombre}</span>
+                  </li>
+                ))}
+              </ul>
+              <span>
+                Total: COP ${' '}
+                {order.total.toLocaleString('es-CO', {
+                  maximumFractionDigits: 0,
+                })}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              className={styles.whatsappButton}
+              onClick={openWhatsApp}
+              style={{ marginBottom: '1rem' }}
+            >
+              <MessageCircle aria-hidden="true" />
+              Continuar por WhatsApp
+            </button>
+
+            <p className={styles.confirmationNote} style={{ marginBottom: '1.5rem' }}>
+              Podrás revisar el mensaje antes de enviarlo.
+            </p>
+          </>
         )}
 
         <div className={styles.actions}>

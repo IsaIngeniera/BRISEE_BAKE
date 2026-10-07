@@ -105,3 +105,36 @@
 .loading {
   color: var(--rose-text);
 }
+
+.whatsappButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 54px;
+  padding: 10px 20px;
+  border: 0;
+  background: #d66098;
+  color: #fff;
+  font: 1.3rem var(--font-body);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.whatsappButton:hover {
+  background: #b94c7e;
+  text-decoration: none;
+}
+
+.whatsappButton:focus-visible {
+  outline: 2px solid #d66098;
+  outline-offset: 3px;
+}
+
+.confirmationNote {
+  margin: 16px 0 0;
+  color: #715b65;
+  font-size: 1.05rem;
+  text-align: center;
+}

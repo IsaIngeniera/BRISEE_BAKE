@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
@@ -151,48 +152,56 @@ export class PedidosService {
   }
 
   async findByUser(userId: string) {
-    return this.prisma.pedido.findMany({
-      where: { idCliente: userId },
-      include: {
-        productos: {
-          select: {
-            cantidad: true,
-            precioUnitario: true,
-            producto: {
-              select: {
-                id: true,
-                nombre: true,
-                categoria: true,
+    try {
+      return await this.prisma.pedido.findMany({
+        where: { idCliente: userId },
+        include: {
+          productos: {
+            select: {
+              cantidad: true,
+              precioUnitario: true,
+              producto: {
+                select: {
+                  id: true,
+                  nombre: true,
+                  categoria: true,
+                },
               },
             },
           },
         },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+        orderBy: { createdAt: 'desc' },
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('Error al obtener el historial de pedidos');
+    }
   }
 
   async findAll() {
-    return this.prisma.pedido.findMany({
-      include: {
-        cliente: {
-          select: {
-            id: true,
-            nombre: true,
-            apellido: true,
-            correo: true,
+    try {
+      return await this.prisma.pedido.findMany({
+        include: {
+          cliente: {
+            select: {
+              id: true,
+              nombre: true,
+              apellido: true,
+              correo: true,
+            },
+          },
+          productos: {
+            include: {
+              producto: true,
+            },
           },
         },
-        productos: {
-          include: {
-            producto: true,
-          },
+        orderBy: {
+          createdAt: 'desc',
         },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+      });
+    } catch (error) {
+      throw new InternalServerErrorException('Error al obtener la lista de pedidos');
+    }
   }
 
   async updateEstado(id: string, estadoEntrega: EstadoEntrega) {
@@ -260,7 +269,7 @@ export class PedidosService {
         );
 
       if (nuevoEstado === 'APROBADO') {
-        this.sendAdminNotification(reference).catch(console.error);
+        await this.sendAdminNotification(reference).catch(console.error);
       }
 
       return {
@@ -299,7 +308,7 @@ export class PedidosService {
 
     let productosHtml = '';
     pedido.productos.forEach((p) => {
-      productosHtml += `<li>${p.cantidad}x ${p.producto.nombre} - $${p.precioUnitario.toString()}</li>`;
+      productosHtml += `<li>${p.cantidad}x ${p.producto?.nombre || 'Producto eliminado'} - $${p.precioUnitario.toString()}</li>`;
     });
 
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@briseebake.com';
@@ -310,7 +319,7 @@ export class PedidosService {
       subject: `🚨 Nuevo Pago Recibido - Pedido #${pedidoId.split('-')[0].toUpperCase()}`,
       html: `
         <h2>¡Nuevo pago confirmado!</h2>
-        <p>El cliente <strong>${pedido.cliente.nombre} ${pedido.cliente.apellido}</strong> ha completado el pago de un pedido.</p>
+        <p>El cliente <strong>${pedido.cliente?.nombre || 'Desconocido'} ${pedido.cliente?.apellido || ''}</strong> ha completado el pago de un pedido.</p>
         
         <h3>Detalles de Entrega:</h3>
         <ul>
