@@ -40,6 +40,7 @@ module.exports = {
             '@/*': ['./src/*'],
           },
           baseUrl: '.',
+          types: ['jest', 'node', '@testing-library/jest-dom'],
         },
         isolatedModules: false,
       },

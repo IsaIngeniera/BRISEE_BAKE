@@ -56,6 +56,20 @@ export function saveSession(token: string, remember: boolean): void {
   sessionStorage.removeItem(AUTH_TOKEN_KEY);
   (remember ? localStorage : sessionStorage).setItem(AUTH_TOKEN_KEY, token);
   window.dispatchEvent(new Event(AUTH_CHANGE_EVENT));
+  if (authChannel) authChannel.postMessage('auth_changed');
+}
+
+const authChannel = typeof window !== 'undefined' ? new BroadcastChannel('brisee_auth_channel') : null;
+
+if (authChannel) {
+  authChannel.onmessage = (event) => {
+    if (event.data === 'auth_changed') {
+      window.dispatchEvent(new Event(AUTH_CHANGE_EVENT));
+      if (!getSessionUser()) {
+        window.location.reload();
+      }
+    }
+  };
 }
 
 export function getSessionUser(): SessionUser | null {
@@ -73,4 +87,5 @@ export function clearSession(): void {
   sessionStorage.removeItem(AUTH_TOKEN_KEY);
   localStorage.removeItem(AUTH_TOKEN_KEY);
   window.dispatchEvent(new Event(AUTH_CHANGE_EVENT));
+  if (authChannel) authChannel.postMessage('auth_changed');
 }

@@ -104,7 +104,7 @@ function SuccessfulPaymentContent() {
     );
   }
 
-  if (isApproved !== true && hasPaymentResult) {
+  if (isApproved === false || (!hasPaymentResult && isApproved === null)) {
     return (
       <main className={styles.page}>
         <section className={styles.card} role="alert">
@@ -117,9 +117,9 @@ function SuccessfulPaymentContent() {
           <p className={styles.eyebrow}>BRISÉE BAKE</p>
           <h1>Pago no procesado</h1>
           <p>
-            No fue posible procesar tu pago. Tus productos siguen
+            No fue posible procesar tu pago, o faltan datos en la URL. Tus productos siguen
             reservados en el carrito para que puedas intentarlo
-            nuevamente con otro método.
+            nuevamente.
           </p>
 
           <div className={styles.actions}>
@@ -136,7 +136,7 @@ function SuccessfulPaymentContent() {
     );
   }
 
-  if (isApproved !== true) {
+  if (isApproved === null) {
     return (
       <main className={styles.page}>
         <p className={styles.loading} role="status">

@@ -54,8 +54,18 @@ async function main() {
   const catGalletas = await prisma.categoria.create({ data: { id: '22222222-2222-2222-2222-222222222222', nombre: 'Galletas' } });
   const catGalletasCongeladas = await prisma.categoria.create({ data: { id: '33333333-3333-3333-3333-333333333333', nombre: 'Galletas congeladas' } });
   const catMacarons = await prisma.categoria.create({ data: { id: '44444444-4444-4444-4444-444444444444', nombre: 'Macarons' } });
+  const catCookieDough = await prisma.categoria.create({ data: { id: '55555555-5555-5555-5555-555555555555', nombre: 'Cookie Dough' } });
 
   console.log('Creando productos...');
+
+  // Cookie Dough
+  const descCookieDough = 'Masa de galleta deliciosa lista para comer o preparar deliciosas galletas.';
+  await prisma.producto.createMany({
+    data: [
+      { idCategoria: catCookieDough.id, nombre: 'Cookie Dough Choco Chips', descripcion: descCookieDough, precio: 22000, presentacion: '350g', existencias: 30, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
+      { idCategoria: catCookieDough.id, nombre: 'Cookie Dough Doble Chocolate', descripcion: descCookieDough, precio: 23500, presentacion: '350g', existencias: 30, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
+    ]
+  });
 
   // Granolas
   const descGranolaAlmendras = 'Snack saludable con almendras, nueces, coco, avena sin gluten y miel de abeja, libre de azúcares añadidos';
@@ -112,9 +122,11 @@ async function main() {
 
   const imagenesData = todosLosProductos.map((p) => {
     const nombreLimpio = p.nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '-');
+    const isCookieDough = nombreLimpio.startsWith('cookie-dough');
+    
     return {
       idProducto: p.id,
-      urlImagen: `/images/productos/${nombreLimpio}.jpg`,
+      urlImagen: isCookieDough ? `/images/catalogo/${nombreLimpio}.png` : `/images/productos/${nombreLimpio}.jpg`,
       nombre: 'Principal'
     };
   });

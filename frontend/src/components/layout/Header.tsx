@@ -95,18 +95,7 @@ export default function Header(): ReactElement {
     );
   }, [viewMode]);
 
-  // Manejar el cierre de sesión en otra pestaña
-  useEffect(() => {
-    function handleStorageChange(event: StorageEvent) {
-      if (event.key === AUTH_TOKEN_KEY && !event.newValue) {
-        // Si el token desapareció (logout en otra tab), forzamos una recarga
-        // para que las rutas protegidas expulsen al usuario
-        window.location.reload();
-      }
-    }
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  // El manejo de cierre de sesión multi-pestaña ahora se realiza a través de BroadcastChannel en auth.ts
 
   function closeMenus(): void {
     setIsMobileMenuOpen(false);
