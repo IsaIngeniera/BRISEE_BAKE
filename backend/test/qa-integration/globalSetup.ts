@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * globalSetup para pruebas de integración.
  *

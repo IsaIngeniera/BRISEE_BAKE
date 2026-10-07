@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * PRUEBAS DE INTEGRACIÓN QA — HU-26: Historial de pedidos
  *

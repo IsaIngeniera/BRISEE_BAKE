@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Guard de seguridad: valida que una `DATABASE_URL` apunte efectivamente
  * a una base de datos de PRUEBAS antes de ejecutar operaciones

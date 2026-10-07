@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * PRUEBAS DE INTEGRACIÓN QA — HU-13: Registro de nuevo usuario
  *

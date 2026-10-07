@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Helper para construir la aplicación NestJS en modo de pruebas de integración.
  *

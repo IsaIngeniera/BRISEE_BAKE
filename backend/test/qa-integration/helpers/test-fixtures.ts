@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Fixtures reutilizables para pruebas de integración.
  *

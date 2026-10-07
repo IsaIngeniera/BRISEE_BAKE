@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * PRUEBAS DE INTEGRACIÓN QA — Crear pedido
  *

@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * PRUEBAS DE INTEGRACIÓN QA — HU-15: Inicio de sesión tradicional
  *
