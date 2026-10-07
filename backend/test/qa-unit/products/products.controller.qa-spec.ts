@@ -1,4 +1,3 @@
-/* eslint-disable */
 /**
  * PRUEBAS UNITARIAS QA - ProductsController
  *

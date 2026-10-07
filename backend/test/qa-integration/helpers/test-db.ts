@@ -1,4 +1,3 @@
-/* eslint-disable */
 /**
  * Helper para limpieza de la BD de pruebas.
  *
