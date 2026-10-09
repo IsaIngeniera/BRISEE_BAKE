@@ -1,0 +1,185 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Usuario {
+  id              String        @id @default(uuid())
+  nombre          String        @db.VarChar(50)
+  apellido        String        @db.VarChar(50)
+  fechaNacimiento DateTime      @db.Date
+  correo          String        @unique @db.VarChar(150)
+  rol             Rol
+  password        String        @db.VarChar(255)
+  celular         String        @db.VarChar(20)
+  estado          EstadoUsuario
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  carritos        Carrito[]
+  pedidos         Pedido[]
+
+  @@map("usuarios")
+}
+
+model Categoria {
+  id        String     @id @default(uuid())
+  nombre    String     @db.VarChar(80)
+  productos Producto[]
+
+  @@map("categorias")
+}
+
+model Producto {
+  id              String              @id @default(uuid())
+  idCategoria     String
+  nombre          String              @db.VarChar(100)
+  descripcion     String
+  precio          Decimal
+  presentacion    String              @db.VarChar(50)
+  existencias     Int
+  estado          EstadoProducto
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  etiquetas       EtiquetaDietetica[]
+  imagenes        ImagenProducto[]
+  itemsCarrito    ItemCarrito[]
+  pedidosProducto PedidoProducto[]
+  categoria       Categoria           @relation(fields: [idCategoria], references: [id])
+
+  @@map("productos")
+}
+
+model Pedido {
+  id                   String           @id @default(uuid())
+  idCliente            String
+  estadoEntrega        EstadoEntrega
+  total                Decimal
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+  fechaEsperada        DateTime         @db.Date
+  direccionEntrega     String
+  ciudad               String           @db.VarChar(80)
+  tipoEntrega          TipoEntrega
+  observacionesEntrega String           @db.VarChar(100)
+  pago                 Pago?
+  cliente              Usuario          @relation(fields: [idCliente], references: [id])
+  productos            PedidoProducto[]
+
+  @@map("pedidos")
+}
+
+model Pago {
+  id              String     @id @default(uuid())
+  idPedido        String     @unique
+  estado          EstadoPago
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  metodo          MetodoPago
+  total           Decimal
+  referenciaWompi String?    @db.VarChar(150)
+  transaccionId   String?    @db.VarChar(150)
+  pedido          Pedido     @relation(fields: [idPedido], references: [id])
+
+  @@map("pagos")
+}
+
+model Carrito {
+  id        String        @id @default(uuid())
+  idUsuario String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  estado    EstadoCarrito
+  usuario   Usuario       @relation(fields: [idUsuario], references: [id])
+  items     ItemCarrito[]
+
+  @@map("carritos")
+}
+
+model ItemCarrito {
+  id         String   @id @default(uuid())
+  idCarrito  String
+  idProducto String
+  cantidad   Int
+  carrito    Carrito  @relation(fields: [idCarrito], references: [id])
+  producto   Producto @relation(fields: [idProducto], references: [id])
+
+  @@map("items_carrito")
+}
+
+model PedidoProducto {
+  id             String   @id @default(uuid())
+  idProducto     String
+  idPedido       String
+  cantidad       Int
+  precioUnitario Decimal
+  pedido         Pedido   @relation(fields: [idPedido], references: [id])
+  producto       Producto @relation(fields: [idProducto], references: [id])
+
+  @@map("pedidos_producto")
+}
+
+model ImagenProducto {
+  id         String   @id @default(uuid())
+  idProducto String
+  urlImagen  String   @db.VarChar(300)
+  nombre     String   @db.VarChar(30)
+  producto   Producto @relation(fields: [idProducto], references: [id])
+
+  @@map("imagenes_producto")
+}
+
+enum Rol {
+  CLIENTE
+  ADMIN
+}
+
+enum EstadoUsuario {
+  ACTIVO
+  INACTIVO
+  BLOQUEADO
+}
+
+enum EstadoProducto {
+  ACTIVO
+  INACTIVO
+}
+
+enum EstadoEntrega {
+  PENDIENTE
+  PREPARANDO
+  DESPACHADO
+  ENTREGADO
+}
+
+enum TipoEntrega {
+  ENVIO
+  RETIRO
+}
+
+enum EstadoPago {
+  PENDIENTE
+  APROBADO
+  RECHAZADO
+  CANCELADO
+}
+
+enum MetodoPago {
+  WOMPI
+}
+
+enum EstadoCarrito {
+  ACTIVO
+  CONVERTIDO
+  ABANDONADO
+}
+
+enum EtiquetaDietetica {
+  SIN_AZUCAR
+  SIN_GLUTEN
+  KETO
+  VEGANO
+  LIBRE_DE_LACTEOS
+}

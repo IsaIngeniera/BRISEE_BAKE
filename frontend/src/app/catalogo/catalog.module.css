@@ -1,0 +1,308 @@
+.catalogLayout {
+  /* Usamos la misma fuente de títulos global */
+  --brand-font: var(--font-title, 'Baskerville Display PT', 'Libre Baskerville', serif);
+  /* Usamos la fuente de cuerpo global para descripciones limpias */
+  --body-font: var(--font-body, 'Canva Sans', 'Plus Jakarta Sans', sans-serif);
+  
+  width: min(100%, 1500px);
+  margin: 0 auto;
+  font-family: var(--body-font);
+  background-color: #ffffff;
+}
+
+.catalogPage {
+  --primary-pink: #e48abd;
+  --secondary-pink: #edaccc;
+  --coral: #f26f71;
+  --dark-pink: #d66098;
+  --soft-pink: #fff5fa;
+  --cream: #f9f2d2;
+  --mint: #e5f1eb;
+  --gold: #c69e73;
+  --text: #513f45;
+
+  width: 100%;
+  padding: 20px 25px 70px;
+  color: var(--text);
+  background-color: #ffffff;
+}
+
+.heading {
+  padding: 36px 15px 30px;
+  text-align: center;
+}
+
+.heading h1 {
+  margin: 0;
+  color: var(--dark-pink);
+  font-size: clamp(2.5rem, 4vw, 3.8rem);
+  font-weight: 400;
+  line-height: 1.1;
+  font-family: var(--brand-font);
+  text-transform: none; /* Respeta las mayúsculas/minúsculas naturales */
+}
+
+.heading p {
+  max-width: 620px;
+  margin: 14px auto 0;
+  color: #765f67;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  font-family: var(--body-font);
+}
+
+.decorativeLine {
+  margin: 13px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  color: var(--primary-pink);
+}
+
+.decorativeLine span:first-child,
+.decorativeLine span:last-child {
+  width: 43px;
+  height: 1px;
+  background-color: var(--primary-pink);
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); 
+  gap: 18px; 
+}
+
+.categoryCard {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgb(214 96 152 / 15%);
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgb(123 75 93 / 6%);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.categoryCard:hover {
+  box-shadow: 0 18px 38px rgb(123 75 93 / 14%);
+  transform: translateY(-8px);
+}
+
+.leafDecoration {
+  position: absolute;
+  z-index: 3;
+  top: 10px;
+  left: 12px;
+  color: rgb(255 255 255 / 60%);
+  font-size: 2.2rem;
+  pointer-events: none;
+  transform: rotate(-35deg);
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.4 / 1; 
+  overflow: hidden;
+  background-color: rgb(255 255 255 / 45%);
+}
+
+.categoryImage {
+  z-index: 2;
+  object-fit: cover;
+  transition: transform 400ms ease;
+}
+
+.categoryCard:hover .categoryImage {
+  transform: scale(1.05);
+}
+
+.imagePlaceholder {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: rgb(111 80 91 / 55%);
+  font-size: 0.95rem;
+  text-align: center;
+  padding: 10px;
+  font-family: var(--body-font);
+}
+
+.imagePlaceholder strong {
+  margin-top: 5px;
+  font-size: 1.15rem;
+  font-family: var(--brand-font);
+  line-height: 1.2;
+}
+
+.healthyBadge {
+  position: absolute;
+  z-index: 4;
+  top: 12px;
+  right: 12px;
+  display: inline-block;
+  background-color: #ffffff;
+  color: #6eaa61;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: bold;
+  border: 1px solid #cce5bc;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+}
+
+.cardContent {
+  padding: 20px 15px 18px; 
+  display: flex;
+  flex: 1; 
+  flex-direction: column;
+}
+
+.textContent {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.textContent h2 {
+  margin: 0 0 8px;
+  font-size: clamp(1.4rem, 1.8vw, 1.8rem);
+  font-weight: 400;
+  line-height: 1.1;
+  font-family: var(--brand-font);
+}
+
+.textContent p {
+  margin: 0; 
+  color: #4f4146;
+  font-family: var(--body-font); /* Usamos fuente de cuerpo legible */
+  font-size: 1.05rem; 
+  line-height: 1.35;
+}
+
+.discoverButton {
+  width: 100%;
+  margin-top: 18px; 
+  padding: 10px 15px;
+  color: white;
+  background: var(--dark-pink);
+  border-radius: 6px;
+  font-family: var(--brand-font);
+  font-size: 1.1rem;
+  text-align: center;
+  text-decoration: none;
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+.discoverButton:hover {
+  background: #be4c80;
+  transform: translateY(-2px);
+}
+
+.discoverButton:focus-visible {
+  outline: 3px solid var(--dark-pink);
+  outline-offset: 4px;
+}
+
+@media (max-width: 1100px) {
+  .categoryGrid {
+    grid-template-columns: repeat(3, 1fr); 
+  }
+}
+
+@media (max-width: 700px) {
+  .catalogPage {
+    padding: 14px 16px 50px;
+  }
+  .categoryGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+}
+
+@media (max-width: 500px) {
+  .categoryGrid {
+    grid-template-columns: 1fr; 
+  }
+}
+
+.noResults {
+  max-width: 650px;
+  margin: 35px auto 0;
+  padding: 18px 25px;
+  border-radius: 12px;
+  background-color: #fff5fa;
+  color: var(--dark-pink);
+  font-family: var(--body-font);
+  font-size: 1.2rem;
+  text-align: center;
+  border: 1px solid var(--secondary-pink);
+}
+
+.searchResultsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+  margin-top: 35px;
+}
+
+.searchResultCard {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #ffffff;
+  border: 1px solid #f3d2e2;
+  box-shadow: 0 4px 12px rgba(123, 75, 93, 0.05);
+  transition: transform 200ms ease;
+}
+
+.searchResultCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 18px rgba(123, 75, 93, 0.1);
+}
+
+.searchResultImageContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-color: #fff2f8;
+}
+
+.searchResultImageContainer img {
+  object-fit: cover;
+}
+
+.searchResultInfo {
+  padding: 15px;
+  text-align: center;
+}
+
+.searchResultInfo h3 {
+  font-size: 1.2rem;
+  font-family: var(--brand-font);
+  color: var(--dark-pink);
+  margin: 0 0 6px;
+  font-weight: normal;
+}
+
+.searchResultInfo p {
+  margin: 0;
+  font-family: var(--body-font);
+  color: #513f45;
+  font-weight: 600;
+  font-size: 0.95rem;
+}

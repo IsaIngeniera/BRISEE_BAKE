@@ -1,0 +1,99 @@
+.detailActionsWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 250px;
+}
+
+.quantityRow {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.optionsFieldset {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.optionsFieldset legend {
+  margin-bottom: 10px;
+  color: var(--cocoa);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.option,
+.selectedOption {
+  min-height: 40px;
+  padding: 8px 18px;
+  border: 1px solid var(--pink-500);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--rose-text);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.selectedOption {
+  border-color: var(--pink-500);
+  background: var(--pink-500);
+  color: #fff;
+}
+
+.selectedPrice {
+  margin: 0;
+  color: var(--cocoa);
+  font-family: var(--font-body);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.themeField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.themeField label {
+  color: var(--cocoa);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.themeField input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--pink-400);
+  border-radius: 8px;
+  color: var(--cocoa);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+}
+
+.themeField input:focus {
+  outline: 2px solid var(--pink-200);
+  outline-offset: 1px;
+}
+
+.themeHint {
+  margin: 0;
+  color: var(--rose-text);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+}

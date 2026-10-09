@@ -1,0 +1,129 @@
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  color: #513f45;
+  font-family: var(--font-body);
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.formGroup label {
+  color: #513f45;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  min-height: 52px;
+  padding: 11px 15px;
+  border: 1px solid #edaccc;
+  border-radius: 5px;
+  outline: none;
+  background: #fff;
+  color: #513f45;
+  font: 1.2rem var(--font-body);
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  border-color: #d66098;
+  box-shadow: 0 0 0 3px rgb(228 138 189 / 20%);
+}
+
+.textarea {
+  min-height: 115px;
+  resize: vertical;
+}
+
+.checkboxGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+}
+
+.checkboxLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #513f45;
+  font-size: 1.15rem;
+  cursor: pointer;
+}
+
+.checkboxLabel input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: #d66098;
+}
+
+.submitButton {
+  min-height: 56px;
+  margin-top: 14px;
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 5px;
+  background: #e48abd;
+  color: #fff;
+  font: 700 1.35rem var(--font-body);
+  cursor: pointer;
+  transition: background-color 200ms ease;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: #d66098;
+}
+
+.submitButton:focus-visible {
+  outline: 3px solid #d66098;
+  outline-offset: 3px;
+}
+
+.submitButton:disabled {
+  background: #c7b8c0;
+  color: #fff;
+  cursor: not-allowed;
+}
+
+.errorMessage {
+  margin: 0;
+  padding: 16px 18px;
+  border: 1px solid #b63159;
+  border-left: 5px solid #b63159;
+  border-radius: 5px;
+  background: #fff0f3;
+  color: #84223d;
+  font-size: 1.2rem;
+  line-height: 1.45;
+}
+
+.successMessage {
+  margin: 0;
+  padding: 16px 18px;
+  border: 1px solid #7baa8b;
+  border-radius: 5px;
+  background: #edf8f0;
+  color: #24633b;
+  font-size: 1.2rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 600px) {
+  .formGroup label {
+    font-size: 1.2rem;
+  }
+
+  .checkboxLabel {
+    font-size: 1.05rem;
+  }
+}

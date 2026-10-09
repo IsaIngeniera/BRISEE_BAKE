@@ -1,0 +1,140 @@
+.page {
+  display: grid;
+  min-height: calc(100vh - 120px);
+  place-items: center;
+  padding: 40px 20px 80px;
+  background: var(--pink-50);
+  color: var(--cocoa);
+  font-family: var(--font-body);
+}
+
+.card {
+  width: min(100%, 560px);
+  padding: clamp(32px, 6vw, 58px);
+  border: 1px solid var(--pink-200);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 15px 40px rgb(110 67 83 / 12%);
+  text-align: center;
+}
+
+.icon {
+  margin-bottom: 18px;
+  color: var(--pink-500);
+}
+
+.errorIcon {
+  margin-bottom: 18px;
+  color: var(--pink-600);
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--pink-600);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.card h1 {
+  margin: 0 0 12px;
+  color: var(--pink-600);
+  font-family: var(--font-title);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 400;
+}
+
+.card > p:not(.eyebrow) {
+  margin: 0;
+  color: var(--rose-text);
+  line-height: 1.5;
+}
+
+.orderSummary {
+  display: grid;
+  gap: 6px;
+  margin: 24px 0;
+  padding: 16px;
+  border-radius: 10px;
+  background: var(--pink-50);
+  color: var(--rose-text);
+}
+
+.orderSummary strong {
+  color: var(--pink-600);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.primaryLink,
+.secondaryLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 10px 18px;
+  border-radius: 7px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.primaryLink {
+  background: var(--pink-500);
+  color: #fff;
+}
+
+.primaryLink:hover {
+  background: var(--pink-600);
+}
+
+.secondaryLink {
+  border: 1px solid var(--pink-500);
+  color: var(--pink-600);
+}
+
+.secondaryLink:hover {
+  background: var(--pink-50);
+}
+
+.loading {
+  color: var(--rose-text);
+}
+
+.whatsappButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 54px;
+  padding: 10px 20px;
+  border: 0;
+  background: #d66098;
+  color: #fff;
+  font: 1.3rem var(--font-body);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.whatsappButton:hover {
+  background: #b94c7e;
+  text-decoration: none;
+}
+
+.whatsappButton:focus-visible {
+  outline: 2px solid #d66098;
+  outline-offset: 3px;
+}
+
+.confirmationNote {
+  margin: 16px 0 0;
+  color: #715b65;
+  font-size: 1.05rem;
+  text-align: center;
+}
