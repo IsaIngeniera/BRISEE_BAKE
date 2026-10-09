@@ -22,7 +22,6 @@ import icon from '@/app/icon.png';
 
 import {
   AUTH_CHANGE_EVENT,
-  AUTH_TOKEN_KEY,
   getSessionUser,
 } from '@/services/auth';
 
