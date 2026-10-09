@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcrypt';
 import { PrismaClient, EstadoProducto } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
@@ -19,6 +20,7 @@ async function main() {
   await prisma.usuario.deleteMany();
 
   console.log('Creando usuario de prueba...');
+  const clientePasswordHash = await bcrypt.hash('cliente123', 10);
   const dummyUser = await prisma.usuario.create({
     data: {
       id: '00000000-0000-0000-0000-000000000000',
@@ -27,19 +29,43 @@ async function main() {
       fechaNacimiento: new Date('1990-01-01'),
       correo: 'cliente@prueba.com',
       rol: 'CLIENTE',
-      password: 'hash_falso',
+      password: clientePasswordHash,
+      celular: '3000000000',
+      estado: 'ACTIVO',
+    }
+  });
+
+  const adminUser = await prisma.usuario.create({
+    data: {
+      id: '99999999-9999-9999-9999-999999999999',
+      nombre: 'Admin',
+      apellido: 'Principal',
+      fechaNacimiento: new Date('1990-01-01'),
+      correo: 'admin@briseebake.com',
+      rol: 'ADMIN',
+      password: '$2b$10$14eZEX/ZfRWkC/Ffo5Z0tup/FlKyk0I3RVKlEs/gzmPoLSOs3sGbi', // admin123
       celular: '3000000000',
       estado: 'ACTIVO',
     }
   });
 
   console.log('Creando categorias...');
-  const catGranolas = await prisma.categoria.create({ data: { nombre: 'Granolas' } });
-  const catGalletas = await prisma.categoria.create({ data: { nombre: 'Galletas' } });
-  const catGalletasCongeladas = await prisma.categoria.create({ data: { nombre: 'Galletas congeladas' } });
-  const catMacarons = await prisma.categoria.create({ data: { nombre: 'Macarons' } });
+  const catGranolas = await prisma.categoria.create({ data: { id: '11111111-1111-1111-1111-111111111111', nombre: 'Granolas' } });
+  const catGalletas = await prisma.categoria.create({ data: { id: '22222222-2222-2222-2222-222222222222', nombre: 'Galletas' } });
+  const catGalletasCongeladas = await prisma.categoria.create({ data: { id: '33333333-3333-3333-3333-333333333333', nombre: 'Galletas congeladas' } });
+  const catMacarons = await prisma.categoria.create({ data: { id: '44444444-4444-4444-4444-444444444444', nombre: 'Macarons' } });
+  const catCookieDough = await prisma.categoria.create({ data: { id: '55555555-5555-5555-5555-555555555555', nombre: 'Cookie Dough' } });
 
   console.log('Creando productos...');
+
+  // Cookie Dough
+  const descCookieDough = 'Masa de galleta deliciosa lista para comer o preparar deliciosas galletas.';
+  await prisma.producto.createMany({
+    data: [
+      { idCategoria: catCookieDough.id, nombre: 'Cookie Dough Choco Chips', descripcion: descCookieDough, precio: 22000, presentacion: '350g', existencias: 30, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
+      { idCategoria: catCookieDough.id, nombre: 'Cookie Dough Doble Chocolate', descripcion: descCookieDough, precio: 23500, presentacion: '350g', existencias: 30, estado: EstadoProducto.ACTIVO, updatedAt: new Date(), createdAt: new Date() },
+    ]
+  });
 
   // Granolas
   const descGranolaAlmendras = 'Snack saludable con almendras, nueces, coco, avena sin gluten y miel de abeja, libre de azúcares añadidos';
@@ -96,9 +122,11 @@ async function main() {
 
   const imagenesData = todosLosProductos.map((p) => {
     const nombreLimpio = p.nombre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '-');
+    const isCookieDough = nombreLimpio.startsWith('cookie-dough');
+    
     return {
       idProducto: p.id,
-      urlImagen: `/images/productos/${nombreLimpio}.jpg`,
+      urlImagen: isCookieDough ? `/images/catalogo/${nombreLimpio}.png` : `/images/productos/${nombreLimpio}.jpg`,
       nombre: 'Principal'
     };
   });

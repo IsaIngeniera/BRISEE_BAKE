@@ -26,6 +26,8 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    environment:
+      DATABASE_URL: "postgresql://brisee:brisee_dev@postgres:5432/brisee_bake"
     ports:
       - "${BACKEND_PORT}:3001"
     volumes:

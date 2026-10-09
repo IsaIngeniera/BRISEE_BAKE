@@ -10,9 +10,11 @@ interface AddToCartButtonProps {
   nombre: string;
   precio: number | string;
   imagenUrl?: string;
+  tematica?: string;
   quantity?: number;
   maxQuantity?: number;
   disabled?: boolean;
+  disabledLabel?: string;
 }
 
 export default function AddToCartButton({
@@ -20,8 +22,10 @@ export default function AddToCartButton({
   nombre,
   precio,
   imagenUrl,
+  tematica,
   quantity = 1,
   disabled = false,
+  disabledLabel = 'Agotado',
 }: AddToCartButtonProps) {
   const { addToCart } = useCart();
   const [confirmationVisible, setConfirmationVisible] = useState(false);
@@ -31,7 +35,7 @@ export default function AddToCartButton({
       return;
     }
 
-    addToCart({ productId, nombre, precio, imagenUrl }, quantity);
+    addToCart({ productId, nombre, precio, imagenUrl, tematica }, quantity);
 
     setConfirmationVisible(true);
     window.setTimeout(() => setConfirmationVisible(false), 2500);
@@ -40,7 +44,7 @@ export default function AddToCartButton({
   if (disabled) {
     return (
       <button type="button" className={styles.disabledButton} disabled>
-        Agotado
+        {disabledLabel}
       </button>
     );
   }
