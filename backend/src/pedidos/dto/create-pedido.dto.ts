@@ -58,4 +58,13 @@ export class CreatePedidoDto {
   @ValidateNested({ each: true })
   @Type(() => PedidoItemDto)
   items: PedidoItemDto[];
+
+  @ApiProperty({
+    description:
+      'URL base a la cual redirigir tras el pago (determina dinámicamente el despliegue)',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  returnUrl?: string;
 }

@@ -115,10 +115,18 @@ export class PedidosService {
     const wompiPublicKey =
       process.env.WOMPI_PUBLIC_KEY || 'pub_test_placeholder';
     const integritySecret = process.env.WOMPI_INTEGRITY_SECRET || '';
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+    // Usamos el returnUrl (que trae el origen dinámico de frontend) o la variable de entorno
+    let frontendBaseUrl =
+      createPedidoDto.returnUrl ||
+      process.env.FRONTEND_URL ||
+      'http://localhost:3000';
+    // Removemos slash final por si acaso
+    frontendBaseUrl = frontendBaseUrl.replace(/\/$/, '');
+
     const amountInCents = Math.round(Number(total) * 100);
     const reference = pedido.id;
-    const redirectUrl = `${frontendUrl}/finalizar-compra?status=APPROVED&reference=${reference}`;
+    const redirectUrl = `${frontendBaseUrl}/finalizar-compra?status=APPROVED&reference=${reference}`;
 
     let signatureStr = '';
     if (integritySecret) {
@@ -129,8 +137,9 @@ export class PedidosService {
 
     let finalRedirectUrl = redirectUrl;
     if (
-      finalRedirectUrl.includes('localhost') ||
-      finalRedirectUrl.includes('127.0.0.1')
+      !createPedidoDto.returnUrl && // Solo si no mandamos el origen dinámico
+      (finalRedirectUrl.includes('localhost') ||
+        finalRedirectUrl.includes('127.0.0.1'))
     ) {
       // NOTA: Para producción, cambiar 'localtest.me' a 'https://brisee-bake-frontend.vercel.app'
       // (O usar la variable FRONTEND_URL directamente desde el .env y quitar este IF)

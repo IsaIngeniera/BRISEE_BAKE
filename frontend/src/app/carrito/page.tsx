@@ -288,6 +288,7 @@ export default function CarritoPage() {
               ? `Domicilio por WhatsApp. Fecha: ${deliveryDate}`
               : `Recogida en tienda. Fecha: ${deliveryDate}`,
           items: payloadItems,
+          returnUrl: typeof window !== 'undefined' ? window.location.origin : undefined,
         }),
       });
 
