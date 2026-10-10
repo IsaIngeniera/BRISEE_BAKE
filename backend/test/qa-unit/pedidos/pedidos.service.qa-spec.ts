@@ -15,10 +15,20 @@ import { PedidosService } from '../../../src/pedidos/pedidos.service';
 import { PrismaService } from '../../../src/prisma.service';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Prisma, EstadoEntrega, TipoEntrega } from '@prisma/client';
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-// Mock nodemailer
-jest.mock('nodemailer');
+// Mock resend
+jest.mock('resend', () => {
+  return {
+    Resend: jest.fn().mockImplementation(() => {
+      return {
+        emails: {
+          send: jest.fn().mockResolvedValue({ data: {}, error: null }),
+        },
+      };
+    }),
+  };
+});
 
 // Mock global fetch for Wompi
 const mockFetch = jest.fn();
@@ -761,13 +771,8 @@ describe('PedidosService [QA]', () => {
     // HU-24: NOTIFICACIÓN POR EMAIL AL ADMIN
     // ============================================================
     it('debe enviar notificación al admin cuando el pago es APROBADO (HU-24)', async () => {
-      const mockSendMail = jest.fn().mockResolvedValue({});
-      const mockTransporter = {
-        sendMail: mockSendMail,
-      };
-      (nodemailer.createTransport as jest.Mock).mockReturnValue(
-        mockTransporter,
-      );
+      // Clean up mock calls before test
+      (Resend as jest.Mock).mockClear();
 
       mockFetch.mockResolvedValue({
         ok: true,
@@ -795,14 +800,11 @@ describe('PedidosService [QA]', () => {
       // Esperar un poco para que la notificación async se procese
       await new Promise((resolve) => setTimeout(resolve, 50));
 
-      expect(nodemailer.createTransport).toHaveBeenCalled();
+      expect(Resend).toHaveBeenCalled();
     });
 
     it('NO debe enviar notificación al admin si el pago es RECHAZADO', async () => {
-      const mockSendMail = jest.fn();
-      (nodemailer.createTransport as jest.Mock).mockReturnValue({
-        sendMail: mockSendMail,
-      });
+      (Resend as jest.Mock).mockClear();
 
       mockFetch.mockResolvedValue({
         ok: true,
@@ -820,7 +822,7 @@ describe('PedidosService [QA]', () => {
 
       await new Promise((resolve) => setTimeout(resolve, 50));
 
-      expect(mockSendMail).not.toHaveBeenCalled();
+      expect(Resend).not.toHaveBeenCalled();
     });
   });
 });

@@ -8,7 +8,7 @@ import { PrismaService } from '../prisma.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
 import { Prisma, EstadoEntrega } from '@prisma/client';
 import * as crypto from 'crypto';
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 @Injectable()
 export class PedidosService {
@@ -316,16 +316,7 @@ export class PedidosService {
 
     if (!pedido) return;
 
-    // Configurar el transporter (Debe configurarse con variables de entorno en producción)
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
-      auth: {
-        user: process.env.EMAIL_USER || 'tu-correo@gmail.com',
-        pass: process.env.EMAIL_PASS || 'tu-contraseña-de-aplicacion',
-      },
-    });
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     let productosHtml = '';
     pedido.productos.forEach((p) => {
@@ -335,7 +326,7 @@ export class PedidosService {
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@briseebake.com';
 
     const mailOptions = {
-      from: '"Brisee Bake" <no-reply@briseebake.com>',
+      from: 'onboarding@resend.dev',
       to: adminEmail,
       subject: `🚨 Nuevo Pago Recibido - Pedido #${pedidoId.split('-')[0].toUpperCase()}`,
       html: `
@@ -362,8 +353,12 @@ export class PedidosService {
     };
 
     try {
-      await transporter.sendMail(mailOptions);
-      console.log(`Notificación enviada al admin para el pedido ${pedidoId}`);
+      const { error } = await resend.emails.send(mailOptions);
+      if (error) {
+        console.error('Error de Resend enviando correo:', error);
+      } else {
+        console.log(`Notificación enviada al admin para el pedido ${pedidoId}`);
+      }
     } catch (error) {
       console.error('Error enviando correo al admin:', error);
     }
