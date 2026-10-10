@@ -145,6 +145,42 @@ export function CartProvider({ children }: { children: ReactNode }) {
     void refreshCart();
 
     const handleAuthChange = () => {
+      const user = getSessionUser();
+      if (user) {
+        const guestCartStr = localStorage.getItem('brisee_cart_guest');
+        if (guestCartStr && guestCartStr !== '[]') {
+          try {
+            const guestCart = JSON.parse(guestCartStr);
+            if (Array.isArray(guestCart) && guestCart.length > 0) {
+              const userKey = `brisee_cart_${user.sub}`;
+              const existingStr = localStorage.getItem(userKey);
+              let mergedCart = guestCart;
+
+              if (existingStr) {
+                const existingCart = JSON.parse(existingStr);
+                if (Array.isArray(existingCart) && existingCart.length > 0) {
+                  // Merge logic: Combine items, update quantities if same product
+                  const cartMap = new Map();
+                  existingCart.forEach((item: CartItem) => cartMap.set(item.productId, item));
+                  guestCart.forEach((item: CartItem) => {
+                    if (cartMap.has(item.productId)) {
+                      const existing = cartMap.get(item.productId);
+                      cartMap.set(item.productId, { ...existing, cantidad: existing.cantidad + item.cantidad });
+                    } else {
+                      cartMap.set(item.productId, item);
+                    }
+                  });
+                  mergedCart = Array.from(cartMap.values());
+                }
+              }
+              localStorage.setItem(userKey, JSON.stringify(mergedCart));
+            }
+          } catch {
+            // Ignorar errores de parseo
+          }
+          localStorage.removeItem('brisee_cart_guest');
+        }
+      }
       void refreshCart();
     };
 
