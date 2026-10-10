@@ -326,7 +326,7 @@ export class PedidosService {
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@briseebake.com';
 
     const mailOptions = {
-      from: '"Brisee Bake"',
+      from: '"Brisee Bake" <onboarding@resend.dev>',
       to: adminEmail,
       subject: `🚨 Nuevo Pago Recibido - Pedido #${pedidoId.split('-')[0].toUpperCase()}`,
       html: `
