@@ -318,7 +318,9 @@ export class PedidosService {
 
     // Configurar el transporter (Debe configurarse con variables de entorno en producción)
     const transporter = nodemailer.createTransport({
-      service: 'gmail', // o el servicio que utilicen
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.EMAIL_USER || 'tu-correo@gmail.com',
         pass: process.env.EMAIL_PASS || 'tu-contraseña-de-aplicacion',
