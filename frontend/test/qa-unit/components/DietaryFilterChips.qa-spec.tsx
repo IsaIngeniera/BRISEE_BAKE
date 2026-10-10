@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 /**
  * PRUEBAS UNITARIAS QA - DietaryFilterChips
  *
