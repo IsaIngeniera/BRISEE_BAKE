@@ -43,7 +43,7 @@ async function main() {
       fechaNacimiento: new Date('1990-01-01'),
       correo: 'admin@briseebake.com',
       rol: 'ADMIN',
-      password: '$2b$10$14eZEX/ZfRWkC/Ffo5Z0tup/FlKyk0I3RVKlEs/gzmPoLSOs3sGbi', // admin123
+      password: '$2b$10$w72eavYugACKxTcTvwEXsua41Y2OSDqBhbCa6ybcZMj0rWJplI0ty', // admin123
       celular: '3000000000',
       estado: 'ACTIVO',
     }
