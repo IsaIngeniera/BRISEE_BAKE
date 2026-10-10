@@ -14,7 +14,7 @@ import { Resend } from 'resend';
 export class PedidosService {
   private readonly WHATSAPP_NUMBER = '573003685556';
 
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async createPedido(userId: string, createPedidoDto: CreatePedidoDto) {
     if (!createPedidoDto.items || createPedidoDto.items.length === 0) {
