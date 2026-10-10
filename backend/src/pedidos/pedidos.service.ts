@@ -14,7 +14,7 @@ import { Resend } from 'resend';
 export class PedidosService {
   private readonly WHATSAPP_NUMBER = '573003685556';
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async createPedido(userId: string, createPedidoDto: CreatePedidoDto) {
     if (!createPedidoDto.items || createPedidoDto.items.length === 0) {
@@ -326,7 +326,7 @@ export class PedidosService {
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@briseebake.com';
 
     const mailOptions = {
-      from: 'onboarding@resend.dev',
+      from: '"Brisee Bake"',
       to: adminEmail,
       subject: `🚨 Nuevo Pago Recibido - Pedido #${pedidoId.split('-')[0].toUpperCase()}`,
       html: `
