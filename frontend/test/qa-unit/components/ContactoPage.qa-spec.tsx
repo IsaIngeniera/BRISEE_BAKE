@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 /**
  * PRUEBAS UNITARIAS QA - HU-27: Página de Contacto
  *
