@@ -35,7 +35,7 @@ describe('PedidosService [QA]', () => {
       update: jest.Mock;
     };
     pedidoProducto: { createMany: jest.Mock };
-    pago: { create: jest.Mock; update: jest.Mock };
+    pago: { create: jest.Mock; update: jest.Mock; findUnique: jest.Mock };
     $transaction: jest.Mock;
   };
 
@@ -84,7 +84,7 @@ describe('PedidosService [QA]', () => {
         update: jest.fn(),
       },
       pedidoProducto: { createMany: jest.fn() },
-      pago: { create: jest.fn(), update: jest.fn() },
+      pago: { create: jest.fn(), update: jest.fn(), findUnique: jest.fn() },
       $transaction: jest.fn(),
     };
 
@@ -594,6 +594,10 @@ describe('PedidosService [QA]', () => {
         amount_in_cents: 5000000,
       },
     };
+
+    beforeEach(() => {
+      prismaService.pago.findUnique.mockResolvedValue({ estado: 'PENDIENTE' });
+    });
 
     it('debe retornar estado APPROVED correctamente', async () => {
       mockFetch.mockResolvedValue({

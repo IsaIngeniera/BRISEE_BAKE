@@ -269,6 +269,12 @@ export class PedidosService {
         nuevoEstado = 'CANCELADO';
       }
 
+      const pagoExistente = await this.prisma.pago.findUnique({
+        where: { idPedido: reference },
+        select: { estado: true },
+      });
+      const wasAlreadyApproved = pagoExistente?.estado === 'APROBADO';
+
       await this.prisma.pago
         .update({
           where: { idPedido: reference },
@@ -281,8 +287,8 @@ export class PedidosService {
           console.error('No se pudo actualizar la tabla Pago:', err),
         );
 
-      if (nuevoEstado === 'APROBADO') {
-        await this.sendAdminNotification(reference).catch(console.error);
+      if (nuevoEstado === 'APROBADO' && !wasAlreadyApproved) {
+        this.sendAdminNotification(reference).catch(console.error);
       }
 
       return {
@@ -312,7 +318,9 @@ export class PedidosService {
 
     // Configurar el transporter (Debe configurarse con variables de entorno en producción)
     const transporter = nodemailer.createTransport({
-      service: 'gmail', // o el servicio que utilicen
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.EMAIL_USER || 'tu-correo@gmail.com',
         pass: process.env.EMAIL_PASS || 'tu-contraseña-de-aplicacion',
