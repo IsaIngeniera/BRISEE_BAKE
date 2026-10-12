@@ -116,12 +116,10 @@ export class PedidosService {
       process.env.WOMPI_PUBLIC_KEY || 'pub_test_placeholder';
     const integritySecret = process.env.WOMPI_INTEGRITY_SECRET || '';
 
-    // Usamos el returnUrl (que trae el origen dinámico de frontend) o la variable de entorno
     let frontendBaseUrl =
       createPedidoDto.returnUrl ||
       process.env.FRONTEND_URL ||
       'http://localhost:3000';
-    // Removemos slash final por si acaso
     frontendBaseUrl = frontendBaseUrl.replace(/\/$/, '');
 
     const amountInCents = Math.round(Number(total) * 100);
