@@ -54,6 +54,7 @@ function SuccessfulPaymentContent() {
     window.open(`https://wa.me/573003685556?text=${encodeURIComponent(message)}`, '_blank');
   }
 
+
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
     const sessionUser = getSessionUser();
@@ -66,10 +67,10 @@ function SuccessfulPaymentContent() {
           if (res.ok) {
             const data = await res.json();
             setWompiStatus(data.status);
-            if (data.status === 'APPROVED' && sessionUser) {
+            if (data.status === 'APPROVED') {
               setIsApproved(true);
               clearCart();
-              if (data.reference || orderReference) {
+              if (sessionUser && (data.reference || orderReference)) {
                 setOrder(updateOrderStatus(sessionUser.sub, data.reference || orderReference, 'PAGO EXITOSO'));
               }
             } else {

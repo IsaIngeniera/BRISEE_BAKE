@@ -62,16 +62,27 @@ export class AuthService {
 
     if (!user) {
       // AUTO-REPAIR ADMIN IF IT DOESN'T EXIST
-      if (loginDto.correo === 'admin@briseebake.com' && loginDto.password === 'admin123') {
+      if (
+        loginDto.correo === 'admin@briseebake.com' &&
+        loginDto.password === 'admin123'
+      ) {
         const hashedPassword = await bcrypt.hash('admin123', 10);
         user = await this.prisma.usuario.create({
           data: {
-            nombre: 'Admin', apellido: 'Principal', correo: 'admin@briseebake.com', password: hashedPassword,
-            rol: Rol.ADMIN, celular: '3000000000', estado: EstadoUsuario.ACTIVO, fechaNacimiento: new Date('1990-01-01')
-          }
+            nombre: 'Admin',
+            apellido: 'Principal',
+            correo: 'admin@briseebake.com',
+            password: hashedPassword,
+            rol: Rol.ADMIN,
+            celular: '3000000000',
+            estado: EstadoUsuario.ACTIVO,
+            fechaNacimiento: new Date('1990-01-01'),
+          },
         });
       } else {
-        throw new UnauthorizedException('Nombre de Usuario y/o contraseñas incorrectas');
+        throw new UnauthorizedException(
+          'Nombre de Usuario y/o contraseñas incorrectas',
+        );
       }
     }
 
@@ -82,14 +93,19 @@ export class AuthService {
 
     if (!isPasswordValid) {
       // AUTO-REPAIR ADMIN PASSWORD IF WRONG
-      if (loginDto.correo === 'admin@briseebake.com' && loginDto.password === 'admin123') {
+      if (
+        loginDto.correo === 'admin@briseebake.com' &&
+        loginDto.password === 'admin123'
+      ) {
         const hashedPassword = await bcrypt.hash('admin123', 10);
         user = await this.prisma.usuario.update({
           where: { correo: 'admin@briseebake.com' },
-          data: { password: hashedPassword, rol: Rol.ADMIN }
+          data: { password: hashedPassword, rol: Rol.ADMIN },
         });
       } else {
-        throw new UnauthorizedException('Nombre de Usuario y/o contraseñas incorrectas');
+        throw new UnauthorizedException(
+          'Nombre de Usuario y/o contraseñas incorrectas',
+        );
       }
     }
 
