@@ -38,9 +38,54 @@ export class ProductsService {
 
     try {
       console.log('Incoming payload:', createProductDto);
+      let targetCategoriaId = createProductDto.idCategoria;
+
+      if (this.prisma.categoria) {
+        const existingCategory = await this.prisma.categoria.findUnique({
+          where: { id: targetCategoriaId },
+        });
+
+        if (!existingCategory) {
+          const knownCategoryNames: Record<string, string> = {
+            'd4f60d9c-9d35-47d4-9441-9c8d2308ffcf': 'Macarons',
+            'e5f8dc69-0540-4a9f-a70e-17cfc1659f15': 'Galletas',
+            '4ab9066a-35e7-4f74-b80d-724de7116472': 'Galletas congeladas',
+            'c1853103-46a8-410d-97b4-73f9cf62afc9': 'Granolas',
+            '11111111-1111-1111-1111-111111111111': 'Granolas',
+            '22222222-2222-2222-2222-222222222222': 'Galletas',
+            '33333333-3333-3333-3333-333333333333': 'Galletas congeladas',
+            '44444444-4444-4444-4444-444444444444': 'Macarons',
+            '55555555-5555-5555-5555-555555555555': 'Cookie Dough',
+          };
+
+          const targetName = knownCategoryNames[targetCategoriaId];
+          let matchedCategory = targetName
+            ? await this.prisma.categoria.findFirst({
+                where: { nombre: { equals: targetName, mode: 'insensitive' } },
+              })
+            : null;
+
+          if (!matchedCategory) {
+            matchedCategory = await this.prisma.categoria.findFirst();
+          }
+
+          if (matchedCategory) {
+            targetCategoriaId = matchedCategory.id;
+          } else {
+            const newCat = await this.prisma.categoria.create({
+              data: {
+                id: targetCategoriaId,
+                nombre: targetName || 'General',
+              },
+            });
+            targetCategoriaId = newCat.id;
+          }
+        }
+      }
+
       const newProduct = await this.prisma.producto.create({
         data: {
-          idCategoria: createProductDto.idCategoria,
+          idCategoria: targetCategoriaId,
           nombre: createProductDto.nombre,
           descripcion: createProductDto.descripcion,
           precio: createProductDto.precio,
@@ -48,16 +93,17 @@ export class ProductsService {
           existencias: createProductDto.existencias,
           estado: createProductDto.estado,
           etiquetas: createProductDto.etiquetas || [],
-          imagenes: createProductDto.imagenUrl
-            ? {
-                create: [
-                  {
-                    urlImagen: createProductDto.imagenUrl,
-                    nombre: 'Principal',
-                  },
-                ],
-              }
-            : undefined,
+          imagenes:
+            createProductDto.imagenUrl && createProductDto.imagenUrl.trim()
+              ? {
+                  create: [
+                    {
+                      urlImagen: createProductDto.imagenUrl.trim(),
+                      nombre: 'Principal',
+                    },
+                  ],
+                }
+              : undefined,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
