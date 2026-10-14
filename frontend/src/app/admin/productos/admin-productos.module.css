@@ -241,6 +241,44 @@
   transform: translateY(-2px);
 }
 
+.searchWrapper {
+  margin-bottom: 35px;
+}
+
+.noResults {
+  margin-top: 20px;
+  padding: 50px 20px;
+  background-color: #fff5fa;
+  border: 1px dashed #edaccc;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.noResults p {
+  margin: 0 0 16px;
+  color: #725e65;
+  font-size: 1.1rem;
+}
+
+.clearSearchButton {
+  padding: 10px 20px;
+  background-color: #fbe3f1;
+  color: #b7437c;
+  border: 1px solid #edaccc;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.clearSearchButton:hover {
+  background-color: #d66098;
+  color: #ffffff;
+  border-color: #d66098;
+}
+
 .errorState,
 .emptyState {
   margin-top: 20px;

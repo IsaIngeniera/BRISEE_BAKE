@@ -1,34 +1,10 @@
 import type { ReactElement } from 'react';
-
-import Image from 'next/image';
 import Link from 'next/link';
 
-import DeleteProductButton from '@/components/products/DeleteProductButton';
+import AdminProductsContent, {
+  type Product,
+} from './AdminProductsContent';
 import styles from './admin-productos.module.css';
-
-interface ProductImage {
-  readonly id: string;
-  readonly urlImagen: string;
-  readonly nombre: string;
-}
-
-interface ProductCategory {
-  readonly id: string;
-  readonly nombre: string;
-}
-
-interface Product {
-  readonly id: string;
-  readonly idCategoria: string;
-  readonly nombre: string;
-  readonly descripcion: string;
-  readonly precio: number | string;
-  readonly presentacion: string;
-  readonly existencias: number;
-  readonly estado: 'ACTIVO' | 'INACTIVO';
-  readonly categoria?: ProductCategory;
-  readonly imagenes?: ProductImage[];
-}
 
 async function getProducts(): Promise<Product[]> {
   const apiUrl =
@@ -47,30 +23,6 @@ async function getProducts(): Promise<Product[]> {
   const products: Product[] = await response.json();
 
   return products.filter((product) => product.estado === 'ACTIVO');
-}
-
-function formatPrice(price: number | string): string {
-  const numericPrice = Number(price);
-
-  if (Number.isNaN(numericPrice)) {
-    return 'COP $ 0';
-  }
-
-  const formatted = numericPrice.toLocaleString('es-CO', {
-    maximumFractionDigits: 0,
-  });
-
-  return `COP $ ${formatted}`;
-}
-
-function shortenDescription(description: string): string {
-  const maximumLength = 80;
-
-  if (description.length <= maximumLength) {
-    return description;
-  }
-
-  return `${description.substring(0, maximumLength)}...`;
 }
 
 export default async function AdminProductsPage(): Promise<ReactElement> {
@@ -133,81 +85,7 @@ export default async function AdminProductsPage(): Promise<ReactElement> {
             </Link>
           </section>
         ) : (
-          <section
-            className={styles.productGrid}
-            aria-label="Productos registrados"
-          >
-            {products.map((product) => {
-              const imageUrl = product.imagenes?.[0]?.urlImagen;
-
-              return (
-                <article
-                  key={product.id}
-                  className={styles.productCard}
-                >
-                  <div className={styles.imageContainer}>
-                    {imageUrl ? (
-                      <Image
-                        src={imageUrl}
-                        alt={`Imagen de ${product.nombre}`}
-                        fill
-                        sizes="(max-width: 680px) 100vw, (max-width: 1050px) 50vw, 33vw"
-                        className={styles.productImage}
-                        unoptimized
-                      />
-                    ) : (
-                      <span className={styles.noImage}>
-                        Sin imagen
-                      </span>
-                    )}
-                  </div>
-
-                  <div className={styles.productInformation}>
-                    {product.categoria && (
-                      <p className={styles.productCategory}>
-                        {product.categoria.nombre}
-                      </p>
-                    )}
-
-                    <h2 className={styles.productName}>
-                      {product.nombre}
-                    </h2>
-
-                    <p className={styles.productPrice}>
-                      {formatPrice(product.precio)}
-                    </p>
-
-                    <p className={styles.productPresentation}>
-                      {product.presentacion}
-                    </p>
-
-                    <p className={styles.productDescription}>
-                      {shortenDescription(product.descripcion)}
-                    </p>
-
-                    <p className={styles.productStock}>
-                      {product.existencias} existencias
-                    </p>
-
-                    <div className={styles.productActions}>
-                      <Link
-                        href={`/admin/productos/${product.id}/editar`}
-                        className={styles.editButton}
-                        aria-label={`Editar ${product.nombre}`}
-                      >
-                        Editar
-                      </Link>
-
-                      <DeleteProductButton
-                        id={product.id}
-                        nombre={product.nombre}
-                      />
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </section>
+          <AdminProductsContent products={products} />
         )}
       </div>
     </main>
