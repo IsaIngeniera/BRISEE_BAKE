@@ -75,7 +75,6 @@ const catalogCategories = [
     backgroundColor: '#f5e6e8',
     titleColor: '#a8616c',
     isHealthy: true,
-    objectFit: 'contain' as const,
   },
 ];
 

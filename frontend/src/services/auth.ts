@@ -59,7 +59,10 @@ export function saveSession(token: string, remember: boolean): void {
   if (authChannel) authChannel.postMessage('auth_changed');
 }
 
-const authChannel = typeof window !== 'undefined' ? new BroadcastChannel('brisee_auth_channel') : null;
+const authChannel =
+  typeof window !== 'undefined' && typeof BroadcastChannel !== 'undefined'
+    ? new BroadcastChannel('brisee_auth_channel')
+    : null;
 
 if (authChannel) {
   authChannel.onmessage = (event) => {
