@@ -218,6 +218,17 @@
   white-space: nowrap;
 }
 
+.forgotPassword {
+  color: var(--brand-pink);
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.forgotPassword:hover {
+  text-decoration: underline;
+}
+
 .submit {
   min-height: 53px;
   border: 0;
@@ -262,9 +273,19 @@
   min-height: 52px;
   border: 1px solid var(--border-pink);
   border-radius: 4px;
-  background: #fff;
   color: var(--brand-pink);
   font: 1.25rem var(--font-body);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.google:hover:not(:disabled) {
+  background-color: #fff5f8;
+  border-color: var(--brand-pink);
+}
+
+.google:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
 }
 

@@ -17,6 +17,7 @@ export interface SeedUserInput {
   apellido?: string;
   rol?: Rol;
   celular?: string;
+  estado?: EstadoUsuario;
 }
 
 export interface SeedUserResult {
@@ -50,7 +51,7 @@ export async function seedUser(
       password: hash,
       rol: overrides.rol ?? Rol.CLIENTE,
       celular: overrides.celular ?? '3001234567',
-      estado: EstadoUsuario.ACTIVO,
+      estado: overrides.estado ?? EstadoUsuario.ACTIVO,
       fechaNacimiento: new Date('1990-01-01'),
     },
   });

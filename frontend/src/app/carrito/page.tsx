@@ -105,10 +105,10 @@ function getCustomerName(): string {
 
 }
 
-function getMinimumDeliveryDate(): string {
+function getMinimumDeliveryDate(onlyMacarons = false): string {
   const minimumDate = new Date();
   minimumDate.setHours(0, 0, 0, 0);
-  minimumDate.setDate(minimumDate.getDate() + 3);
+  minimumDate.setDate(minimumDate.getDate() + (onlyMacarons ? 2 : 3));
 
   const year = minimumDate.getFullYear();
   const month = String(minimumDate.getMonth() + 1).padStart(2, '0');
@@ -190,6 +190,14 @@ export default function CarritoPage() {
     removeFromCart,
     refreshCart,
   } = useCart();
+
+  const hasMacarons = items.some((item) =>
+    item.nombre.toLowerCase().includes('macaron'),
+  );
+  const hasOtherProducts = items.some(
+    (item) => !item.nombre.toLowerCase().includes('macaron'),
+  );
+  const onlyMacarons = hasMacarons && !hasOtherProducts;
 
   useEffect(() => {
     void refreshCart();
@@ -619,14 +627,16 @@ export default function CarritoPage() {
             ) : (
               <div className={styles.deliveryForm}>
                 <p className={styles.dateDescription}>
-                  Selecciona la fecha en la que deseas tu producto.
+                  {onlyMacarons
+                    ? 'Tu pedido contiene únicamente macarons (elaboración artesanal con 2 días de anticipación).'
+                    : 'La fecha de entrega debe ser al menos 3 días después de la fecha actual para la preparación de los productos.'}
                 </p>
                 <label className={styles.dateField}>
                   Fecha solicitada
                   <input
                     type="date"
                     value={deliveryDate}
-                    min={getMinimumDeliveryDate()}
+                    min={getMinimumDeliveryDate(onlyMacarons)}
                     onChange={(event) => setDeliveryDate(event.target.value)}
                     required
                   />
@@ -644,6 +654,16 @@ export default function CarritoPage() {
                   onClick={() => {
                     if (!deliveryDate) {
                       setCheckoutError('Selecciona una fecha para continuar.');
+                      return;
+                    }
+
+                    const minDate = getMinimumDeliveryDate(onlyMacarons);
+                    if (deliveryDate < minDate) {
+                      setCheckoutError(
+                        onlyMacarons
+                          ? 'Los pedidos con macarons deben tener al menos 2 días de anticipación.'
+                          : 'La fecha de entrega debe ser al menos 3 días después de la fecha actual.',
+                      );
                       return;
                     }
 
