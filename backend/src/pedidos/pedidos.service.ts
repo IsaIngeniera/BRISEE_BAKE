@@ -26,6 +26,9 @@ export class PedidosService {
         id: { in: createPedidoDto.items.map((item) => item.idProducto) },
         estado: 'ACTIVO',
       },
+      include: {
+        categoria: true,
+      },
     });
 
     if (productosDb.length === 0) {
@@ -53,6 +56,25 @@ export class PedidosService {
       }
     }
 
+    interface ProductoItem {
+      nombre?: string;
+      categoria?: { nombre?: string } | null;
+    }
+
+    const typedProducts = productosDb as unknown as ProductoItem[];
+
+    const hasMacarons = typedProducts.some((p) => {
+      const categoria = (p.categoria?.nombre || '').toLowerCase();
+      const nombre = (p.nombre || '').toLowerCase();
+      return categoria.includes('macaron') || nombre.includes('macaron');
+    });
+
+    const hasOtherProducts = typedProducts.some((p) => {
+      const categoria = (p.categoria?.nombre || '').toLowerCase();
+      const nombre = (p.nombre || '').toLowerCase();
+      return !categoria.includes('macaron') && !nombre.includes('macaron');
+    });
+
     const [year, month, day] = createPedidoDto.fechaEsperada.split('-');
     const fechaEsperadaDate = new Date(
       Number(year),
@@ -62,13 +84,31 @@ export class PedidosService {
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const minValidDate = new Date(today);
-    minValidDate.setDate(today.getDate() + 3);
 
-    if (fechaEsperadaDate < minValidDate) {
+    if (fechaEsperadaDate < today) {
       throw new BadRequestException(
-        'La fecha de entrega debe ser al menos 3 días después de la fecha actual.',
+        'La fecha de entrega no puede ser en el pasado.',
       );
+    }
+
+    if (hasOtherProducts) {
+      const minOtherDate = new Date(today);
+      minOtherDate.setDate(today.getDate() + 3);
+
+      if (fechaEsperadaDate < minOtherDate) {
+        throw new BadRequestException(
+          'La fecha de entrega debe ser al menos 3 días después de la fecha actual.',
+        );
+      }
+    } else if (hasMacarons) {
+      const minMacaronsDate = new Date(today);
+      minMacaronsDate.setDate(today.getDate() + 2);
+
+      if (fechaEsperadaDate < minMacaronsDate) {
+        throw new BadRequestException(
+          'Los pedidos con macarons deben tener al menos 2 días de anticipación.',
+        );
+      }
     }
 
     const pedido = await this.prisma.$transaction(async (tx) => {
@@ -238,9 +278,28 @@ export class PedidosService {
 
   async verificarPagoWompi(transactionId: string) {
     try {
-      const response = await fetch(
-        `https://sandbox.wompi.co/v1/transactions/${transactionId}`,
-      );
+      const isProd =
+        process.env.WOMPI_PUBLIC_KEY?.startsWith('pub_prod_') ||
+        process.env.WOMPI_ENV === 'production' ||
+        process.env.NODE_ENV === 'production';
+
+      const defaultApiUrl = isProd
+        ? 'https://production.wompi.co/v1'
+        : 'https://sandbox.wompi.co/v1';
+
+      const wompiApiUrl = process.env.WOMPI_API_URL || defaultApiUrl;
+
+      const headers: Record<string, string> = {};
+      if (process.env.WOMPI_PRIVATE_KEY) {
+        headers['Authorization'] = `Bearer ${process.env.WOMPI_PRIVATE_KEY}`;
+      }
+
+      const response =
+        Object.keys(headers).length > 0
+          ? await fetch(`${wompiApiUrl}/transactions/${transactionId}`, {
+              headers,
+            })
+          : await fetch(`${wompiApiUrl}/transactions/${transactionId}`);
       if (!response.ok) {
         throw new Error('No se pudo verificar la transacción');
       }
