@@ -11,7 +11,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from '../../../src/auth/auth.controller';
 import { AuthService } from '../../../src/auth/auth.service';
-import { UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { JwtAuthGuard } from '../../../src/common/guards/jwt-auth.guard';
 import { Rol } from '@prisma/client';
@@ -23,6 +23,7 @@ describe('AuthController [QA]', () => {
     login: jest.Mock;
     loginMockAdmin: jest.Mock;
     updateProfile: jest.Mock;
+    loginGoogle: jest.Mock;
   };
 
   beforeEach(async () => {
@@ -31,6 +32,7 @@ describe('AuthController [QA]', () => {
       login: jest.fn(),
       loginMockAdmin: jest.fn(),
       updateProfile: jest.fn(),
+      loginGoogle: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -251,6 +253,100 @@ describe('AuthController [QA]', () => {
 
       const result = await controller.updateProfile(req, updateDto);
 
+      expect(result.user).not.toHaveProperty('password');
+    });
+  });
+
+  // ============================================================
+  // POST /auth/google (HU-14 SSO)
+  // ============================================================
+  describe('POST /google (HU-14 SSO)', () => {
+    const validGoogleDto = {
+      credential: 'mock-google-credential-token',
+    };
+
+    it('debe delegar a authService.loginGoogle con el DTO recibido', async () => {
+      const expectedResponse = {
+        message: 'Inicio de sesión exitoso',
+        access_token: 'jwt-google-123',
+        user: {
+          id: 'google-user-1',
+          nombre: 'Ana',
+          apellido: 'Gómez',
+          correo: 'ana.gomez@gmail.com',
+          rol: Rol.CLIENTE,
+        },
+        isNewUser: false,
+      };
+      authService.loginGoogle.mockResolvedValue(expectedResponse);
+
+      const result = await controller.googleLogin(validGoogleDto);
+
+      expect(authService.loginGoogle).toHaveBeenCalledWith(validGoogleDto);
+      expect(result).toEqual(expectedResponse);
+      expect(result).toHaveProperty('access_token');
+    });
+
+    it('debe responder exitosamente con creación automática en primer ingreso', async () => {
+      const newUserResponse = {
+        message: 'Usuario registrado exitosamente con Google',
+        access_token: 'jwt-new-user-token',
+        user: {
+          id: 'new-user-uuid',
+          nombre: 'Carlos',
+          apellido: 'Pérez',
+          correo: 'carlos@gmail.com',
+          rol: Rol.CLIENTE,
+        },
+        isNewUser: true,
+      };
+      authService.loginGoogle.mockResolvedValue(newUserResponse);
+
+      const result = await controller.googleLogin({
+        idToken: 'mock-id-token',
+      });
+
+      expect(result.isNewUser).toBe(true);
+      expect(result.access_token).toBe('jwt-new-user-token');
+    });
+
+    it('debe propagar errores cuando el usuario cancela la ventana emergente', async () => {
+      authService.loginGoogle.mockRejectedValue(
+        new BadRequestException(
+          'El proceso de autenticación con Google fue cancelado o rechazado',
+        ),
+      );
+
+      await expect(
+        controller.googleLogin({ error: 'popup_closed_by_user' }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('debe propagar UnauthorizedException si el token de Google es inválido', async () => {
+      authService.loginGoogle.mockRejectedValue(
+        new UnauthorizedException(
+          'Credenciales de Google inválidas o expiradas',
+        ),
+      );
+
+      await expect(
+        controller.googleLogin({ credential: 'invalid-token' }),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('no debe exponer el hash de la contraseña en los datos del usuario', async () => {
+      authService.loginGoogle.mockResolvedValue({
+        message: 'Inicio de sesión exitoso',
+        access_token: 'jwt-token',
+        user: {
+          id: 'user-1',
+          nombre: 'Ana',
+          correo: 'ana@gmail.com',
+        },
+      });
+
+      const result = await controller.googleLogin(validGoogleDto);
+      expect(result).not.toHaveProperty('password');
       expect(result.user).not.toHaveProperty('password');
     });
   });

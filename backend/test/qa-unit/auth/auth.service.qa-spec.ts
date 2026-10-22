@@ -30,6 +30,7 @@ describe('AuthService [QA]', () => {
   };
   let jwtService: {
     signAsync: jest.Mock;
+    decode?: jest.Mock;
   };
 
   const mockUser = {
@@ -57,6 +58,7 @@ describe('AuthService [QA]', () => {
 
     jwtService = {
       signAsync: jest.fn().mockResolvedValue('mock-jwt-token'),
+      decode: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -426,6 +428,179 @@ describe('AuthService [QA]', () => {
           data: expect.objectContaining({ nombre: 'Carlos' }),
         }),
       );
+    });
+  });
+
+  // ============================================================
+  // LOGIN GOOGLE (HU-14 SSO)
+  // ============================================================
+  describe('loginGoogle (HU-14 SSO)', () => {
+    const mockGoogleProfile = {
+      email: 'sofia.google@example.com',
+      nombre: 'Sofía',
+      apellido: 'Ramírez',
+      sub: 'google-sub-987654',
+    };
+
+    beforeEach(() => {
+      // Por defecto, espiamos verifyGoogleToken para simular verificación exitosa
+      jest
+        .spyOn(service, 'verifyGoogleToken')
+        .mockResolvedValue(mockGoogleProfile);
+    });
+
+    it('debe autenticar exitosamente a un usuario existente y retornar access_token', async () => {
+      const existingUser = {
+        ...mockUser,
+        id: 'existing-google-user',
+        correo: 'sofia.google@example.com',
+        nombre: 'Sofía',
+        apellido: 'Ramírez',
+        rol: Rol.CLIENTE,
+        estado: EstadoUsuario.ACTIVO,
+      };
+      prismaService.usuario.findUnique.mockResolvedValue(existingUser);
+
+      const result = await service.loginGoogle({
+        credential: 'valid-google-id-token',
+      });
+
+      expect(prismaService.usuario.findUnique).toHaveBeenCalledWith({
+        where: { correo: 'sofia.google@example.com' },
+      });
+      expect(prismaService.usuario.create).not.toHaveBeenCalled();
+      expect(jwtService.signAsync).toHaveBeenCalledWith({
+        sub: existingUser.id,
+        correo: existingUser.correo,
+        rol: existingUser.rol,
+      });
+      expect(result).toHaveProperty('access_token');
+      expect(result.isNewUser).toBe(false);
+      expect(result.message).toBe('Inicio de sesión exitoso');
+    });
+
+    it('debe crear automáticamente un perfil de cliente en su primer ingreso (Criterio 3)', async () => {
+      prismaService.usuario.findUnique.mockResolvedValue(null);
+      (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-google-password');
+
+      const createdUser = {
+        ...mockUser,
+        id: 'new-google-user-uuid',
+        correo: 'sofia.google@example.com',
+        nombre: 'Sofía',
+        apellido: 'Ramírez',
+        rol: Rol.CLIENTE,
+        estado: EstadoUsuario.ACTIVO,
+      };
+      prismaService.usuario.create.mockResolvedValue(createdUser);
+
+      const result = await service.loginGoogle({
+        idToken: 'first-time-google-token',
+      });
+
+      expect(prismaService.usuario.findUnique).toHaveBeenCalledWith({
+        where: { correo: 'sofia.google@example.com' },
+      });
+      expect(prismaService.usuario.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          nombre: 'Sofía',
+          apellido: 'Ramírez',
+          correo: 'sofia.google@example.com',
+          rol: Rol.CLIENTE,
+          estado: EstadoUsuario.ACTIVO,
+          celular: '0000000000',
+        }),
+      });
+      expect(result.isNewUser).toBe(true);
+      expect(result.message).toBe('Usuario registrado exitosamente con Google');
+      expect(result).toHaveProperty('access_token');
+    });
+
+    it('debe manejar la cancelación del proceso sin errores de sistema (Criterio 2)', async () => {
+      await expect(
+        service.loginGoogle({ error: 'access_denied' }),
+      ).rejects.toThrow(BadRequestException);
+
+      await expect(
+        service.loginGoogle({ error: 'access_denied' }),
+      ).rejects.toThrow(
+        'El proceso de autenticación con Google fue cancelado o rechazado',
+      );
+
+      expect(prismaService.usuario.findUnique).not.toHaveBeenCalled();
+      expect(prismaService.usuario.create).not.toHaveBeenCalled();
+    });
+
+    it('debe lanzar BadRequestException si no se provee ningún token de Google', async () => {
+      await expect(service.loginGoogle({})).rejects.toThrow(BadRequestException);
+      await expect(service.loginGoogle({ token: '   ' })).rejects.toThrow(
+        'Token de Google requerido',
+      );
+    });
+
+    it('debe lanzar UnauthorizedException si la cuenta del usuario está BLOQUEADA', async () => {
+      const blockedUser = {
+        ...mockUser,
+        correo: 'sofia.google@example.com',
+        estado: EstadoUsuario.BLOQUEADO,
+      };
+      prismaService.usuario.findUnique.mockResolvedValue(blockedUser);
+
+      await expect(
+        service.loginGoogle({ credential: 'token-test' }),
+      ).rejects.toThrow(UnauthorizedException);
+      await expect(
+        service.loginGoogle({ credential: 'token-test' }),
+      ).rejects.toThrow(
+        'Tu cuenta se encuentra bloqueada. Contacta al administrador',
+      );
+    });
+
+    it('debe lanzar UnauthorizedException si la cuenta del usuario está INACTIVA', async () => {
+      const inactiveUser = {
+        ...mockUser,
+        correo: 'sofia.google@example.com',
+        estado: EstadoUsuario.INACTIVO,
+      };
+      prismaService.usuario.findUnique.mockResolvedValue(inactiveUser);
+
+      await expect(
+        service.loginGoogle({ credential: 'token-test' }),
+      ).rejects.toThrow(UnauthorizedException);
+      await expect(
+        service.loginGoogle({ credential: 'token-test' }),
+      ).rejects.toThrow('Tu cuenta se encuentra inactiva');
+    });
+
+    it('debe propagar UnauthorizedException si el token de Google es inválido o expiró', async () => {
+      jest
+        .spyOn(service, 'verifyGoogleToken')
+        .mockRejectedValue(
+          new UnauthorizedException(
+            'Credenciales de Google inválidas o expiradas',
+          ),
+        );
+
+      await expect(
+        service.loginGoogle({ credential: 'expired-or-bad-token' }),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('debe funcionar con el campo `token` alternativo', async () => {
+      const existingUser = {
+        ...mockUser,
+        correo: 'sofia.google@example.com',
+      };
+      prismaService.usuario.findUnique.mockResolvedValue(existingUser);
+
+      const result = await service.loginGoogle({
+        token: 'google-oauth2-access-token',
+      });
+
+      expect(service.verifyGoogleToken).toHaveBeenCalledWith(
+        'google-oauth2-access-token',
+      );
+      expect(result).toHaveProperty('access_token');
     });
   });
 });
