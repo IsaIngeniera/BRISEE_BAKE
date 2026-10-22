@@ -4,9 +4,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 
-import { getSessionUser, login, saveSession } from '@/services/auth';
+import { getSessionUser, login, loginWithGoogle, saveSession } from '@/services/auth';
 
 import styles from './login.module.css';
 
@@ -70,6 +70,92 @@ export default function LoginPage() {
     } finally {
       setIsSubmitting(false);
     }
+  }
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Detectar si Google retornó con access_token en el hash de la URL (#access_token=ya29...)
+    const hash = window.location.hash;
+    if (hash && (hash.includes('access_token=') || hash.includes('error='))) {
+      const params = new URLSearchParams(hash.substring(1));
+      const accessToken = params.get('access_token');
+      const idToken = params.get('id_token');
+      const authError = params.get('error');
+
+      // Limpiar hash de la URL para que no quede visible
+      window.history.replaceState(null, '', window.location.pathname);
+
+      queueMicrotask(() => {
+        if (authError) {
+          setIsSubmitting(true);
+          void loginWithGoogle({ error: authError })
+            .catch((err: unknown) => {
+              setError(
+                err instanceof Error
+                  ? err.message
+                  : 'El proceso de inicio de sesión con Google fue cancelado.',
+              );
+            })
+            .finally(() => setIsSubmitting(false));
+          return;
+        }
+
+        if (accessToken || idToken) {
+          setIsSubmitting(true);
+          void (async () => {
+            try {
+              const token = await loginWithGoogle({
+                token: accessToken || undefined,
+                credential: idToken || undefined,
+              });
+              saveSession(token, true);
+
+              const destination =
+                getSessionUser()?.rol === 'ADMIN' ? '/admin/productos' : '/';
+              router.replace(destination);
+            } catch (cause) {
+              setError(
+                cause instanceof Error
+                  ? cause.message
+                  : 'No fue posible completar el inicio de sesión con Google.',
+              );
+            } finally {
+              setIsSubmitting(false);
+            }
+          })();
+        }
+      });
+    }
+  }, [router]);
+
+  function handleGoogleLogin() {
+    setError('');
+
+    const clientId =
+      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+      '226767961526-tvt08tg96u9bv0vjbakuagkt714po0d1.apps.googleusercontent.com';
+
+    if (!clientId) {
+      setError(
+        'Para redirigirte a la página oficial de Google donde eliges tu cuenta, debes configurar la variable NEXT_PUBLIC_GOOGLE_CLIENT_ID en el archivo .env con tu Client ID de Google Cloud Console.',
+      );
+      return;
+    }
+
+    setIsSubmitting(true);
+    const redirectUri = `${window.location.origin}/login`;
+    const googleAuthUrl =
+      'https://accounts.google.com/o/oauth2/v2/auth?' +
+      new URLSearchParams({
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        response_type: 'token',
+        scope: 'openid email profile',
+        prompt: 'select_account',
+      }).toString();
+
+    window.location.href = googleAuthUrl;
   }
 
   return (
@@ -240,8 +326,8 @@ export default function LoginPage() {
           <button
             className={styles.google}
             type="button"
-            disabled
-            title="Disponible próximamente"
+            disabled={isSubmitting}
+            onClick={() => void handleGoogleLogin()}
           >
             <span className={styles.googleMark} aria-hidden="true">
               G

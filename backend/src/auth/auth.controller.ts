@@ -18,6 +18,7 @@ import {
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { GoogleAuthDto } from './dto/google-auth.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 
 @ApiTags('auth')
@@ -55,6 +56,26 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'Token generado' })
   async loginAdmin() {
     return this.authService.loginMockAdmin();
+  }
+
+  @Post(['google', 'google-login'])
+  @ApiOperation({
+    summary: 'Iniciar sesión o registrarse automáticamente con Google (SSO)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Autenticación con Google exitosa, retorna el token JWT',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Token no proporcionado o proceso cancelado por el usuario',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Credenciales de Google inválidas o cuenta inactiva/bloqueada',
+  })
+  async googleLogin(@Body() googleAuthDto: GoogleAuthDto) {
+    return this.authService.loginGoogle(googleAuthDto);
   }
 
   @Patch('profile')
