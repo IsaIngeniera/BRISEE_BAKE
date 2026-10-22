@@ -51,6 +51,31 @@ export async function login(correo: string, password: string): Promise<string> {
   return data.access_token;
 }
 
+export async function loginWithGoogle(body: {
+  credential?: string;
+  idToken?: string;
+  token?: string;
+  error?: string;
+}): Promise<string> {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const response = await fetch(`${apiUrl}/auth/google`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const data: LoginResponse = await response.json();
+  if (!response.ok) {
+    throw new Error(
+      (Array.isArray(data.message) ? data.message[0] : data.message) ||
+        'No fue posible iniciar sesión con Google.',
+    );
+  }
+  if (!data.access_token || !decodeUser(data.access_token)) {
+    throw new Error('El servidor no devolvió una sesión válida.');
+  }
+  return data.access_token;
+}
+
 export function saveSession(token: string, remember: boolean): void {
   localStorage.removeItem(AUTH_TOKEN_KEY);
   sessionStorage.removeItem(AUTH_TOKEN_KEY);
@@ -91,4 +116,38 @@ export function clearSession(): void {
   localStorage.removeItem(AUTH_TOKEN_KEY);
   window.dispatchEvent(new Event(AUTH_CHANGE_EVENT));
   if (authChannel) authChannel.postMessage('auth_changed');
+}
+
+export async function requestPasswordReset(correo: string): Promise<string> {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const response = await fetch(`${apiUrl}/auth/forgot-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ correo }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(
+      (Array.isArray(data.message) ? data.message[0] : data.message) ||
+        'No fue posible procesar la solicitud.',
+    );
+  }
+  return data.message || 'Si el correo está registrado, recibirás un enlace de recuperación.';
+}
+
+export async function resetPassword(token: string, password: string): Promise<string> {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const response = await fetch(`${apiUrl}/auth/reset-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, password }),
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(
+      (Array.isArray(data.message) ? data.message[0] : data.message) ||
+        'No fue posible restablecer la contraseña.',
+    );
+  }
+  return data.message || 'Contraseña actualizada exitosamente.';
 }
