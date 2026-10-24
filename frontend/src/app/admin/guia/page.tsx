@@ -43,7 +43,7 @@ const chapters: Chapter[] = [
     screens: [
       {
         title: 'Barra y menú del administrador',
-        image: null,
+        image: '/manual/admin/guia/AccesoNav.png',
         points: [
           {
             label: 'Barra administrativa',
@@ -76,7 +76,7 @@ const chapters: Chapter[] = [
     screens: [
       {
         title: 'Catálogo de productos del administrador',
-        image: null,
+        image: '/manual/admin/productos/adminProducto.png',
         points: [
           {
             label: 'Crear producto',
@@ -103,7 +103,7 @@ const chapters: Chapter[] = [
     screens: [
       {
         title: 'Productos de un subcatálogo',
-        image: null,
+        image: '/manual/admin/productos/accionSub.png',
         points: [
           {
             label: 'Producto que vas a gestionar',
@@ -140,7 +140,7 @@ const chapters: Chapter[] = [
     screens: [
       {
         title: 'Formulario de creación de producto',
-        image: null,
+        image: '/manual/admin/crear-producto/crearProducto.png',
         points: [
           {
             label: 'Nombre del producto',
@@ -177,7 +177,7 @@ const chapters: Chapter[] = [
     screens: [
       {
         title: 'Edición de un producto',
-        image: null,
+        image: '/manual/admin/editar-producto/editatProducto.png',
         points: [
           {
             label: 'Identificar el producto',
@@ -208,7 +208,7 @@ const chapters: Chapter[] = [
     screens: [
       {
         title: 'Eliminación de un producto',
-        image: null,
+        image: '/manual/admin/editar-producto/eliminarProducto.png',
         points: [
           {
             label: 'Seleccionar el artículo',
@@ -241,7 +241,7 @@ const chapters: Chapter[] = [
     screens: [
       {
         title: 'Consulta de pedidos',
-        image: null,
+        image: '/manual/admin/pedidos/adminPedido.png',
         points: [
           {
             label: 'Activos',
@@ -267,7 +267,7 @@ const chapters: Chapter[] = [
       },
       {
         title: 'Actualizar el estado de entrega',
-        image: null,
+        image: '/manual/admin/pedidos/adminPedidoEstado.png',
         points: [
           {
             label: 'Localizar el pedido',
@@ -300,7 +300,7 @@ const chapters: Chapter[] = [
     screens: [
       {
         title: 'Listado de clientes',
-        image: null,
+        image: '/manual/admin/clientes/clientesPermisos.png',
         points: [
           {
             label: 'Cantidad de clientes',
@@ -341,7 +341,7 @@ const chapters: Chapter[] = [
     screens: [
       {
         title: 'Submenú de manuales',
-        image: null,
+        image: '/manual/admin/guia/manualesAydua.png',
         points: [
           {
             label: 'Ícono de ayuda',
@@ -374,7 +374,7 @@ const chapters: Chapter[] = [
     screens: [
       {
         title: 'Cuenta del administrador',
-        image: null,
+        image: '/manual/admin/guia/miCuenta.png',
         points: [
           {
             label: 'Ícono de perfil',

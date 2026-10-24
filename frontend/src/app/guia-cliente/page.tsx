@@ -9,7 +9,7 @@ type Chapter = { id: string; title: string; short: string; intro: string; screen
 
 const chapters: Chapter[] = [
   { id: 'inicio', title: 'Conoce tu rincón dulce', short: 'La página principal', intro: 'Empieza por conocer la tienda. Desde la página principal puedes explorar nuestras propuestas y encontrar los accesos que te acompañarán durante tu compra.', screens: [
-    { title: 'Página principal y navegación', file: 'inicio.png', image: null, points: [
+    { title: 'Página principal y navegación', file: 'inicio.png', image: '/manual/user/inicio/paginaPrincipal.png', points: [
       { label: 'Inicio', text: 'Regresa a la página principal para conocer Brisée Bake y sus productos destacados.' },
       { label: 'Catálogo', text: 'Accede a las categorías y encuentra los productos que quieres llevar.' },
       { label: 'Contacto', text: 'Encuentra la información para comunicarte con el negocio.' },
@@ -38,24 +38,24 @@ const chapters: Chapter[] = [
     ] },
   ] },
   { id: 'acceso', title: 'Un espacio para ti', short: 'Registro e inicio de sesión', intro: 'Desde el ícono de perfil puedes crear una cuenta o ingresar con tus datos. Si ya tienes sesión activa, puedes seguir con tu compra.', screens: [
-    { title: 'Bienvenida y acceso', file: 'acceso.png', image: null, points: [
+    { title: 'Bienvenida y acceso', file: 'acceso.png', image: '/manual/user/cuenta/bienvenida1.png', points: [
       { label: 'Crear cuenta', text: 'Elige esta opción si es tu primera vez en Brisée Bake.' },
       { label: 'Iniciar sesión', text: 'Selecciona esta opción si ya tienes una cuenta registrada.' },
     ] },
-    { title: 'Crear una cuenta', file: 'registro.png', image: null, points: [
+    { title: 'Crear una cuenta', file: 'registro.png', image: '/manual/user/cuenta/crearCuenta.png', points: [
       { label: 'Datos personales', text: 'Completa tu nombre, apellido, teléfono y fecha de nacimiento.' },
       { label: 'Correo electrónico', text: 'Ingresa el correo que usarás para acceder a tu cuenta.' },
       { label: 'Contraseña y confirmación', text: 'Escribe tu contraseña y repítela exactamente igual en la confirmación.' },
       { label: 'Crear cuenta', text: 'Envía el formulario. Si aparece un error, revisa el mensaje y corrige los datos indicados.' },
       { label: 'Iniciar sesión', text: 'Si ya estás registrado, usa el enlace al formulario de ingreso.' },
     ] },
-    { title: 'Iniciar sesión', file: 'inicio-sesion.png', image: null, points: [
+    { title: 'Iniciar sesión', file: 'inicio-sesion.png', image: '/manual/user/inicio/iniciosesion.png', points: [
       { label: 'Correo y contraseña', text: 'Escribe los datos de tu cuenta y selecciona “Iniciar sesión”.' },
       { label: 'Mostrar contraseña', text: 'Usa el ícono del campo para mostrar u ocultar lo que escribiste.' },
     ] },
   ], note: 'Si el correo ya está registrado, inicia sesión con esa cuenta. Si las contraseñas no coinciden al registrarte, corrige la confirmación antes de enviar el formulario.' },
   { id: 'entrega', title: '¿Cómo recibirás tu pedido?', short: 'Opciones de entrega', intro: 'Al continuar desde el carrito, elige cómo quieres recibir tu compra antes de ir al pago.', screens: [
-    { title: 'Recogida o domicilio', file: 'entrega.png', image: null, points: [
+    { title: 'Recogida o domicilio', file: 'entrega.png', image: '/manual/user/entrega/opcionesEntrega.png', points: [
       { label: 'Recogida en tienda', text: 'Selecciona esta opción si recogerás tu pedido en el establecimiento y continúa con el pago.' },
       { label: 'Domicilio', text: 'Selecciona esta opción si necesitas entrega a domicilio.' },
       { label: 'Aceptación del domicilio', text: 'Para domicilio, marca la casilla que confirma que pagarás los productos sin incluir todavía el costo del envío.' },
@@ -82,7 +82,7 @@ const chapters: Chapter[] = [
     ] },
   ], note: 'Abrir WhatsApp no envía el mensaje automáticamente. Revísalo y presiona enviar para iniciar la conversación.' },
   { id: 'cuenta', title: 'Vuelve cuando quieras', short: 'Mi cuenta y mis pedidos', intro: 'Con tu sesión activa, entra a “Mi Cuenta” para consultar tu información y encontrar los accesos de tu compra.', screens: [
-    { title: 'Mi cuenta', file: 'mi-cuenta.png', image: null, points: [
+    { title: 'Mi cuenta', file: 'mi-cuenta.png', image: '/manual/user/cuenta/cuenta.png', points: [
       { label: 'Información personal', text: 'Consulta tu nombre, apellido, teléfono, fecha de nacimiento y correo electrónico.' },
       { label: 'Editar datos', text: 'Accede a la opción para actualizar tu información personal y sigue las indicaciones del formulario.' },
       { label: 'Mis pedidos', text: 'Ingresa a la sección donde puedes consultar tus pedidos registrados.' },
@@ -91,7 +91,7 @@ const chapters: Chapter[] = [
     ] },
   ] },
   { id: 'contacto', title: 'Estamos para acompañarte', short: 'Contacto y ubicación', intro: 'Si necesitas ayuda, consulta los datos de Brisée Bake en el pie de página de la tienda.', screens: [
-    { title: 'Información de contacto', file: 'contacto.png', image: null, points: [
+    { title: 'Información de contacto', file: 'contacto.png', image: '/manual/user/ayuda/contacto.png', points: [
       { label: 'Teléfono y correo', text: 'Encuentra los canales de contacto del negocio.' },
       { label: 'Dirección y mapa', text: 'Consulta dónde se encuentra el establecimiento.' },
       { label: 'Horarios de atención', text: 'Revisa los días y horarios publicados antes de planear tu visita.' },
