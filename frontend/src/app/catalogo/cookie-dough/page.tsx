@@ -5,11 +5,11 @@ import styles from './cookie-dough.module.css';
 export default function CookieDoughPage() {
   return (
     <CookieCategoryPage
-      title="Cookies Cookie Dough"
+      title="Cookie Dough"
       subtitle="Descubre nuestras preparaciones Cookie Dough y elige tu favorita."
       categoryNames={[
         'Cookie Dough',
-        'Cookies Cookie Dough',
+        ' Cookie Dough',
         'Galletas Cookie Dough',
       ]}
       searchPlaceholder="Buscar Cookie Dough..."

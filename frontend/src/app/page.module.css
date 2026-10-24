@@ -313,3 +313,9 @@
     padding: 42px 25px 34px;
   }
 }
+
+/* Oculta los controles administrativos internos del Home,
+   incluido el del carrusel si usa la clase admin-only. */
+.homePage :global(.admin-only) {
+  display: none !important;
+}

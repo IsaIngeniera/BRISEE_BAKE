@@ -18,12 +18,13 @@ import {
   X,
 } from 'lucide-react';
 
-import icon from '@/app/icon.png';
+
 
 import {
   AUTH_CHANGE_EVENT,
   getSessionUser,
 } from '@/services/auth';
+import { useCart } from '@/hooks/useCart';
 
 import styles from './header.module.css';
 
@@ -74,6 +75,7 @@ function subscribeToViewMode(
 }
 
 export default function Header(): ReactElement {
+  const { totalItems } = useCart();
   const pathname = usePathname();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] =
@@ -173,11 +175,12 @@ export default function Header(): ReactElement {
             aria-label="Ir al inicio de Brisée Bake"
           >
             <Image
-              src={icon}
+              src="/images/logo-brisee-nuevo.png"
               alt="Brisée Bake - Handmade with love"
-              width={330}
-              height={115}
+              width={600}
+              height={200}
               priority
+              unoptimized
               className={styles.logo}
             />
           </Link>
@@ -190,11 +193,10 @@ export default function Header(): ReactElement {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`${styles.navigationLink} ${
-                  isActiveLink(item.href)
-                    ? styles.activeLink
-                    : ''
-                }`}
+                className={`${styles.navigationLink} ${isActiveLink(item.href)
+                  ? styles.activeLink
+                  : ''
+                  }`}
                 onClick={closeMenus}
               >
                 {item.label}
@@ -205,13 +207,11 @@ export default function Header(): ReactElement {
               <div className={styles.dropdown}>
                 <button
                   type="button"
-                  className={`${styles.navigationLink} ${
-                    styles.dropdownButton
-                  } ${
-                    isAdminSectionActive
+                  className={`${styles.navigationLink} ${styles.dropdownButton
+                    } ${isAdminSectionActive
                       ? styles.activeLink
                       : ''
-                  }`}
+                    }`}
                   onClick={() =>
                     setIsAdminMenuOpen((isOpen) => !isOpen)
                   }
@@ -269,6 +269,14 @@ export default function Header(): ReactElement {
                 title="Carrito"
               >
                 <ShoppingCart aria-hidden="true" />
+                {totalItems > 0 && (
+                  <span
+                    className={styles.cartBadge}
+                    aria-label={`${totalItems} productos en el carrito`}
+                  >
+                    {totalItems}
+                  </span>
+                )}
               </Link>
             )}
 
@@ -313,11 +321,10 @@ export default function Header(): ReactElement {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`${styles.mobileLink} ${
-                  isActiveLink(item.href)
-                    ? styles.mobileActiveLink
-                    : ''
-                }`}
+                className={`${styles.mobileLink} ${isActiveLink(item.href)
+                  ? styles.mobileActiveLink
+                  : ''
+                  }`}
                 onClick={closeMenus}
               >
                 {item.label}
@@ -328,9 +335,8 @@ export default function Header(): ReactElement {
               <>
                 <button
                   type="button"
-                  className={`${styles.mobileLink} ${
-                    styles.mobileDropdownButton
-                  }`}
+                  className={`${styles.mobileLink} ${styles.mobileDropdownButton
+                    }`}
                   onClick={() =>
                     setIsAdminMenuOpen((isOpen) => !isOpen)
                   }

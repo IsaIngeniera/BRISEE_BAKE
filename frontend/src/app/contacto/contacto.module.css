@@ -1,156 +1,245 @@
 .page {
-  max-width: 1200px;
+  width: 100%;
+  min-height: calc(100vh - 120px);
+  padding: 42px 24px 80px;
+  background: #ffffff;
+  color: #513f45;
+  font-family: 'Baskerville Old Face', Baskerville, 'Times New Roman',
+    Georgia, serif;
+  box-sizing: border-box;
+}
+
+.content {
+  width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 40px 20px 80px;
 }
 
 .cardsGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
   gap: 24px;
   margin-bottom: 24px;
 }
 
 .infoCard,
 .formCard {
-  background-color: var(--pink-100);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 32px;
+  min-width: 0;
+  padding: clamp(28px, 4vw, 40px);
+  border: 1px solid #edaccc;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.infoCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .infoCard h1,
 .formCard h1 {
-  margin: 0 0 6px;
-  color: var(--pink-500);
-  font-family: var(--font-title);
-  font-size: 2.2rem;
-  font-weight: 500;
+  margin: 0 0 14px;
+  color: #d66098;
+  font-family: inherit;
+  font-size: clamp(2.8rem, 5vw, 4rem);
+  font-weight: 400;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.infoCard h1 {
+  margin-bottom: 28px;
 }
 
 .formSubtitle {
-  margin: 0 0 24px;
-  color: var(--rose-text);
+  margin: 0 0 36px;
+  color: #68545c;
+  font-size: 1.3rem;
+  line-height: 1.45;
+  text-align: center;
 }
 
 .schedule {
-  margin: 0 0 14px;
-  color: var(--cocoa);
-  font-size: 0.85rem;
+  width: 100%;
+  margin: 0 0 18px;
+  color: #68545c;
+  font-size: 1.2rem;
   line-height: 1.5;
+  text-align: center;
 }
 
 .infoItem {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-top: 22px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  max-width: 360px;
+  margin-top: 26px;
+  text-align: center;
+}
+
+.infoItem > div {
+  width: 100%;
+  min-width: 0;
 }
 
 .infoIcon {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   flex-shrink: 0;
-  margin-top: 3px;
-  color: var(--pink-500);
+  color: #d66098;
 }
 
 .infoItem h2 {
-  margin: 0 0 4px;
-  color: var(--rose-text);
-  font-family: var(--font-title);
-  font-size: 1.2rem;
-  font-weight: 500;
+  margin: 0 0 8px;
+  color: #d66098;
+  font-family: inherit;
+  font-size: 1.6rem;
+  font-weight: 400;
+  line-height: 1.2;
 }
 
 .infoItem p {
   margin: 0;
-  font-size: 0.9rem;
-  line-height: 1.5;
+  color: #68545c;
+  font-size: 1.2rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 22px;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  color: var(--rose-text);
-  font-size: 0.85rem;
-  font-weight: 600;
+  gap: 9px;
+  color: #513f45;
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 1.4;
 }
 
 .field input,
 .field textarea {
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background-color: #ffffff;
-  color: var(--cocoa);
-  font-family: var(--font-body);
-  font-size: 0.9rem;
+  width: 100%;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid #edaccc;
+  border-radius: 0;
+  background: #ffffff;
+  color: #513f45;
+  font-family: inherit;
+  font-size: 1.2rem;
+  line-height: 1.45;
+  box-sizing: border-box;
+}
+
+.field input {
+  min-height: 48px;
+}
+
+.field textarea {
+  min-height: 150px;
   resize: vertical;
 }
 
 .field input:focus-visible,
 .field textarea:focus-visible {
-  outline: 2px solid var(--pink-400);
-  outline-offset: 1px;
+  outline: 2px solid #d66098;
+  outline-offset: 3px;
 }
 
 .submitButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
   margin-top: 8px;
   padding: 12px 20px;
-  border: none;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--pink-500), var(--pink-600));
+  border: 1px solid #d66098;
+  border-radius: 0;
+  background: #d66098;
   color: #ffffff;
   font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 1.2rem;
+  font-weight: 400;
   cursor: pointer;
-  transition:
-    filter 0.2s,
-    transform 0.2s;
+  transition: background-color 180ms ease;
 }
 
-.submitButton:hover,
+.submitButton svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.submitButton:hover {
+  background: #b94c7e;
+}
+
 .submitButton:focus-visible {
-  filter: brightness(0.93);
-  transform: scale(1.02);
+  outline: 2px solid #d66098;
+  outline-offset: 3px;
 }
 
 .confirmationMessage {
   margin: 0;
   color: #2e7d32;
-  font-size: 0.85rem;
+  font-size: 1.1rem;
+  line-height: 1.45;
+  text-align: center;
 }
 
 .mapContainer {
-  border-radius: 18px;
+  width: 100%;
+  border: 1px solid #edaccc;
+  background: #ffffff;
   overflow: hidden;
-  box-shadow: var(--shadow);
+  box-sizing: border-box;
 }
 
 .mapContainer iframe {
+  display: block;
   width: 100%;
   height: 420px;
   border: 0;
-  display: block;
 }
 
 @media (max-width: 800px) {
   .cardsGrid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 28px 16px 56px;
+  }
+
+  .infoCard,
+  .formCard {
+    padding: 28px 20px;
+  }
+
+  .formSubtitle {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mapContainer iframe {
+    height: 320px;
   }
 }
