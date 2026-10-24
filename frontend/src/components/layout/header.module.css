@@ -272,6 +272,9 @@
 
 .iconButton,
 .mobileMenuButton {
+  position: relative;
+  width: 43px;
+  height: 43px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -287,6 +290,26 @@
     color 180ms ease,
     background-color 180ms ease,
     transform 180ms ease;
+}
+
+.cartBadge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  background-color: var(--dark-pink);
+  border: 2px solid var(--soft-pink);
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .iconButton svg,

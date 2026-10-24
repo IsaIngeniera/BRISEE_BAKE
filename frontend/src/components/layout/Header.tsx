@@ -24,6 +24,7 @@ import {
   AUTH_CHANGE_EVENT,
   getSessionUser,
 } from '@/services/auth';
+import { useCart } from '@/hooks/useCart';
 
 import styles from './header.module.css';
 
@@ -74,6 +75,7 @@ function subscribeToViewMode(
 }
 
 export default function Header(): ReactElement {
+  const { totalItems } = useCart();
   const pathname = usePathname();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] =
@@ -267,6 +269,14 @@ export default function Header(): ReactElement {
                 title="Carrito"
               >
                 <ShoppingCart aria-hidden="true" />
+                {totalItems > 0 && (
+                  <span
+                    className={styles.cartBadge}
+                    aria-label={`${totalItems} productos en el carrito`}
+                  >
+                    {totalItems}
+                  </span>
+                )}
               </Link>
             )}
 
