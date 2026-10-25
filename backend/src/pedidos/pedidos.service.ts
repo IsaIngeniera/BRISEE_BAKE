@@ -173,19 +173,10 @@ export class PedidosService {
       signatureStr = `&signature%3Aintegrity=${hash}`;
     }
 
-    let finalRedirectUrl = redirectUrl;
-    if (
-      !createPedidoDto.returnUrl && // Solo si no mandamos el origen dinámico
-      (finalRedirectUrl.includes('localhost') ||
-        finalRedirectUrl.includes('127.0.0.1'))
-    ) {
-      // NOTA: Para producción, cambiar 'localtest.me' a 'https://brisee-bake-frontend.vercel.app'
-      // (O usar la variable FRONTEND_URL directamente desde el .env y quitar este IF)
-      finalRedirectUrl = finalRedirectUrl.replace(
-        /localhost|127\.0\.0\.1/g,
-        'localtest.me',
-      );
-    }
+    const finalRedirectUrl = redirectUrl.replace(
+      /localhost|127\.0\.0\.1/g,
+      'localtest.me',
+    );
     const redirectStr = `&redirect-url=${encodeURIComponent(finalRedirectUrl)}`;
 
     const wompiUrl = `https://checkout.wompi.co/p/?public-key=${wompiPublicKey}&currency=COP&amount-in-cents=${amountInCents}&reference=${reference}${signatureStr}${redirectStr}`;

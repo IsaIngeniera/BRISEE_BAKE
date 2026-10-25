@@ -400,11 +400,7 @@ const chapters: Chapter[] = [
   },
 ];
 
-// Para incorporar el video:
-// 1. Guárdalo en public/videos/guia-admin.mp4.
-// 2. Cambia null por '/videos/guia-admin.mp4'.
-
-const VIDEO_SRC: string | null = null;
+const VIDEO_SRC = 'https://www.youtube.com/embed/r6xDyVS8SZA';
 
 function Screenshot({
   screen,
@@ -708,45 +704,14 @@ export default function AdminGuidePage(): ReactElement {
                 administrador para acompañar esta guía.
               </p>
 
-              {VIDEO_SRC ? (
-                <video
-                  className={styles.video}
-                  controls
-                  preload="metadata"
-                  aria-label="Video tutorial del administrador de Brisée Bake"
-                >
-                  <source
-                    src={VIDEO_SRC}
-                    type="video/mp4"
-                  />
-
-                  Tu navegador no permite reproducir
-                  este video.
-                </video>
-              ) : (
-                <div
-                  className={styles.videoPlaceholder}
-                >
-                  <span
-                    className={styles.playCircle}
-                  >
-                    <Play
-                      size={27}
-                      aria-hidden="true"
-                    />
-                  </span>
-
-                  <strong>
-                    Recorrido del administrador
-                  </strong>
-
-                  <span>
-                    Mientras se incorpora el video,
-                    consulta las instrucciones de
-                    cada sección.
-                  </span>
-                </div>
-              )}
+              <iframe
+                className={styles.video}
+                src={VIDEO_SRC}
+                title="Video tutorial del administrador de Brisée Bake"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                loading="lazy"
+              />
             </section>
 
             <footer className={styles.guideFooter}>

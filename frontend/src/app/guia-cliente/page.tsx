@@ -19,16 +19,18 @@ const chapters: Chapter[] = [
     ] },
   ], note: 'Al bajar por la página encontrarás “¿Quiénes somos?” y los detalles que hacen especial a Brisée: sabor, ingredientes frescos y elaboración artesanal.' },
   { id: 'catalogo', title: 'Encuentra tu próximo antojo', short: 'Catálogo y productos', intro: 'Explora las categorías de galletas, macarons y granolas. Elige con calma: cada tarjeta reúne la información del producto antes de agregarlo.', screens: [
-    { title: 'Explorar el catálogo', file: 'catalogo.png', image: null, points: [
+    { title: 'Explorar el catálogo', file: 'catalogo1.png', image: '/manual/user/catalogo/catalogo1.png', points: [
       { label: 'Categorías', text: 'Selecciona la categoría que te interesa para ver sus productos.' },
       { label: 'Buscador', text: 'Escribe parte del nombre del producto que quieres encontrar.' },
+    ] },
+    { title: 'Seleccionar un producto', file: 'catalogo2.png', image: '/manual/user/catalogo/catalogo2.png', points: [
       { label: 'Información del producto', text: 'Revisa la fotografía, el nombre, la descripción y el precio. Consulta más información con la opción disponible en la tarjeta.' },
       { label: 'Cantidad', text: 'Usa los controles de aumentar y disminuir para elegir las unidades.' },
       { label: 'Añadir al carrito', text: 'Agrega la cantidad seleccionada. Puedes seguir explorando otros productos y categorías.' },
     ] },
   ] },
   { id: 'carrito', title: 'Todo lo rico, en un solo lugar', short: 'Revisa tu carrito', intro: 'Abre el carrito desde la barra superior. Antes de continuar, revisa los artículos, sus cantidades y el valor de tu pedido.', screens: [
-    { title: 'Mi carrito', file: 'carrito.png', image: null, points: [
+    { title: 'Mi carrito', file: 'carrito.png', image: '/manual/user/carrito/carrito.png', points: [
       { label: 'Productos seleccionados', text: 'Comprueba el nombre, la imagen y el precio de cada artículo.' },
       { label: 'Modificar cantidad', text: 'Aumenta o disminuye las unidades. El total se actualiza con los cambios.' },
       { label: 'Eliminar producto', text: 'Retira del carrito un artículo que ya no quieras comprar.' },
@@ -38,7 +40,7 @@ const chapters: Chapter[] = [
     ] },
   ] },
   { id: 'acceso', title: 'Un espacio para ti', short: 'Registro e inicio de sesión', intro: 'Desde el ícono de perfil puedes crear una cuenta o ingresar con tus datos. Si ya tienes sesión activa, puedes seguir con tu compra.', screens: [
-    { title: 'Bienvenida y acceso', file: 'acceso.png', image: '/manual/user/cuenta/bienvenida1.png', points: [
+    { title: 'Bienvenida y acceso', file: 'bienvenido.png', image: '/manual/user/cuenta/bienvenido.png', points: [
       { label: 'Crear cuenta', text: 'Elige esta opción si es tu primera vez en Brisée Bake.' },
       { label: 'Iniciar sesión', text: 'Selecciona esta opción si ya tienes una cuenta registrada.' },
     ] },
@@ -63,20 +65,20 @@ const chapters: Chapter[] = [
     ] },
   ], note: 'El domicilio se paga después: su costo no se suma al pago de los productos en este paso. Coordina los detalles de la entrega con Brisée Bake.' },
   { id: 'pago', title: 'Un paso más para disfrutar', short: 'Pago con Wompi', intro: 'La compra continúa en Wompi. Allí podrás revisar el valor y elegir entre los medios de pago que la plataforma tenga disponibles.', screens: [
-    { title: 'Pago y comprobante en Wompi', file: 'wompi.png', image: null, points: [
+    { title: 'Pago y comprobante en Wompi', file: 'wompi.png', image: '/manual/user/pagos/wompi.png', points: [
       { label: 'Valor a pagar', text: 'Verifica el total que aparece antes de continuar.' },
       { label: 'Medio de pago', text: 'Elige una de las opciones disponibles y completa la información solicitada por Wompi.' },
       { label: 'Resultado de la transacción', text: 'Sigue las indicaciones y revisa el estado final. Conserva el comprobante cuando el pago se complete.' },
     ] },
   ], note: 'Si el pago queda pendiente o no se completa, revisa el estado antes de intentarlo nuevamente. Si tienes dudas, consulta con Brisée Bake.' },
   { id: 'confirmacion', title: '¡Tu pedido ya tiene historia!', short: 'Confirmación y WhatsApp', intro: 'Cuando el pago se confirma, la pantalla “¡Pago Exitoso!” muestra la compra registrada. Revisa el resumen y continúa con la coordinación de tu entrega.', screens: [
-    { title: 'Confirmación de la compra', file: 'confirmacion.png', image: null, points: [
+    { title: 'Confirmación de la compra', file: 'confirmacion.png', image: '/manual/user/pagos/pagoExitoso.png', points: [
       { label: 'Resumen de compra', text: 'Consulta el número del pedido, los productos, sus cantidades y el total.' },
       { label: 'Continuar por WhatsApp', text: 'Abre la conversación con el mensaje preparado de tu pedido.' },
       { label: 'Ver mis pedidos', text: 'Accede a la sección de pedidos de tu cuenta.' },
       { label: 'Ir a mi cuenta', text: 'Regresa al espacio de tu información personal.' },
     ] },
-    { title: 'Coordina la entrega por WhatsApp', file: 'whatsapp.png', image: null, points: [
+    { title: 'Coordina la entrega por WhatsApp', file: 'whatsapp.png', image: '/manual/user/pagos/whatsApp.png', points: [
       { label: 'Mensaje del pedido', text: 'Revisa tu nombre, el número del pedido, los productos, las cantidades y el total.' },
       { label: 'Enviar mensaje', text: 'Envía el mensaje desde WhatsApp para acordar los detalles con Brisée Bake.' },
     ] },
@@ -99,7 +101,7 @@ const chapters: Chapter[] = [
   ] },
 ];
 
-const VIDEO_SRC: string | null = null;
+const VIDEO_SRC = 'https://www.youtube.com/embed/cVPvYHLl94o';
 
 function Screenshot({ screen }: { screen: Screen }): ReactElement {
   return (
@@ -179,7 +181,14 @@ export default function ClientGuidePage(): ReactElement {
               <p className={styles.eyebrow}>MÍRALO PASO A PASO</p>
               <h2 id="video-title">Tu próxima compra, en video.</h2>
               <p>Un recorrido para acompañar las explicaciones de esta guía.</p>
-              {VIDEO_SRC ? <video className={styles.video} controls preload="metadata" aria-label="Video tutorial para comprar en Brisée Bake"><source src={VIDEO_SRC} type="video/mp4" />Tu navegador no permite reproducir este video.</video> : <div className={styles.videoPlaceholder}><span className={styles.playCircle}><Play size={27} aria-hidden="true" /></span><strong>Video tutorial próximamente</strong><span>Mientras tanto, sigue las explicaciones de cada sección.</span></div>}
+              <iframe
+                className={styles.video}
+                src={VIDEO_SRC}
+                title="Video tutorial para comprar en Brisée Bake"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                loading="lazy"
+              />
             </section>
             <footer className={styles.guideFooter}><span>Brisée Bake · Handmade with love</span><a href="#guia-inicio">Volver al inicio ↑</a></footer>
           </div>

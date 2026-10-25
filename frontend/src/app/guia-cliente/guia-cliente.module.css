@@ -516,8 +516,10 @@
 
 .video {
     width: 100%;
+    aspect-ratio: 16 / 9;
     display: block;
     background: #513f45;
+    border: 0;
 }
 
 .guideFooter {
