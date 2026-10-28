@@ -196,29 +196,38 @@ export class ProductsService {
         dataToUpdate.idCategoria = updateProductDto.idCategoria;
       }
 
-      if (updateProductDto.imagenUrl) {
-        // En una implementación real se podría actualizar o crear, por simplicidad:
+      if (updateProductDto.imagenUrl !== undefined) {
+        const imagenUrl = updateProductDto.imagenUrl.trim();
         dataToUpdate.imagenes = {
           deleteMany: {},
-          create: [
-            {
-              urlImagen: updateProductDto.imagenUrl,
-              nombre: 'Principal',
-            },
-          ],
+          ...(imagenUrl
+            ? {
+                create: [
+                  {
+                    urlImagen: imagenUrl,
+                    nombre: 'Principal',
+                  },
+                ],
+              }
+            : {}),
         };
       }
 
       const updatedProduct = await this.prisma.producto.update({
         where: { id },
         data: dataToUpdate,
+        include: {
+          categoria: true,
+          imagenes: true,
+        },
       });
 
       return {
         message: 'Producto actualizado exitosamente',
         product: updatedProduct,
       };
-    } catch {
+    } catch (error) {
+      console.error(`Error al actualizar el producto ${id}:`, error);
       throw new BadRequestException('Error al actualizar el producto');
     }
   }

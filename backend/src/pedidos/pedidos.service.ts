@@ -69,46 +69,27 @@ export class PedidosService {
       return categoria.includes('macaron') || nombre.includes('macaron');
     });
 
-    const hasOtherProducts = typedProducts.some((p) => {
-      const categoria = (p.categoria?.nombre || '').toLowerCase();
-      const nombre = (p.nombre || '').toLowerCase();
-      return !categoria.includes('macaron') && !nombre.includes('macaron');
-    });
-
     const [year, month, day] = createPedidoDto.fechaEsperada.split('-');
     const fechaEsperadaDate = new Date(
-      Number(year),
-      Number(month) - 1,
-      Number(day),
+      Date.UTC(Number(year), Number(month) - 1, Number(day)),
     );
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    if (fechaEsperadaDate < today) {
+    const now = new Date();
+    const todayDate = new Date(
+      Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()),
+    );
+    const daysUntilDelivery =
+      (fechaEsperadaDate.getTime() - todayDate.getTime()) /
+      (24 * 60 * 60 * 1000);
+    if (daysUntilDelivery < 0) {
       throw new BadRequestException(
         'La fecha de entrega no puede ser en el pasado.',
       );
     }
 
-    if (hasOtherProducts) {
-      const minOtherDate = new Date(today);
-      minOtherDate.setDate(today.getDate() + 3);
-
-      if (fechaEsperadaDate < minOtherDate) {
-        throw new BadRequestException(
-          'La fecha de entrega debe ser al menos 3 días después de la fecha actual.',
-        );
-      }
-    } else if (hasMacarons) {
-      const minMacaronsDate = new Date(today);
-      minMacaronsDate.setDate(today.getDate() + 2);
-
-      if (fechaEsperadaDate < minMacaronsDate) {
-        throw new BadRequestException(
-          'Los pedidos con macarons deben tener al menos 2 días de anticipación.',
-        );
-      }
+    if (hasMacarons && daysUntilDelivery < 2) {
+      throw new BadRequestException(
+        'Los pedidos con macarons deben tener al menos 2 días de anticipación.',
+      );
     }
 
     const pedido = await this.prisma.$transaction(async (tx) => {
