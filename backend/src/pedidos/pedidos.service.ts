@@ -69,6 +69,12 @@ export class PedidosService {
       return categoria.includes('macaron') || nombre.includes('macaron');
     });
 
+    const hasOtherProducts = typedProducts.some((p) => {
+      const categoria = (p.categoria?.nombre || '').toLowerCase();
+      const nombre = (p.nombre || '').toLowerCase();
+      return !categoria.includes('macaron') && !nombre.includes('macaron');
+    });
+
     const [year, month, day] = createPedidoDto.fechaEsperada.split('-');
     const fechaEsperadaDate = new Date(
       Date.UTC(Number(year), Number(month) - 1, Number(day)),
@@ -86,10 +92,18 @@ export class PedidosService {
       );
     }
 
-    if (hasMacarons && daysUntilDelivery < 2) {
-      throw new BadRequestException(
-        'Los pedidos con macarons deben tener al menos 2 días de anticipación.',
-      );
+    if (hasOtherProducts) {
+      if (daysUntilDelivery < 3) {
+        throw new BadRequestException(
+          'La fecha de entrega debe ser al menos 3 días después de la fecha actual.',
+        );
+      }
+    } else if (hasMacarons) {
+      if (daysUntilDelivery < 2) {
+        throw new BadRequestException(
+          'Los pedidos con macarons deben tener al menos 2 días de anticipación.',
+        );
+      }
     }
 
     const pedido = await this.prisma.$transaction(async (tx) => {
