@@ -10,16 +10,26 @@ export default function CreateProductPage(): ReactElement {
   return (
     <main className={styles.page}>
       <div className={styles.container}>
-        <Link href="/admin/productos" className={styles.backLink}>
+        <Link
+          href="/admin/productos"
+          className={styles.backLink}
+        >
           <ArrowLeft size={20} aria-hidden="true" />
           Volver a productos
         </Link>
 
         <section className={styles.card}>
           <header className={styles.heading}>
-            <p className={styles.eyebrow}>BRISÉE BAKE ADMIN</p>
+            <p className={styles.eyebrow}>
+              BRISÉE BAKE ADMIN
+            </p>
+
             <h1>Crear nuevo producto</h1>
-            <p>Completa la información del postre que quieres agregar al catálogo.</p>
+
+            <p>
+              Completa la información del postre que quieres
+              agregar al catálogo.
+            </p>
           </header>
 
           <Suspense

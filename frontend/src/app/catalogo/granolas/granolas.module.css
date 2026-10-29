@@ -14,7 +14,7 @@
   width: min(100%, 1500px);
   margin: 0 auto;
   padding: 35px 32px 80px;
-  background-color: var(--bg-pink);
+  background-color: #ffffff;
   color: var(--text);
   font-family: var(--font-body);
 }

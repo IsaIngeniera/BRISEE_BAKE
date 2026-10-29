@@ -1,14 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
-
 import type { ReactElement } from 'react';
 
 import {
   Heart,
   Leaf,
-  Plus,
   Sparkles,
   type LucideIcon,
 } from 'lucide-react';
@@ -27,7 +24,6 @@ interface Benefit {
   backgroundColor: string;
   iconBackground: string;
   color: string;
-  editPath: string;
 }
 
 const homeSlides: CarouselSlide[] = [
@@ -55,10 +51,9 @@ const benefits: Benefit[] = [
     description:
       'Combinamos ingredientes de calidad con recetas cuidadosamente elaboradas para ofrecer un sabor delicioso.',
     icon: Heart,
-    backgroundColor: '#fbe3f1', /* Fondo rosado original */
+    backgroundColor: '#fbe3f1',
     iconBackground: '#f3b7d4',
     color: '#d66098',
-    editPath: '/admin/inicio/beneficios/1',
   },
   {
     id: 2,
@@ -66,10 +61,9 @@ const benefits: Benefit[] = [
     description:
       'Combinamos ingredientes de calidad con recetas cuidadosamente elaboradas para ofrecer un sabor delicioso.',
     icon: Leaf,
-    backgroundColor: '#e5f1eb', /* Fondo verde original */
+    backgroundColor: '#e5f1eb',
     iconBackground: '#cce5bc',
     color: '#6eaa61',
-    editPath: '/admin/inicio/beneficios/2',
   },
   {
     id: 3,
@@ -77,33 +71,21 @@ const benefits: Benefit[] = [
     description:
       'Elaboramos cada producto con dedicación y atención al detalle, cuidando desde la preparación hasta la presentación.',
     icon: Sparkles,
-    backgroundColor: '#f9f2d2', /* Fondo amarillo original */
+    backgroundColor: '#f9f2d2',
     iconBackground: '#f5df9a',
     color: '#d7a81f',
-    editPath: '/admin/inicio/beneficios/3',
   },
 ];
 
 export default function HomePage(): ReactElement {
   return (
     <div className={styles.homePage}>
-      {/* Functional carousel */}
       <HomeCarousel
         slides={homeSlides}
         editHref="/admin/inicio/carrusel"
       />
 
-      {/* About us */}
       <section className={styles.aboutSection}>
-        <Link
-          href="/admin/inicio/quienes-somos"
-          className={`${styles.sectionEditButton} admin-only`}
-          aria-label="Editar la sección Quiénes somos"
-          title="Editar esta sección"
-        >
-          <Plus aria-hidden="true" />
-        </Link>
-
         <div className={styles.aboutContent}>
           <h1>¿Quiénes somos?</h1>
 
@@ -137,24 +119,13 @@ export default function HomePage(): ReactElement {
         </div>
       </section>
 
-      {/* Brand phrase */}
       <section className={styles.brandPhrase}>
-        <Link
-          href="/admin/inicio/frase"
-          className={`${styles.phraseEditButton} admin-only`}
-          aria-label="Editar frase principal"
-          title="Editar frase"
-        >
-          <Plus aria-hidden="true" />
-        </Link>
-
         <p>
           “Creamos momentos dulces que nutren el cuerpo, elevan
           los sentidos y se convierten en recuerdos.”
         </p>
       </section>
 
-      {/* Benefits */}
       <section className={styles.benefitsSection}>
         <div className={styles.benefitsHeading}>
           <p className={styles.eyebrow}>
@@ -176,15 +147,6 @@ export default function HomePage(): ReactElement {
                   backgroundColor: benefit.backgroundColor,
                 }}
               >
-                <Link
-                  href={benefit.editPath}
-                  className={`${styles.cardEditButton} admin-only`}
-                  aria-label={`Editar ${benefit.title}`}
-                  title={`Editar ${benefit.title}`}
-                >
-                  <Plus aria-hidden="true" />
-                </Link>
-
                 <div
                   className={styles.benefitIcon}
                   style={{
@@ -195,11 +157,7 @@ export default function HomePage(): ReactElement {
                   <BenefitIcon aria-hidden="true" />
                 </div>
 
-                <h3
-                  style={{
-                    color: benefit.color,
-                  }}
-                >
+                <h3 style={{ color: benefit.color }}>
                   {benefit.title}
                 </h3>
 

@@ -59,6 +59,15 @@ describe('PedidosService [QA]', () => {
     nombre: 'Producto Test',
     precio: new Prisma.Decimal(25000),
     estado: 'ACTIVO',
+    categoria: { id: 'cat-1', nombre: 'Galletas' },
+  };
+
+  const mockMacaronProducto = {
+    id: 'prod-macaron-1',
+    nombre: 'Caja de Macarons * 6',
+    precio: new Prisma.Decimal(30000),
+    estado: 'ACTIVO',
+    categoria: { id: 'cat-4', nombre: 'Macarons' },
   };
 
   const mockPedido = {
@@ -171,8 +180,8 @@ describe('PedidosService [QA]', () => {
       ).rejects.toThrow('No hay productos disponibles en el carrito.');
     });
 
-    it('debe rechazar fechas de entrega menores a 3 días desde hoy', async () => {
-      prismaService.producto.findMany.mockResolvedValue([mockProducto]);
+    it('debe rechazar fechas menores a 2 días cuando el pedido contiene únicamente macarons', async () => {
+      prismaService.producto.findMany.mockResolvedValue([mockMacaronProducto]);
 
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
@@ -183,7 +192,99 @@ describe('PedidosService [QA]', () => {
 
       await expect(
         service.createPedido(userId, dtoConFechaInvalida),
-      ).rejects.toThrow('La fecha de entrega debe ser al menos 3 días');
+      ).rejects.toThrow(
+        'Los pedidos con macarons deben tener al menos 2 días de anticipación.',
+      );
+    });
+
+    it('debe aceptar fecha con exactamente 2 días de anticipación cuando contiene únicamente macarons', async () => {
+      prismaService.producto.findMany.mockResolvedValue([mockMacaronProducto]);
+      prismaService.$transaction.mockImplementation(async (cb: any) => {
+        const tx = {
+          pedido: { create: jest.fn().mockResolvedValue(mockPedido) },
+          pedidoProducto: { createMany: jest.fn() },
+          pago: { create: jest.fn() },
+        };
+        return cb(tx);
+      });
+
+      const twoDaysLater = new Date();
+      twoDaysLater.setDate(twoDaysLater.getDate() + 2);
+      const dto = {
+        ...createPedidoDto,
+        fechaEsperada: twoDaysLater.toISOString().split('T')[0],
+      };
+
+      await expect(service.createPedido(userId, dto)).resolves.toHaveProperty(
+        'pedidoId',
+      );
+    });
+
+    it('debe exigir al menos 3 días cuando el pedido contiene otros productos', async () => {
+      prismaService.producto.findMany.mockResolvedValue([mockProducto]);
+
+      const twoDaysLater = new Date();
+      twoDaysLater.setDate(twoDaysLater.getDate() + 2);
+      const dto = {
+        ...createPedidoDto,
+        fechaEsperada: twoDaysLater.toISOString().split('T')[0],
+      };
+
+      await expect(service.createPedido(userId, dto)).rejects.toThrow(
+        'La fecha de entrega debe ser al menos 3 días después de la fecha actual.',
+      );
+    });
+
+    it('debe exigir al menos 3 días cuando el pedido combina macarons con otros productos', async () => {
+      prismaService.producto.findMany.mockResolvedValue([
+        mockMacaronProducto,
+        mockProducto,
+      ]);
+
+      const twoDaysLater = new Date();
+      twoDaysLater.setDate(twoDaysLater.getDate() + 2);
+      const dto = {
+        ...createPedidoDto,
+        items: [
+          { idProducto: mockMacaronProducto.id, cantidad: 1 },
+          { idProducto: mockProducto.id, cantidad: 1 },
+        ],
+        fechaEsperada: twoDaysLater.toISOString().split('T')[0],
+      };
+
+      await expect(service.createPedido(userId, dto)).rejects.toThrow(
+        'La fecha de entrega debe ser al menos 3 días después de la fecha actual.',
+      );
+    });
+
+    it('debe aceptar fecha con 3 días para pedidos con otros productos o mixtos', async () => {
+      prismaService.producto.findMany.mockResolvedValue([
+        mockMacaronProducto,
+        mockProducto,
+      ]);
+      prismaService.$transaction.mockImplementation(async (cb: any) => {
+        const tx = {
+          pedido: { create: jest.fn().mockResolvedValue(mockPedido) },
+          pedidoProducto: { createMany: jest.fn() },
+          pago: { create: jest.fn() },
+        };
+        return cb(tx);
+      });
+
+      const threeDaysLater = new Date();
+      threeDaysLater.setDate(threeDaysLater.getDate() + 3);
+      const dto = {
+        ...createPedidoDto,
+        items: [
+          { idProducto: mockMacaronProducto.id, cantidad: 1 },
+          { idProducto: mockProducto.id, cantidad: 1 },
+        ],
+        fechaEsperada: threeDaysLater.toISOString().split('T')[0],
+      };
+
+      await expect(service.createPedido(userId, dto)).resolves.toHaveProperty(
+        'pedidoId',
+      );
     });
 
     it('debe rechazar fechas de entrega en el pasado', async () => {
@@ -199,29 +300,6 @@ describe('PedidosService [QA]', () => {
       await expect(
         service.createPedido(userId, dtoFechaPasada),
       ).rejects.toThrow(BadRequestException);
-    });
-
-    it('debe aceptar fecha de entrega exactamente 3 días después', async () => {
-      prismaService.producto.findMany.mockResolvedValue([mockProducto]);
-      prismaService.$transaction.mockImplementation(async (cb: any) => {
-        const tx = {
-          pedido: { create: jest.fn().mockResolvedValue(mockPedido) },
-          pedidoProducto: { createMany: jest.fn() },
-          pago: { create: jest.fn() },
-        };
-        return cb(tx);
-      });
-
-      const threeDaysLater = new Date();
-      threeDaysLater.setDate(threeDaysLater.getDate() + 3);
-      const dto = {
-        ...createPedidoDto,
-        fechaEsperada: threeDaysLater.toISOString().split('T')[0],
-      };
-
-      await expect(service.createPedido(userId, dto)).resolves.toHaveProperty(
-        'pedidoId',
-      );
     });
 
     it('debe calcular el total correctamente', async () => {
