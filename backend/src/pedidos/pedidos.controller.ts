@@ -83,11 +83,11 @@ export class PedidosController {
   async retornoWompi(
     @Query('id') id: string,
     @Query('reference') reference: string,
-    @Query('frontendUrl') frontendUrl: string,
+    @Query('frontendUrl') _frontendUrl: string,
     @Res() res: Response,
   ) {
     const defaultFrontend = 'http://127.0.0.1:3000';
-    const base = frontendUrl || defaultFrontend;
+    const base = process.env.FRONTEND_URL || defaultFrontend;
 
     if (!id) {
       return res.redirect(`${base}/carrito?error=pago_rechazado`);

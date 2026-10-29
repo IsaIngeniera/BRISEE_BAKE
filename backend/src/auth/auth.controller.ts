@@ -6,6 +6,7 @@ import {
   UseGuards,
   Req,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
@@ -57,6 +58,9 @@ export class AuthController {
   @ApiOperation({ summary: 'Obtener un Token de Administrador para pruebas' })
   @ApiResponse({ status: 201, description: 'Token generado' })
   async loginAdmin() {
+    if (process.env.NODE_ENV !== 'test') {
+      throw new NotFoundException();
+    }
     return this.authService.loginMockAdmin();
   }
 

@@ -35,15 +35,23 @@ async function main() {
     }
   });
 
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminPassword || !adminEmail) {
+    throw new Error(
+      'ADMIN_EMAIL and ADMIN_PASSWORD must be configured before running the seed',
+    );
+  }
+
   const adminUser = await prisma.usuario.create({
     data: {
       id: '99999999-9999-9999-9999-999999999999',
       nombre: 'Admin',
       apellido: 'Principal',
       fechaNacimiento: new Date('1990-01-01'),
-      correo: 'admin@briseebake.com',
+      correo: adminEmail,
       rol: 'ADMIN',
-      password: '$2b$10$w72eavYugACKxTcTvwEXsua41Y2OSDqBhbCa6ybcZMj0rWJplI0ty', // admin123
+      password: await bcrypt.hash(adminPassword, 10),
       celular: '3000000000',
       estado: 'ACTIVO',
     }

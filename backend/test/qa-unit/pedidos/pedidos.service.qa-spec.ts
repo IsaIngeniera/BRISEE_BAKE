@@ -684,7 +684,10 @@ describe('PedidosService [QA]', () => {
     };
 
     beforeEach(() => {
-      prismaService.pago.findUnique.mockResolvedValue({ estado: 'PENDIENTE' });
+      prismaService.pago.findUnique.mockResolvedValue({
+        estado: 'PENDIENTE',
+        total: new Prisma.Decimal(50000),
+      });
     });
 
     it('debe retornar estado APPROVED correctamente', async () => {
@@ -711,6 +714,10 @@ describe('PedidosService [QA]', () => {
         json: async () => mockWompiResponse,
       });
       prismaService.pago.update.mockResolvedValue({});
+      prismaService.pago.findUnique.mockResolvedValue({
+        estado: 'PENDIENTE',
+        total: new Prisma.Decimal(50000),
+      });
       prismaService.pedido.findUnique.mockResolvedValue(null);
 
       await service.verificarPagoWompi(transactionId);
@@ -821,7 +828,7 @@ describe('PedidosService [QA]', () => {
 
       await service.verificarPagoWompi(transactionId);
 
-      expect(mockFetch).toHaveBeenCalledWith(
+      expect(mockFetch.mock.calls[0][0]).toBe(
         `https://sandbox.wompi.co/v1/transactions/${transactionId}`,
       );
     });
@@ -838,6 +845,10 @@ describe('PedidosService [QA]', () => {
         }),
       });
       prismaService.pago.update.mockResolvedValue({});
+      prismaService.pago.findUnique.mockResolvedValue({
+        estado: 'PENDIENTE',
+        total: new Prisma.Decimal(75000),
+      });
       prismaService.pedido.findUnique.mockResolvedValue(null);
 
       const result = await service.verificarPagoWompi(transactionId);

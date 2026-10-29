@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { getJwtSecret } from '../security/jwt-secret';
 
 interface AuthRequest extends Request {
   user?: Record<string, unknown>;
@@ -27,7 +28,7 @@ export class JwtAuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync<
         Record<string, unknown>
       >(token, {
-        secret: process.env.JWT_SECRET || 'secretKey',
+        secret: getJwtSecret(),
       });
       // Asignar el payload (información del usuario) al request para usarlo en otras partes
       request.user = payload;

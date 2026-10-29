@@ -13,9 +13,9 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/test/qa-unit/jest.setup.ts'],
   moduleNameMapper: {
     // Force single React instance
-    '^react$': '<rootDir>/node_modules/react',
-    '^react-dom$': '<rootDir>/node_modules/react-dom',
-    '^react-dom/(.*)$': '<rootDir>/node_modules/react-dom/$1',
+    '^react$': '<rootDir>/../node_modules/react',
+    '^react-dom$': '<rootDir>/../node_modules/react-dom',
+    '^react-dom/(.*)$': '<rootDir>/../node_modules/react-dom/$1',
     // Styles CSS Modules
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     // Static assets

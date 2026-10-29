@@ -147,14 +147,18 @@ export class PedidosService {
     const mensaje = `Hola, acabo de realizar el pedido #${shortId}, escribo para coordinar la entrega`;
     const whatsappUrl = `https://wa.me/${this.WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
 
-    const wompiPublicKey =
-      process.env.WOMPI_PUBLIC_KEY || 'pub_test_placeholder';
-    const integritySecret = process.env.WOMPI_INTEGRITY_SECRET || '';
+    const wompiPublicKey = process.env.WOMPI_PUBLIC_KEY?.trim();
+    if (process.env.NODE_ENV === 'production' && !wompiPublicKey) {
+      throw new Error('WOMPI_PUBLIC_KEY must be configured in production');
+    }
+    const integritySecret = process.env.WOMPI_INTEGRITY_SECRET?.trim();
+    if (process.env.NODE_ENV === 'production' && !integritySecret) {
+      throw new Error(
+        'WOMPI_INTEGRITY_SECRET must be configured in production',
+      );
+    }
 
-    let frontendBaseUrl =
-      createPedidoDto.returnUrl ||
-      process.env.FRONTEND_URL ||
-      'http://localhost:3000';
+    let frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     frontendBaseUrl = frontendBaseUrl.replace(/\/$/, '');
 
     const amountInCents = Math.round(Number(total) * 100);
@@ -174,7 +178,7 @@ export class PedidosService {
     );
     const redirectStr = `&redirect-url=${encodeURIComponent(finalRedirectUrl)}`;
 
-    const wompiUrl = `https://checkout.wompi.co/p/?public-key=${wompiPublicKey}&currency=COP&amount-in-cents=${amountInCents}&reference=${reference}${signatureStr}${redirectStr}`;
+    const wompiUrl = `https://checkout.wompi.co/p/?public-key=${wompiPublicKey || 'pub_test_placeholder'}&currency=COP&amount-in-cents=${amountInCents}&reference=${reference}${signatureStr}${redirectStr}`;
 
     return {
       message: 'Pedido creado exitosamente',
@@ -295,12 +299,68 @@ export class PedidosService {
           status: string;
           reference: string;
           amount_in_cents: number;
+          currency?: string;
+          signature?: {
+            checksum?: string;
+            properties?: string[];
+          };
         };
       }
       const data = (await response.json()) as WompiTransactionResponse;
 
       const status = data.data.status;
       const reference = data.data.reference;
+      const integritySecret = process.env.WOMPI_INTEGRITY_SECRET?.trim();
+      if (process.env.NODE_ENV === 'production' && !integritySecret) {
+        throw new Error(
+          'WOMPI_INTEGRITY_SECRET must be configured in production',
+        );
+      }
+      const pagoExistente = await this.prisma.pago.findUnique({
+        where: { idPedido: reference },
+        select: { estado: true, total: true },
+      });
+
+      if (!pagoExistente) {
+        throw new Error('No existe un pago asociado a la transacción');
+      }
+
+      const expectedAmountInCents = Math.round(
+        Number(pagoExistente.total) * 100,
+      );
+      if (
+        status === 'APPROVED' &&
+        (data.data.amount_in_cents !== expectedAmountInCents ||
+          (data.data.currency && data.data.currency !== 'COP'))
+      ) {
+        throw new Error('El monto o la moneda de la transacción no coinciden');
+      }
+
+      if (integritySecret && data.data.signature?.checksum) {
+        const properties = data.data.signature.properties ?? [
+          'amount_in_cents',
+          'reference',
+          'currency',
+        ];
+        const signaturePayload = properties
+          .map((property) => {
+            if (property === 'amount_in_cents')
+              return data.data.amount_in_cents;
+            if (property === 'reference') return data.data.reference;
+            if (property === 'currency') return data.data.currency ?? 'COP';
+            return '';
+          })
+          .join('');
+        const expectedChecksum = crypto
+          .createHash('sha256')
+          .update(`${signaturePayload}${integritySecret}`)
+          .digest('hex');
+        if (expectedChecksum !== data.data.signature.checksum) {
+          throw new Error('La firma de la transacción no es válida');
+        }
+      } else if (process.env.NODE_ENV === 'production') {
+        throw new Error('La transacción no incluye una firma válida');
+      }
 
       let nuevoEstado: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO' | 'CANCELADO' =
         'PENDIENTE';
@@ -312,10 +372,6 @@ export class PedidosService {
         nuevoEstado = 'CANCELADO';
       }
 
-      const pagoExistente = await this.prisma.pago.findUnique({
-        where: { idPedido: reference },
-        select: { estado: true },
-      });
       const wasAlreadyApproved = pagoExistente?.estado === 'APROBADO';
 
       await this.prisma.pago
