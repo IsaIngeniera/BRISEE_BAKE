@@ -59,5 +59,6 @@ module.exports = {
   ],
   coverageDirectory: '<rootDir>/test/qa-unit/coverage',
   testPathIgnorePatterns: ['/node_modules/', '/.next/'],
+  modulePathIgnorePatterns: ['<rootDir>/.next/'],
   moduleDirectories: ['node_modules', '<rootDir>/../node_modules'],
 };

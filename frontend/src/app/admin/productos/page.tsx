@@ -6,6 +6,8 @@ import AdminProductsContent, {
 } from './AdminProductsContent';
 import styles from './admin-productos.module.css';
 
+export const dynamic = 'force-dynamic';
+
 async function getProducts(): Promise<Product[]> {
   const apiUrl =
     process.env.INTERNAL_API_URL ?? 'http://backend:3001';

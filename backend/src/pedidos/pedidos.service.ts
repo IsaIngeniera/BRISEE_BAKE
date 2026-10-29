@@ -106,6 +106,17 @@ export class PedidosService {
       }
     }
 
+    const wompiPublicKey = process.env.WOMPI_PUBLIC_KEY?.trim();
+    if (process.env.NODE_ENV === 'production' && !wompiPublicKey) {
+      throw new Error('WOMPI_PUBLIC_KEY must be configured in production');
+    }
+    const integritySecret = process.env.WOMPI_INTEGRITY_SECRET?.trim();
+    if (process.env.NODE_ENV === 'production' && !integritySecret) {
+      throw new Error(
+        'WOMPI_INTEGRITY_SECRET must be configured in production',
+      );
+    }
+
     const pedido = await this.prisma.$transaction(async (tx) => {
       const nuevoPedido = await tx.pedido.create({
         data: {
@@ -146,17 +157,6 @@ export class PedidosService {
     const shortId = pedido.id.split('-')[0].toUpperCase();
     const mensaje = `Hola, acabo de realizar el pedido #${shortId}, escribo para coordinar la entrega`;
     const whatsappUrl = `https://wa.me/${this.WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
-
-    const wompiPublicKey = process.env.WOMPI_PUBLIC_KEY?.trim();
-    if (process.env.NODE_ENV === 'production' && !wompiPublicKey) {
-      throw new Error('WOMPI_PUBLIC_KEY must be configured in production');
-    }
-    const integritySecret = process.env.WOMPI_INTEGRITY_SECRET?.trim();
-    if (process.env.NODE_ENV === 'production' && !integritySecret) {
-      throw new Error(
-        'WOMPI_INTEGRITY_SECRET must be configured in production',
-      );
-    }
 
     let frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     frontendBaseUrl = frontendBaseUrl.replace(/\/$/, '');

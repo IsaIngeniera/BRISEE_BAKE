@@ -18,6 +18,14 @@
     "node": "24.14.1",
     "npm": "11.11.0"
   },
+  "overrides": {
+    "@nestjs/platform-express": {
+      "multer": "^2.5.0"
+    },
+    "@nestjs/swagger": {
+      "js-yaml": "^5.5.0"
+    }
+  },
   "devDependencies": {
     "@prisma/client": "^7.10.0",
     "prisma": "^7.10.0"

@@ -71,6 +71,14 @@ export class AuthService {
       );
     }
 
+    if (user.estado !== EstadoUsuario.ACTIVO) {
+      throw new UnauthorizedException(
+        user.estado === EstadoUsuario.BLOQUEADO
+          ? 'Tu cuenta se encuentra bloqueada. Contacta al administrador'
+          : 'Tu cuenta se encuentra inactiva',
+      );
+    }
+
     const isPasswordValid = await bcrypt.compare(
       loginDto.password,
       user.password,

@@ -18,6 +18,8 @@ import {
 } from '@/utils/product-variants';
 
 import styles from './macarons.module.css';
+
+export const dynamic = 'force-dynamic';
 import ProductCardActions from '@/components/products/ProductCardActions';
 
 interface ProductImage {
