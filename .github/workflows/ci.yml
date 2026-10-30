@@ -129,6 +129,14 @@ jobs:
           cp e2e/.env.e2e.example e2e/.env.e2e
           sed -i 's#^DATABASE_URL=.*#DATABASE_URL="postgresql://brisee:ci-password@localhost:5432/brisee_bake_e2e"#' e2e/.env.e2e
 
+      - name: Prepare Prisma for E2E
+        run: |
+          set -a
+          . e2e/.env.e2e
+          set +a
+          npx prisma generate --schema backend/prisma/schema.prisma
+          npx prisma migrate deploy --schema backend/prisma/schema.prisma
+
       - name: Install Chromium
         run: npx --prefix e2e playwright install --with-deps chromium
 
