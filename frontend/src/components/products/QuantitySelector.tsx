@@ -61,7 +61,13 @@ export default function QuantitySelector({
   };
 
   const handleBlur = () => {
-    if (!isPositiveInteger(inputValue)) {
+    const parsed = Number(inputValue);
+
+    if (
+      !isPositiveInteger(inputValue) ||
+      !Number.isSafeInteger(parsed) ||
+      (max !== undefined && parsed > max)
+    ) {
       // Al perder el foco con un valor inválido, se restaura el último válido
       commitValue(value);
     }

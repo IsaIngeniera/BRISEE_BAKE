@@ -14,6 +14,8 @@ COPY frontend ./frontend
 WORKDIR /app
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
+ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID
 RUN npm run build --workspace=frontend
 
 FROM node:24.14.1-bookworm AS runtime
@@ -23,10 +25,10 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
-COPY --from=build /app/frontend/public ./public
+COPY --from=build /app/frontend/public ./frontend/public
 COPY --from=build /app/frontend/.next/standalone ./
-COPY --from=build /app/frontend/.next/static ./.next/static
+COPY --from=build /app/frontend/.next/static ./frontend/.next/static
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["node", "frontend/server.js"]

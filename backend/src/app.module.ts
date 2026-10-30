@@ -8,6 +8,8 @@ import { PedidosModule } from './pedidos/pedidos.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RateLimitGuard } from './common/guards/rate-limit.guard';
+import { PrismaService } from './prisma.service';
+import { ContactoModule } from './contacto/contacto.module';
 
 @Module({
   imports: [
@@ -16,10 +18,12 @@ import { RateLimitGuard } from './common/guards/rate-limit.guard';
     CarritoModule,
     PedidosModule,
     UsuariosModule,
+    ContactoModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
+    PrismaService,
     {
       provide: APP_GUARD,
       useClass: RateLimitGuard,

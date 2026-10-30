@@ -159,6 +159,28 @@ Los servicios estarán disponibles en:
 * Frontend: `http://localhost:3000`
 * Backend: `http://localhost:3001`
 
+### Requisitos para producción
+
+En producción, el backend valida al arrancar que estén configuradas las
+variables `DATABASE_URL`, `JWT_SECRET`, `FRONTEND_URL`, `CORS_ORIGINS`,
+`WOMPI_ENV`, `WOMPI_API_URL`, `WOMPI_PUBLIC_KEY`, `WOMPI_PRIVATE_KEY`,
+`WOMPI_INTEGRITY_SECRET`, `WOMPI_EVENTS_SECRET`, `RESEND_API_KEY` y
+`ADMIN_EMAIL`. Deben inyectarse desde el gestor de secretos del proveedor de
+despliegue; no deben escribirse en Git.
+
+El endpoint `/health/live` comprueba que el proceso está activo y
+`/health/ready` comprueba además la conexión con PostgreSQL. El despliegue debe
+usar `/health/ready` como readiness probe y ejecutar las migraciones con:
+
+```bash
+NODE_ENV=production npm run start:prod --workspace=backend
+```
+
+Wompi debe apuntar al endpoint público `POST /pedidos/webhook-wompi`. El
+webhook valida `WOMPI_EVENTS_SECRET`, el monto y la moneda antes de actualizar
+el pedido. El retorno del navegador se conserva únicamente como experiencia de
+usuario; la confirmación operativa debe provenir del webhook.
+
 ## Flujo de desarrollo
 
 Cada desarrollador trabaja en su propia rama personal:

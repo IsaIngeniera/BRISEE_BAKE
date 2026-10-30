@@ -14,12 +14,17 @@ export interface CartItem {
   precio: number | string;
   imagenUrl?: string;
   tematica?: string;
+  existencias?: number;
   cantidad: number;
 }
 
 interface CatalogProduct {
   id: string | number;
+  nombre: string;
+  precio: number | string;
   estado: 'ACTIVO' | 'INACTIVO';
+  existencias: number;
+  imagenes?: Array<{ urlImagen: string }>;
 }
 
 interface CartContextValue {
@@ -38,7 +43,7 @@ interface CartContextValue {
   clearCart: () => void;
   removedItems: string[];
   isHydrated: boolean;
-  refreshCart: () => Promise<void>;
+  refreshCart: () => Promise<CartItem[]>;
 }
 
 import { getSessionUser, AUTH_CHANGE_EVENT } from '../services/auth';
@@ -84,7 +89,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [loadError, setLoadError] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  const refreshCart = useCallback(async (): Promise<void> => {
+  const refreshCart = useCallback(async (): Promise<CartItem[]> => {
     try {
       const storedItems = readStoredCart();
 
@@ -92,7 +97,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setItems([]);
         setRemovedItems([]);
         setLoadError(false);
-        return;
+        return [];
       }
 
       const response = await fetch(`${API_URL}/products`, {
@@ -117,24 +122,48 @@ export function CartProvider({ children }: { children: ReactNode }) {
           .map((product) => String(product.id)),
       );
 
-      const availableItems = storedItems.filter((item) =>
-        activeIds.has(String(item.productId)),
+      const catalogById = new Map(
+        catalog.map((product) => [String(product.id), product]),
       );
+      const availableItems = storedItems
+        .filter((item) => activeIds.has(String(item.productId)))
+        .map((item) => {
+          const catalogProduct = catalogById.get(String(item.productId));
+          return {
+            ...item,
+            nombre: catalogProduct?.nombre ?? item.nombre,
+            precio: catalogProduct?.precio ?? item.precio,
+            imagenUrl:
+              catalogProduct?.imagenes?.[0]?.urlImagen ?? item.imagenUrl,
+            existencias: catalogProduct?.existencias,
+          };
+        })
+        .filter(
+          (item) =>
+            item.existencias === undefined || item.existencias > 0,
+        )
+        .map((item) => ({
+          ...item,
+          cantidad:
+            item.existencias === undefined
+              ? item.cantidad
+              : Math.min(Math.max(1, item.cantidad), item.existencias),
+        }));
 
       const removed = storedItems
         .filter((item) => !activeIds.has(String(item.productId)))
         .map((item) => item.nombre);
 
-      if (removed.length > 0) {
-        saveStoredCart(availableItems);
-      }
+      saveStoredCart(availableItems);
 
       setItems(availableItems);
       setRemovedItems(removed);
       setLoadError(false);
+      return availableItems;
     } catch (error) {
       console.error('Error al validar el carrito:', error);
       setLoadError(true);
+      return [];
     } finally {
       setIsHydrated(true);
     }
@@ -202,7 +231,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const updated = existingItem
         ? previous.map((item) =>
             String(item.productId) === String(product.productId)
-              ? { ...item, cantidad: item.cantidad + cantidad }
+              ? {
+                  ...item,
+                  cantidad: Math.min(
+                    item.cantidad + cantidad,
+                    item.existencias ?? Number.MAX_SAFE_INTEGER,
+                  ),
+                }
               : item,
           )
         : [...previous, { ...product, cantidad }];
@@ -230,7 +265,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems((previous) => {
       const updated = previous.map((item) =>
         String(item.productId) === String(productId)
-          ? { ...item, cantidad }
+          ? {
+              ...item,
+              cantidad: Math.min(
+                Math.max(1, cantidad),
+                item.existencias ?? Number.MAX_SAFE_INTEGER,
+              ),
+            }
           : item,
       );
 

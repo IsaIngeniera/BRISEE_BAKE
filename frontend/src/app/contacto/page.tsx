@@ -16,6 +16,8 @@ export default function ContactoPage() {
   });
 
   const [isSent, setIsSent] = useState(false);
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (
     field: keyof typeof formData,
@@ -24,14 +26,42 @@ export default function ContactoPage() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // TODO: conectar con el backend cuando exista el endpoint de contacto.
-    setIsSent(true);
-    setFormData({ nombre: '', email: '', mensaje: '' });
+    setError('');
+    setIsSent(false);
+    setIsSubmitting(true);
 
-    window.setTimeout(() => setIsSent(false), 4000);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/contacto`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        },
+      );
+      const data: { message?: string | string[] } = await response.json();
+
+      if (!response.ok) {
+        const message = Array.isArray(data.message)
+          ? data.message.join('. ')
+          : data.message;
+        throw new Error(message || 'No se pudo enviar el mensaje.');
+      }
+
+      setIsSent(true);
+      setFormData({ nombre: '', email: '', mensaje: '' });
+    } catch (caughtError) {
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : 'No se pudo enviar el mensaje.',
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -143,8 +173,9 @@ export default function ContactoPage() {
               <button
                 type="submit"
                 className={styles.submitButton}
+                disabled={isSubmitting}
               >
-                Enviar mensaje
+                {isSubmitting ? 'Enviando...' : 'Enviar mensaje'}
                 <ArrowRight aria-hidden="true" />
               </button>
 
@@ -153,7 +184,12 @@ export default function ContactoPage() {
                   className={styles.confirmationMessage}
                   role="status"
                 >
-                  ¡Gracias! Tu mensaje fue registrado.
+                  ¡Gracias! Tu mensaje fue registrado y enviado correctamente.
+                </p>
+              )}
+              {error && (
+                <p className={styles.confirmationMessage} role="alert">
+                  {error}
                 </p>
               )}
             </form>

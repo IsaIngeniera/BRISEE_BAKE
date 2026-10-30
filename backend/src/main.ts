@@ -6,7 +6,36 @@ import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { PrismaClientExceptionFilter } from './common/filters/prisma-client-exception.filter';
 
+function validateProductionEnvironment() {
+  if (process.env.NODE_ENV !== 'production') {
+    return;
+  }
+
+  const required = [
+    'DATABASE_URL',
+    'JWT_SECRET',
+    'FRONTEND_URL',
+    'CORS_ORIGINS',
+    'WOMPI_ENV',
+    'WOMPI_API_URL',
+    'WOMPI_PUBLIC_KEY',
+    'WOMPI_PRIVATE_KEY',
+    'WOMPI_INTEGRITY_SECRET',
+    'WOMPI_EVENTS_SECRET',
+    'RESEND_API_KEY',
+    'ADMIN_EMAIL',
+  ];
+  const missing = required.filter((name) => !process.env[name]?.trim());
+
+  if (missing.length > 0) {
+    throw new Error(
+      `Missing required production environment variables: ${missing.join(', ')}`,
+    );
+  }
+}
+
 async function bootstrap() {
+  validateProductionEnvironment();
   const app = await NestFactory.create(AppModule);
 
   const { httpAdapter } = app.get(HttpAdapterHost);

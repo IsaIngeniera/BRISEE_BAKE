@@ -19,6 +19,9 @@ type BackendOrder = {
   createdAt: string;
   fechaEsperada: string;
   tipoEntrega: 'ENVIO' | 'RETIRO';
+  pago?: {
+    estado: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO' | 'CANCELADO';
+  } | null;
   productos: Array<{
     cantidad: number;
     precioUnitario: number | string;
@@ -130,6 +133,9 @@ export default function CuentaPedidosPage() {
                       </strong>
                       <span className={styles.orderStatus}>
                         {order.estadoEntrega}
+                      </span>
+                      <span className={styles.orderStatus}>
+                        Pago: {order.pago?.estado ?? 'PENDIENTE'}
                       </span>
                     </div>
 

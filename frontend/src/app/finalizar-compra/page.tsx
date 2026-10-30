@@ -12,7 +12,6 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { getSessionUser, type SessionUser } from '@/services/auth';
-import { useCart } from '@/hooks/useCart';
 import {
   updateOrderStatus,
   type CustomerOrder,
@@ -24,7 +23,6 @@ import { Suspense } from 'react';
 
 function SuccessfulPaymentContent() {
   const searchParams = useSearchParams();
-  const { clearCart } = useCart();
   const wompiTransactionId = searchParams.get('id');
   const paymentError = searchParams.get('error');
   const [wompiStatus, setWompiStatus] = useState<string | null>(searchParams.get('status'));
@@ -69,12 +67,14 @@ function SuccessfulPaymentContent() {
             setWompiStatus(data.status);
             if (data.status === 'APPROVED') {
               setIsApproved(true);
-              clearCart();
               if (sessionUser && (data.reference || orderReference)) {
                 setOrder(updateOrderStatus(sessionUser.sub, data.reference || orderReference, 'PAGO EXITOSO'));
               }
             } else {
               setIsApproved(false);
+              if (sessionUser && (data.reference || orderReference)) {
+                setOrder(updateOrderStatus(sessionUser.sub, data.reference || orderReference, 'PAGO NO APROBADO'));
+              }
             }
           } else {
             console.error("Backend devolvió error:", await res.text());
@@ -93,7 +93,7 @@ function SuccessfulPaymentContent() {
     };
 
     verifyPayment();
-  }, [clearCart, orderReference, wompiTransactionId, wompiStatus]);
+  }, [orderReference, wompiTransactionId, wompiStatus]);
 
   if (user === undefined) {
     return (

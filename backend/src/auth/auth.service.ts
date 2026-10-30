@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   UnauthorizedException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma.service';
@@ -512,7 +513,12 @@ export class AuthService {
       }
     }
 
-    // 2. Fallback de desarrollo y testing local
+    if (process.env.NODE_ENV === 'production') {
+      throw new InternalServerErrorException(
+        'El servicio de correo no está disponible',
+      );
+    }
+
     console.log(
       `[AUTH RECOVERY] Enlace de recuperación para ${to}: ${resetLink}`,
     );

@@ -5,6 +5,8 @@ import {
   IsOptional,
   IsArray,
   ValidateNested,
+  IsInt,
+  Min,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { TipoEntrega } from '@prisma/client';
@@ -15,7 +17,8 @@ export class PedidoItemDto {
   @IsNotEmpty()
   idProducto: string;
 
-  @IsNotEmpty()
+  @IsInt()
+  @Min(1)
   cantidad: number;
 }
 

@@ -10,6 +10,7 @@ import {
   UnauthorizedException,
   Res,
   Query,
+  BadRequestException,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { PedidosService } from './pedidos.service';
@@ -77,6 +78,14 @@ export class PedidosController {
   @Get('verificar-pago/:transactionId')
   verificarPago(@Param('transactionId') transactionId: string) {
     return this.pedidosService.verificarPagoWompi(transactionId);
+  }
+
+  @Post('webhook-wompi')
+  async webhookWompi(@Body() payload: unknown) {
+    if (!payload || typeof payload !== 'object') {
+      throw new BadRequestException('Payload de Wompi inválido');
+    }
+    return this.pedidosService.processWompiWebhook(payload);
   }
 
   @Get('retorno-wompi')

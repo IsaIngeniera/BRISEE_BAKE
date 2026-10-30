@@ -93,6 +93,11 @@ export default function CuentaPage() {
 
     if (!user) return;
 
+    if (!/^\d+$/.test(draft.celular.trim())) {
+      setMessage('El número de teléfono solo puede contener números.');
+      return;
+    }
+
     const nextProfile: Profile = {
       nombre: draft.nombre.trim(),
       apellido: draft.apellido.trim(),
@@ -352,9 +357,11 @@ export default function CuentaPage() {
                         onChange={(event) =>
                           updateField(
                             'celular',
-                            event.target.value,
+                            event.target.value.replace(/\D/g, ''),
                           )
                         }
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         maxLength={20}
                         type="tel"
                         autoComplete="tel"
