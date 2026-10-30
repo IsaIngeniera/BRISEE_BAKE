@@ -131,9 +131,7 @@ jobs:
 
       - name: Prepare Prisma for E2E
         run: |
-          set -a
-          . e2e/.env.e2e
-          set +a
+          cp e2e/.env.e2e backend/.env
           npx prisma generate --schema backend/prisma/schema.prisma
           npx prisma migrate deploy --schema backend/prisma/schema.prisma
 
