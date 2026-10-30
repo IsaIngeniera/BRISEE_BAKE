@@ -7,6 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { getJwtSecret } from '../security/jwt-secret';
+import { PrismaService } from '../../prisma.service';
 
 interface AuthRequest extends Request {
   user?: Record<string, unknown>;
@@ -14,7 +15,10 @@ interface AuthRequest extends Request {
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private prisma: PrismaService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<AuthRequest>();
@@ -30,8 +34,27 @@ export class JwtAuthGuard implements CanActivate {
       >(token, {
         secret: getJwtSecret(),
       });
-      // Asignar el payload (información del usuario) al request para usarlo en otras partes
-      request.user = payload;
+      const userId = typeof payload.sub === 'string' ? payload.sub : undefined;
+      if (!userId) {
+        throw new UnauthorizedException('Token inválido');
+      }
+
+      const currentUser = await this.prisma.usuario.findUnique({
+        where: { id: userId },
+        select: { correo: true, rol: true, estado: true },
+      });
+
+      if (!currentUser || currentUser.estado !== 'ACTIVO') {
+        throw new UnauthorizedException(
+          'La sesión ya no está activa. Inicie sesión nuevamente',
+        );
+      }
+
+      request.user = {
+        ...payload,
+        correo: currentUser.correo,
+        rol: currentUser.rol,
+      };
     } catch {
       throw new UnauthorizedException('Token inválido o expirado');
     }

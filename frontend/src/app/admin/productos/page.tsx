@@ -24,7 +24,7 @@ async function getProducts(): Promise<Product[]> {
 
   const products: Product[] = await response.json();
 
-  return products.filter((product) => product.estado === 'ACTIVO');
+  return products;
 }
 
 export default async function AdminProductsPage(): Promise<ReactElement> {

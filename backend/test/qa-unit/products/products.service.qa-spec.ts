@@ -7,7 +7,7 @@
  * - Listado con filtros (búsqueda y etiquetas)
  * - Búsqueda por ID
  * - Actualización
- * - Eliminación (soft delete)
+ * - Eliminación definitiva con protección del historial de pedidos
  */
 
 import { Test, TestingModule } from '@nestjs/testing';
@@ -19,11 +19,19 @@ import { EstadoProducto, EtiquetaDietetica } from '@prisma/client';
 describe('ProductsService [QA]', () => {
   let service: ProductsService;
   let prismaService: {
+    $transaction: jest.Mock;
     producto: {
       findMany: jest.Mock;
       findUnique: jest.Mock;
       create: jest.Mock;
       update: jest.Mock;
+      delete: jest.Mock;
+    };
+    itemCarrito: {
+      deleteMany: jest.Mock;
+    };
+    imagenProducto: {
+      deleteMany: jest.Mock;
     };
   };
 
@@ -45,11 +53,19 @@ describe('ProductsService [QA]', () => {
 
   beforeEach(async () => {
     prismaService = {
+      $transaction: jest.fn(),
       producto: {
         findMany: jest.fn(),
         findUnique: jest.fn(),
         create: jest.fn(),
         update: jest.fn(),
+        delete: jest.fn(),
+      },
+      itemCarrito: {
+        deleteMany: jest.fn(),
+      },
+      imagenProducto: {
+        deleteMany: jest.fn(),
       },
     };
 
@@ -448,12 +464,16 @@ describe('ProductsService [QA]', () => {
   // REMOVE (SOFT DELETE)
   // ============================================================
   describe('remove', () => {
-    it('debe hacer soft delete del producto (estado INACTIVO)', async () => {
+    it('debe eliminar el producto y sus referencias del carrito e imágenes', async () => {
       prismaService.producto.findUnique.mockResolvedValue(mockProduct);
-      prismaService.producto.update.mockResolvedValue({
-        ...mockProduct,
-        estado: EstadoProducto.INACTIVO,
-      });
+      prismaService.$transaction.mockImplementation(async (callback) =>
+        callback({
+          itemCarrito: prismaService.itemCarrito,
+          imagenProducto: prismaService.imagenProducto,
+          producto: prismaService.producto,
+        }),
+      );
+      prismaService.producto.delete.mockResolvedValue(mockProduct);
 
       const result = await service.remove('prod-123');
 
@@ -461,33 +481,28 @@ describe('ProductsService [QA]', () => {
         'message',
         'Producto eliminado correctamente',
       );
-      expect(prismaService.producto.update).toHaveBeenCalledWith({
-        where: { id: 'prod-123' },
-        data: { estado: 'INACTIVO' },
+      expect(prismaService.itemCarrito.deleteMany).toHaveBeenCalledWith({
+        where: { idProducto: 'prod-123' },
       });
-    });
-
-    it('no debe hacer hard delete (siempre soft delete)', async () => {
-      prismaService.producto.findUnique.mockResolvedValue(mockProduct);
-      prismaService.producto.update.mockResolvedValue(mockProduct);
-
-      await service.remove('prod-123');
-
-      // Solo se llama a update, nunca a delete (soft delete)
-      expect(prismaService.producto.update).toHaveBeenCalled();
+      expect(prismaService.imagenProducto.deleteMany).toHaveBeenCalledWith({
+        where: { idProducto: 'prod-123' },
+      });
+      expect(prismaService.producto.delete).toHaveBeenCalledWith({
+        where: { id: 'prod-123' },
+      });
     });
 
     it('debe retornar error si el producto no existe', async () => {
       prismaService.producto.findUnique.mockResolvedValue(null);
 
       await expect(service.remove('no-existe')).rejects.toThrow(
-        BadRequestException,
+        NotFoundException,
       );
     });
 
     it('debe manejar errores de BD', async () => {
       prismaService.producto.findUnique.mockResolvedValue(mockProduct);
-      prismaService.producto.update.mockRejectedValue(new Error('DB Error'));
+      prismaService.$transaction.mockRejectedValue(new Error('DB Error'));
 
       await expect(service.remove('prod-123')).rejects.toThrow(
         BadRequestException,

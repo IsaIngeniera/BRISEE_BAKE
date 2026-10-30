@@ -102,6 +102,25 @@ export class AuthService {
     };
   }
 
+  async getSession(userId: string) {
+    const user = await this.prisma.usuario.findUnique({
+      where: { id: userId },
+      select: { id: true, correo: true, rol: true, estado: true },
+    });
+
+    if (!user || user.estado !== EstadoUsuario.ACTIVO) {
+      throw new UnauthorizedException(
+        'La sesión ya no está activa. Inicie sesión nuevamente',
+      );
+    }
+
+    return {
+      sub: user.id,
+      correo: user.correo,
+      rol: user.rol,
+    };
+  }
+
   async loginMockAdmin() {
     if (process.env.NODE_ENV !== 'test') {
       throw new UnauthorizedException();

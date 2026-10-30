@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { AUTH_TOKEN_KEY } from '@/services/auth';
 import styles from './delete-product.module.css';
 
 interface DeleteProductButtonProps {
@@ -41,25 +42,57 @@ export default function DeleteProductButton({
     try {
       const apiUrl =
         process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      const token =
+        sessionStorage.getItem(AUTH_TOKEN_KEY) ||
+        localStorage.getItem(AUTH_TOKEN_KEY);
 
       const response = await fetch(`${apiUrl}/products/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       });
 
       if (!response.ok) {
-        throw new Error('Error al eliminar el producto');
+        let errorMessage = 'Error al eliminar el producto';
+
+        try {
+          const errorBody: unknown = await response.json();
+          if (
+            typeof errorBody === 'object' &&
+            errorBody !== null &&
+            'message' in errorBody
+          ) {
+            const message = (errorBody as { message?: unknown }).message;
+            if (typeof message === 'string') {
+              errorMessage = message;
+            } else if (
+              Array.isArray(message) &&
+              message.every(
+                (item): item is string => typeof item === 'string',
+              )
+            ) {
+              errorMessage = message.join(', ');
+            }
+          }
+        } catch {
+          // Conserva el mensaje predeterminado si no hay un cuerpo JSON.
+        }
+
+        throw new Error(errorMessage);
       }
 
       setIsModalOpen(false);
       showToast(`Producto '${nombre}' eliminado correctamente`);
       router.refresh();
     } catch (error) {
-      console.error(error);
-      alert('Hubo un problema al intentar eliminar el producto.');
+      console.error('Error al eliminar el producto:', error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : 'Hubo un problema al intentar eliminar el producto.',
+      );
     } finally {
       setIsDeleting(false);
     }

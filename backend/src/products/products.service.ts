@@ -239,21 +239,41 @@ export class ProductsService {
       });
 
       if (!existingProduct) {
-        throw new BadRequestException('Producto no encontrado');
+        throw new NotFoundException('Producto no encontrado');
       }
 
-      const deletedProduct = await this.prisma.producto.update({
-        where: { id },
-        data: {
-          estado: 'INACTIVO',
-        },
+      const deletedProduct = await this.prisma.$transaction(async (tx) => {
+        await tx.itemCarrito.deleteMany({
+          where: { idProducto: id },
+        });
+        await tx.imagenProducto.deleteMany({
+          where: { idProducto: id },
+        });
+
+        return tx.producto.delete({
+          where: { id },
+        });
       });
 
       return {
         message: 'Producto eliminado correctamente',
         product: deletedProduct,
       };
-    } catch {
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2003'
+      ) {
+        throw new BadRequestException(
+          'No se puede eliminar este producto porque pertenece a uno o más pedidos. Cámbielo a INACTIVO para ocultarlo del catálogo.',
+        );
+      }
+
+      console.error(`Error al eliminar el producto ${id}:`, error);
       throw new BadRequestException(
         'Error al eliminar el producto. Intente nuevamente.',
       );

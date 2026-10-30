@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Get,
   Body,
   Patch,
   UseGuards,
@@ -52,6 +53,18 @@ export class AuthController {
   })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Get('session')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Validar la sesión y el rol actuales' })
+  getSession(@Req() req: Request & { user?: { sub: string } }) {
+    const userId = req.user?.sub;
+    if (!userId) {
+      throw new UnauthorizedException('Usuario no válido');
+    }
+    return this.authService.getSession(userId);
   }
 
   @Post('login-admin')

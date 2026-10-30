@@ -13,6 +13,7 @@ import { ProductsService } from '../../../src/products/products.service';
 import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
 import { EstadoProducto } from '@prisma/client';
+import { PrismaService } from '../../../src/prisma.service';
 
 describe('ProductsController [QA]', () => {
   let controller: ProductsController;
@@ -39,6 +40,7 @@ describe('ProductsController [QA]', () => {
         { provide: ProductsService, useValue: productsService },
         JwtService,
         Reflector,
+        { provide: PrismaService, useValue: {} },
       ],
     }).compile();
 

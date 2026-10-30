@@ -118,6 +118,34 @@ export function clearSession(): void {
   if (authChannel) authChannel.postMessage('auth_changed');
 }
 
+export async function validateSession(): Promise<SessionUser | null> {
+  if (typeof window === 'undefined') return null;
+
+  const token =
+    sessionStorage.getItem(AUTH_TOKEN_KEY) ||
+    localStorage.getItem(AUTH_TOKEN_KEY);
+  if (!token) return null;
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  const response = await fetch(`${apiUrl}/auth/session`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    clearSession();
+    return null;
+  }
+
+  const user: SessionUser = await response.json();
+  if (user.rol !== 'ADMIN' && user.rol !== 'CLIENTE') {
+    clearSession();
+    return null;
+  }
+
+  return user;
+}
+
 export async function requestPasswordReset(correo: string): Promise<string> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
   const response = await fetch(`${apiUrl}/auth/forgot-password`, {
