@@ -82,7 +82,9 @@ jobs:
           DATABASE_URL: "******localhost:5432/dummy"
 
       - name: Prepare integration test environment
-        run: cp backend/.env.test.example backend/.env.test
+        run: |
+          cp backend/.env.test.example backend/.env.test
+          sed -i 's#^DATABASE_URL=.*#DATABASE_URL="postgresql://brisee:ci-password@localhost:5432/brisee_bake_test"#' backend/.env.test
 
       - name: Integration tests
         run: npm run test:integration --workspace=backend
@@ -123,7 +125,9 @@ jobs:
         run: npm ci --prefix e2e
 
       - name: Prepare E2E environment
-        run: cp e2e/.env.e2e.example e2e/.env.e2e
+        run: |
+          cp e2e/.env.e2e.example e2e/.env.e2e
+          sed -i 's#^DATABASE_URL=.*#DATABASE_URL="postgresql://brisee:ci-password@localhost:5432/brisee_bake_e2e"#' e2e/.env.e2e
 
       - name: Install Chromium
         run: npx --prefix e2e playwright install --with-deps chromium
