@@ -2,15 +2,15 @@
 
 :root {
   /* Títulos principales H1 – Baskerville Display PT con respaldo en Libre Baskerville */
-  --font-title: 'Baskerville Display PT', 'Libre Baskerville', 'Baskerville Old Face', Baskerville,
+  --font-title: 'Baskerville Display PT', var(--gf-baskerville), 'Libre Baskerville', 'Baskerville Old Face', Baskerville,
     'Book Antiqua', 'Times New Roman', Georgia, serif;
 
   /* Subtítulos H2, H3 – Antique Olive con respaldo en Chivo */
-  --font-subtitle: 'Antique Olive', 'Chivo', 'Gill Sans', 'Gill Sans MT', Optima,
+  --font-subtitle: 'Antique Olive', var(--gf-chivo), 'Chivo', 'Gill Sans', 'Gill Sans MT', Optima,
     Verdana, Geneva, sans-serif;
 
   /* Cuerpo / descripciones – Canva Sans con respaldo en Plus Jakarta Sans e Inter */
-  --font-body: 'Canva Sans', 'Plus Jakarta Sans', 'Inter', 'Helvetica Neue',
+  --font-body: 'Canva Sans', var(--gf-jakarta), 'Plus Jakarta Sans', 'Inter', 'Helvetica Neue',
     Arial, Helvetica, sans-serif;
 
   --font-display: var(--font-title);
