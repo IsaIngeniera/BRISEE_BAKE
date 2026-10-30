@@ -139,7 +139,18 @@ Luego aplicar las migraciones de la base de datos:
 
 ```bash
 cd backend
-npx prisma migrate deploy
+npx prisma generate --config prisma.config.ts
+npx prisma migrate deploy --config prisma.config.ts
+```
+
+`prisma.config.ts` carga `DATABASE_URL` desde el `.env` de la raíz del
+repositorio. Para ejecutar una migración sin archivo `.env`, se puede pasar la
+variable explícitamente:
+
+```bash
+cd ..
+DATABASE_URL="postgresql://usuario:contraseña@localhost:5432/brisee_bake" \
+  npx prisma migrate deploy --config backend/prisma.config.ts
 ```
 
 Iniciar el backend:
@@ -180,6 +191,22 @@ Wompi debe apuntar al endpoint público `POST /pedidos/webhook-wompi`. El
 webhook valida `WOMPI_EVENTS_SECRET`, el monto y la moneda antes de actualizar
 el pedido. El retorno del navegador se conserva únicamente como experiencia de
 usuario; la confirmación operativa debe provenir del webhook.
+
+## Pruebas automatizadas
+
+Desde la raíz del repositorio:
+
+```bash
+npm test --workspace=frontend
+npm run test --workspace=backend
+npm run test:integration --workspace=backend
+npm test --prefix e2e
+```
+
+Las pruebas de integración y E2E requieren PostgreSQL. El workflow de
+GitHub Actions crea una base efímera, genera Prisma Client, aplica las
+migraciones y luego ejecuta Playwright. No se deben usar credenciales reales
+en los archivos de entorno de pruebas ni en el repositorio.
 
 ## Flujo de desarrollo
 

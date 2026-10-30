@@ -131,8 +131,8 @@ jobs:
 
       - name: Prepare Prisma for E2E
         run: |
-          npx prisma generate --schema backend/prisma/schema.prisma
-          npx prisma migrate deploy --schema backend/prisma/schema.prisma
+          npx prisma generate --config backend/prisma.config.ts
+          npx prisma migrate deploy --config backend/prisma.config.ts
         env:
           DATABASE_URL: postgresql://brisee:ci-password@localhost:5432/brisee_bake_e2e
 
