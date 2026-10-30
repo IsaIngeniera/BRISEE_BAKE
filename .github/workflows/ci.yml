@@ -131,9 +131,10 @@ jobs:
 
       - name: Prepare Prisma for E2E
         run: |
-          cp e2e/.env.e2e .env
           npx prisma generate --schema backend/prisma/schema.prisma
           npx prisma migrate deploy --schema backend/prisma/schema.prisma
+        env:
+          DATABASE_URL: postgresql://brisee:ci-password@localhost:5432/brisee_bake_e2e
 
       - name: Install Chromium
         run: npx --prefix e2e playwright install --with-deps chromium
