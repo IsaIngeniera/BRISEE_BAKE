@@ -123,7 +123,10 @@ export class PedidosService {
         'Wompi no está configurado. Define WOMPI_PUBLIC_KEY con una clave pub_test_* para pruebas.',
       );
     }
-    const integritySecret = process.env.WOMPI_INTEGRITY_SECRET?.trim();
+    const integritySecret = process.env.WOMPI_INTEGRITY_SECRET?.replace(
+      /['"]/g,
+      '',
+    ).trim();
     if (process.env.NODE_ENV === 'production' && !integritySecret) {
       throw new Error(
         'WOMPI_INTEGRITY_SECRET must be configured in production',
@@ -288,9 +291,9 @@ export class PedidosService {
   async verificarPagoWompi(transactionId: string) {
     try {
       const isProd =
-        process.env.WOMPI_PUBLIC_KEY?.startsWith('pub_prod_') ||
-        process.env.WOMPI_ENV === 'production' ||
-        process.env.NODE_ENV === 'production';
+        process.env.WOMPI_PUBLIC_KEY?.replace(/['"]/g, '').startsWith(
+          'pub_prod_',
+        ) || process.env.WOMPI_ENV === 'production';
 
       const defaultApiUrl = isProd
         ? 'https://production.wompi.co/v1'
@@ -298,9 +301,13 @@ export class PedidosService {
 
       const wompiApiUrl = process.env.WOMPI_API_URL || defaultApiUrl;
 
+      const rawPrivateKey = process.env.WOMPI_PRIVATE_KEY?.replace(
+        /['"]/g,
+        '',
+      ).trim();
       const headers: Record<string, string> = {};
-      if (process.env.WOMPI_PRIVATE_KEY) {
-        headers['Authorization'] = `Bearer ${process.env.WOMPI_PRIVATE_KEY}`;
+      if (rawPrivateKey) {
+        headers['Authorization'] = `Bearer ${rawPrivateKey}`;
       }
 
       const response =
@@ -377,7 +384,7 @@ export class PedidosService {
         if (expectedChecksum !== data.data.signature.checksum) {
           throw new Error('La firma de la transacción no es válida');
         }
-      } else if (process.env.NODE_ENV === 'production') {
+      } else if (isProd) {
         throw new Error('La transacción no incluye una firma válida');
       }
 
