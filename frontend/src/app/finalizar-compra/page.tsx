@@ -1,34 +1,36 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
+import Link from "next/link";
 import {
   CheckCircle2,
   ShoppingBag,
   ShoppingCart,
   XCircle,
   MessageCircle,
-} from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+} from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-import { getSessionUser, type SessionUser } from '@/services/auth';
-import {
-  updateOrderStatus,
-  type CustomerOrder,
-} from '@/utils/order-history';
+import { getSessionUser, type SessionUser } from "@/services/auth";
+import { updateOrderStatus, type CustomerOrder } from "@/utils/order-history";
 
-import styles from './finalizar-compra.module.css';
+import styles from "./finalizar-compra.module.css";
 
-import { Suspense } from 'react';
+import { Suspense } from "react";
 
 function SuccessfulPaymentContent() {
   const searchParams = useSearchParams();
-  const wompiTransactionId = searchParams.get('id');
-  const paymentError = searchParams.get('error');
-  const [wompiStatus, setWompiStatus] = useState<string | null>(searchParams.get('status'));
-  const orderReference = searchParams.get('reference');
-  
-  const hasPaymentResult = Boolean(wompiStatus) || paymentError !== null || Boolean(wompiTransactionId);
+  const wompiTransactionId = searchParams.get("id");
+  const paymentError = searchParams.get("error");
+  const [wompiStatus, setWompiStatus] = useState<string | null>(
+    searchParams.get("status"),
+  );
+  const orderReference = searchParams.get("reference");
+
+  const hasPaymentResult =
+    Boolean(wompiStatus) ||
+    paymentError !== null ||
+    Boolean(wompiTransactionId);
   const [user, setUser] = useState<SessionUser | null | undefined>(undefined);
   const [isApproved, setIsApproved] = useState<boolean | null>(null);
   const [order, setOrder] = useState<CustomerOrder | null>(null);
@@ -37,21 +39,33 @@ function SuccessfulPaymentContent() {
     if (!order) return;
     const userName = (() => {
       try {
-        if (!user) return '';
-        const saved = JSON.parse(localStorage.getItem(`brisee_profile_${user.sub}`) || '{}');
-        const nombre = typeof saved.nombre === 'string' ? saved.nombre.trim() : '';
-        const apellido = typeof saved.apellido === 'string' ? saved.apellido.trim() : '';
-        return [nombre, apellido].filter(Boolean).join(' ');
+        if (!user) return "";
+        const saved = JSON.parse(
+          localStorage.getItem(`brisee_profile_${user.sub}`) || "{}",
+        );
+        const nombre =
+          typeof saved.nombre === "string" ? saved.nombre.trim() : "";
+        const apellido =
+          typeof saved.apellido === "string" ? saved.apellido.trim() : "";
+        return [nombre, apellido].filter(Boolean).join(" ");
       } catch {
-        return '';
+        return "";
       }
     })();
-    const products = order.items.map((item) => `• ${item.nombre} × ${item.cantidad}`).join('\n');
-    const totalFormat = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(order.total);
-    const message = `¡Hola, Brisée Bake!\n${userName ? `Soy ${userName} y acabo de realizar un pedido.` : 'Acabo de realizar un pedido.'}\nMi número de pedido es #${order.number}.\n\nEstos son los productos que elegí:\n${products}\n\nTotal del pedido: ${totalFormat}\n\n¿Podemos coordinar los detalles de la entrega? ¡Muchas gracias!`;
-    window.open(`https://wa.me/573003685556?text=${encodeURIComponent(message)}`, '_blank');
+    const products = order.items
+      .map((item) => `• ${item.nombre} × ${item.cantidad}`)
+      .join("\n");
+    const totalFormat = new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
+      maximumFractionDigits: 0,
+    }).format(order.total);
+    const message = `¡Hola, Brisée Bake!\n${userName ? `Soy ${userName} y acabo de realizar un pedido.` : "Acabo de realizar un pedido."}\nMi número de pedido es #${order.number}.\n\nEstos son los productos que elegí:\n${products}\n\nTotal del pedido: ${totalFormat}\n\n¿Podemos coordinar los detalles de la entrega? ¡Muchas gracias!`;
+    window.open(
+      `https://wa.me/573003685556?text=${encodeURIComponent(message)}`,
+      "_blank",
+    );
   }
-
 
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
@@ -63,7 +77,7 @@ function SuccessfulPaymentContent() {
       let effectiveReference = orderReference;
       let effectiveStatus = wompiStatus;
 
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         const fullHref = window.location.href;
         if (!effectiveTransactionId) {
           const matchId = fullHref.match(/[?&]id=([^&#]+)/);
@@ -71,8 +85,8 @@ function SuccessfulPaymentContent() {
             effectiveTransactionId = decodeURIComponent(matchId[1]);
           }
         }
-        if (effectiveReference && effectiveReference.includes('?')) {
-          effectiveReference = effectiveReference.split('?')[0];
+        if (effectiveReference && effectiveReference.includes("?")) {
+          effectiveReference = effectiveReference.split("?")[0];
         }
         if (!effectiveStatus) {
           const matchStatus = fullHref.match(/[?&]status=([^&#]+)/);
@@ -84,40 +98,66 @@ function SuccessfulPaymentContent() {
 
       if (effectiveTransactionId) {
         try {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/pedidos/verificar-pago/${effectiveTransactionId}`);
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/pedidos/verificar-pago/${effectiveTransactionId}`,
+          );
           if (res.ok) {
             const data = await res.json();
             setWompiStatus(data.status);
-            if (data.status === 'APPROVED') {
+            if (data.status === "APPROVED") {
               setIsApproved(true);
               if (sessionUser && (data.reference || effectiveReference)) {
-                setOrder(updateOrderStatus(sessionUser.sub, data.reference || effectiveReference, 'PAGO EXITOSO'));
+                setOrder(
+                  updateOrderStatus(
+                    sessionUser.sub,
+                    data.reference || effectiveReference,
+                    "PAGO EXITOSO",
+                  ),
+                );
               }
               return;
             } else {
               setIsApproved(false);
               if (sessionUser && (data.reference || effectiveReference)) {
-                setOrder(updateOrderStatus(sessionUser.sub, data.reference || effectiveReference, 'PAGO NO APROBADO'));
+                setOrder(
+                  updateOrderStatus(
+                    sessionUser.sub,
+                    data.reference || effectiveReference,
+                    "PAGO NO APROBADO",
+                  ),
+                );
               }
               return;
             }
           } else {
-            console.error('Backend devolvio error:', await res.text());
+            console.error("Backend devolvio error:", await res.text());
           }
         } catch (err) {
-          console.error('Error verificando pago:', err);
+          console.error("Error verificando pago:", err);
         }
       }
 
-      if (effectiveStatus === 'APPROVED') {
+      if (effectiveStatus === "APPROVED") {
         setIsApproved(true);
         if (sessionUser && effectiveReference) {
-          setOrder(updateOrderStatus(sessionUser.sub, effectiveReference, 'PAGO EXITOSO'));
+          setOrder(
+            updateOrderStatus(
+              sessionUser.sub,
+              effectiveReference,
+              "PAGO EXITOSO",
+            ),
+          );
         }
       } else {
         setIsApproved(false);
         if (sessionUser && effectiveReference) {
-          setOrder(updateOrderStatus(sessionUser.sub, effectiveReference, 'PAGO NO APROBADO'));
+          setOrder(
+            updateOrderStatus(
+              sessionUser.sub,
+              effectiveReference,
+              "PAGO NO APROBADO",
+            ),
+          );
         }
       }
     };
@@ -148,8 +188,8 @@ function SuccessfulPaymentContent() {
           <p className={styles.eyebrow}>BRISÉE BAKE</p>
           <h1>Pago no procesado</h1>
           <p>
-            No fue posible procesar tu pago, o faltan datos en la URL. Tus productos siguen
-            reservados en el carrito para que puedas intentarlo
+            No fue posible procesar tu pago, o faltan datos en la URL. Tus
+            productos siguen reservados en el carrito para que puedas intentarlo
             nuevamente.
           </p>
 
@@ -182,9 +222,7 @@ function SuccessfulPaymentContent() {
       <main className={styles.page}>
         <section className={styles.card}>
           <h1>Pago recibido</h1>
-          <p>
-            Inicia sesión para consultar el resumen de tu pedido.
-          </p>
+          <p>Inicia sesión para consultar el resumen de tu pedido.</p>
           <Link href="/login" className={styles.primaryLink}>
             Iniciar sesión
           </Link>
@@ -204,24 +242,31 @@ function SuccessfulPaymentContent() {
         />
         <p className={styles.eyebrow}>BRISÉE BAKE</p>
         <h1>¡Pago exitoso!</h1>
-        <p>
-          Recibimos correctamente tu pago y tu orden fue registrada.
-        </p>
+        <p>Recibimos correctamente tu pago y tu orden fue registrada.</p>
 
         {order && (
           <>
             <div className={styles.orderSummary}>
               <strong>Orden #{order.number}</strong>
-              <ul style={{ listStyle: 'none', padding: 0, margin: '1rem 0' }}>
+              <ul style={{ listStyle: "none", padding: 0, margin: "1rem 0" }}>
                 {order.items?.map((item) => (
-                  <li key={item.productId} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                    <span>{item.cantidad}x {item.nombre}</span>
+                  <li
+                    key={item.productId}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginBottom: "0.5rem",
+                    }}
+                  >
+                    <span>
+                      {item.cantidad}x {item.nombre}
+                    </span>
                   </li>
                 ))}
               </ul>
               <span>
-                Total: COP ${' '}
-                {order.total.toLocaleString('es-CO', {
+                Total: COP ${" "}
+                {order.total.toLocaleString("es-CO", {
                   maximumFractionDigits: 0,
                 })}
               </span>
@@ -231,13 +276,16 @@ function SuccessfulPaymentContent() {
               type="button"
               className={styles.whatsappButton}
               onClick={openWhatsApp}
-              style={{ marginBottom: '1rem' }}
+              style={{ marginBottom: "1rem" }}
             >
               <MessageCircle aria-hidden="true" />
               Continuar por WhatsApp
             </button>
 
-            <p className={styles.confirmationNote} style={{ marginBottom: '1.5rem' }}>
+            <p
+              className={styles.confirmationNote}
+              style={{ marginBottom: "1.5rem" }}
+            >
               Podrás revisar el mensaje antes de enviarlo.
             </p>
           </>
@@ -259,13 +307,15 @@ function SuccessfulPaymentContent() {
 
 export default function SuccessfulPaymentPage() {
   return (
-    <Suspense fallback={
-      <main className={styles.page}>
-        <p className={styles.loading} role="status">
-          Cargando...
-        </p>
-      </main>
-    }>
+    <Suspense
+      fallback={
+        <main className={styles.page}>
+          <p className={styles.loading} role="status">
+            Cargando...
+          </p>
+        </main>
+      }
+    >
       <SuccessfulPaymentContent />
     </Suspense>
   );
