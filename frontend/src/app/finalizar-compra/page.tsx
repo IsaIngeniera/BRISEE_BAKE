@@ -12,7 +12,6 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { getSessionUser, type SessionUser } from "@/services/auth";
-import { useCart } from "@/hooks/useCart";
 import { updateOrderStatus, type CustomerOrder } from "@/utils/order-history";
 
 import styles from "./finalizar-compra.module.css";
@@ -20,7 +19,6 @@ import styles from "./finalizar-compra.module.css";
 import { Suspense } from "react";
 
 function SuccessfulPaymentContent() {
-  const { clearCart } = useCart();
   const searchParams = useSearchParams();
   const wompiTransactionId = searchParams.get("id");
   const paymentError = searchParams.get("error");
@@ -108,13 +106,6 @@ function SuccessfulPaymentContent() {
             setWompiStatus(data.status);
             if (data.status === "APPROVED") {
               setIsApproved(true);
-              clearCart();
-              if (typeof window !== "undefined") {
-                const u = getSessionUser();
-                localStorage.removeItem(
-                  u ? `brisee_cart_${u.sub}` : "brisee_cart_guest",
-                );
-              }
               if (sessionUser && (data.reference || effectiveReference)) {
                 setOrder(
                   updateOrderStatus(
@@ -148,13 +139,6 @@ function SuccessfulPaymentContent() {
 
       if (effectiveStatus === "APPROVED") {
         setIsApproved(true);
-        clearCart();
-        if (typeof window !== "undefined") {
-          const u = getSessionUser();
-          localStorage.removeItem(
-            u ? `brisee_cart_${u.sub}` : "brisee_cart_guest",
-          );
-        }
         if (sessionUser && effectiveReference) {
           setOrder(
             updateOrderStatus(
@@ -179,7 +163,7 @@ function SuccessfulPaymentContent() {
     };
 
     verifyPayment();
-  }, [orderReference, wompiTransactionId, wompiStatus, clearCart]);
+  }, [orderReference, wompiTransactionId, wompiStatus]);
 
   if (user === undefined) {
     return (
