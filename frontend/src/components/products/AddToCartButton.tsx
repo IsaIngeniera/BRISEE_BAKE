@@ -24,6 +24,7 @@ export default function AddToCartButton({
   imagenUrl,
   tematica,
   quantity = 1,
+  maxQuantity,
   disabled = false,
   disabledLabel = 'Agotado',
 }: AddToCartButtonProps) {
@@ -35,7 +36,10 @@ export default function AddToCartButton({
       return;
     }
 
-    addToCart({ productId, nombre, precio, imagenUrl, tematica }, quantity);
+    addToCart(
+      { productId, nombre, precio, imagenUrl, tematica, existencias: maxQuantity },
+      Math.min(quantity, maxQuantity ?? quantity),
+    );
 
     setConfirmationVisible(true);
     window.setTimeout(() => setConfirmationVisible(false), 2500);

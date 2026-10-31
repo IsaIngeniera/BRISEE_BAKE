@@ -315,6 +315,12 @@ export default function EditProductForm({
     setIsSaving(true);
 
     try {
+      const token =
+        typeof window !== 'undefined'
+          ? localStorage.getItem('brisee_access_token') ||
+            sessionStorage.getItem('brisee_access_token')
+          : null;
+
       const payload = {
         ...formData,
         precio: Number.parseFloat(formData.precio),
@@ -326,6 +332,7 @@ export default function EditProductForm({
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify(payload),
       });

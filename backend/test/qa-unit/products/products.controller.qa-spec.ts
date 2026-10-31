@@ -10,7 +10,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductsController } from '../../../src/products/products.controller';
 import { ProductsService } from '../../../src/products/products.service';
+import { JwtService } from '@nestjs/jwt';
+import { Reflector } from '@nestjs/core';
 import { EstadoProducto } from '@prisma/client';
+import { PrismaService } from '../../../src/prisma.service';
 
 describe('ProductsController [QA]', () => {
   let controller: ProductsController;
@@ -33,7 +36,12 @@ describe('ProductsController [QA]', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ProductsController],
-      providers: [{ provide: ProductsService, useValue: productsService }],
+      providers: [
+        { provide: ProductsService, useValue: productsService },
+        JwtService,
+        Reflector,
+        { provide: PrismaService, useValue: {} },
+      ],
     }).compile();
 
     controller = module.get<ProductsController>(ProductsController);

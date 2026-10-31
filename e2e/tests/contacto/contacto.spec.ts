@@ -74,6 +74,15 @@ test.describe('HU-27 Página de contacto [E2E]', () => {
   test('happy path: enviar un mensaje válido muestra confirmación', async ({
     page,
   }) => {
+    await page.route('**:3011/contacto', async (route) => {
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          message: 'Mensaje enviado correctamente.',
+        }),
+      });
+    });
     await page.goto('/contacto');
 
     const main = page.locator('main').first();

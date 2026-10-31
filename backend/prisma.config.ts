@@ -2,7 +2,7 @@ import { config } from "dotenv";
 import * as path from "path";
 config({ path: path.resolve(__dirname, "../.env") });
 
-import { defineConfig } from "prisma/config";
+import { defineConfig, env } from "prisma/config";
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -11,6 +11,6 @@ export default defineConfig({
     seed: "npx ts-node prisma/seed.ts",
   },
   datasource: {
-    url: process.env.DATABASE_URL as string,
+    url: env("DATABASE_URL"),
   },
 });

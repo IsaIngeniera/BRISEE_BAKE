@@ -2,6 +2,8 @@ import CookieCategoryPage from '@/components/products/CookieCategoryPage';
 
 import styles from './cookies-congeladas.module.css';
 
+export const dynamic = 'force-dynamic';
+
 export default function CookiesCongeladasPage() {
   return (
     <CookieCategoryPage

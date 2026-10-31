@@ -10,6 +10,7 @@ import {
   UnauthorizedException,
   Res,
   Query,
+  BadRequestException,
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { PedidosService } from './pedidos.service';
@@ -79,15 +80,23 @@ export class PedidosController {
     return this.pedidosService.verificarPagoWompi(transactionId);
   }
 
+  @Post('webhook-wompi')
+  async webhookWompi(@Body() payload: unknown) {
+    if (!payload || typeof payload !== 'object') {
+      throw new BadRequestException('Payload de Wompi inválido');
+    }
+    return this.pedidosService.processWompiWebhook(payload);
+  }
+
   @Get('retorno-wompi')
   async retornoWompi(
     @Query('id') id: string,
     @Query('reference') reference: string,
-    @Query('frontendUrl') frontendUrl: string,
+    @Query('frontendUrl') _frontendUrl: string,
     @Res() res: Response,
   ) {
     const defaultFrontend = 'http://127.0.0.1:3000';
-    const base = frontendUrl || defaultFrontend;
+    const base = process.env.FRONTEND_URL || defaultFrontend;
 
     if (!id) {
       return res.redirect(`${base}/carrito?error=pago_rechazado`);

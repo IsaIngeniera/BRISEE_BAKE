@@ -12,6 +12,10 @@ import styles from './cart-item-row.module.css';
 interface CartItemRowProps {
   item: CartItem;
   onQuantityChange: (productId: CartItem['productId'], value: number) => void;
+  onQuantityValidityChange: (
+    productId: CartItem['productId'],
+    isValid: boolean,
+  ) => void;
   onRemove: (productId: CartItem['productId']) => void;
 }
 
@@ -32,6 +36,7 @@ function formatPrice(price: number | string): string {
 export default function CartItemRow({
   item,
   onQuantityChange,
+  onQuantityValidityChange,
   onRemove,
 }: CartItemRowProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -73,8 +78,13 @@ export default function CartItemRow({
 
         <div className={styles.quantityColumn}>
           <QuantitySelector
+            key={`${item.productId}-${item.cantidad}`}
             value={item.cantidad}
             onChange={(value) => onQuantityChange(item.productId, value)}
+            onValidityChange={(isValid) =>
+              onQuantityValidityChange(item.productId, isValid)
+            }
+            max={item.existencias}
           />
         </div>
 

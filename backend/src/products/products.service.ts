@@ -196,29 +196,38 @@ export class ProductsService {
         dataToUpdate.idCategoria = updateProductDto.idCategoria;
       }
 
-      if (updateProductDto.imagenUrl) {
-        // En una implementación real se podría actualizar o crear, por simplicidad:
+      if (updateProductDto.imagenUrl !== undefined) {
+        const imagenUrl = updateProductDto.imagenUrl.trim();
         dataToUpdate.imagenes = {
           deleteMany: {},
-          create: [
-            {
-              urlImagen: updateProductDto.imagenUrl,
-              nombre: 'Principal',
-            },
-          ],
+          ...(imagenUrl
+            ? {
+                create: [
+                  {
+                    urlImagen: imagenUrl,
+                    nombre: 'Principal',
+                  },
+                ],
+              }
+            : {}),
         };
       }
 
       const updatedProduct = await this.prisma.producto.update({
         where: { id },
         data: dataToUpdate,
+        include: {
+          categoria: true,
+          imagenes: true,
+        },
       });
 
       return {
         message: 'Producto actualizado exitosamente',
         product: updatedProduct,
       };
-    } catch {
+    } catch (error) {
+      console.error(`Error al actualizar el producto ${id}:`, error);
       throw new BadRequestException('Error al actualizar el producto');
     }
   }
@@ -230,21 +239,41 @@ export class ProductsService {
       });
 
       if (!existingProduct) {
-        throw new BadRequestException('Producto no encontrado');
+        throw new NotFoundException('Producto no encontrado');
       }
 
-      const deletedProduct = await this.prisma.producto.update({
-        where: { id },
-        data: {
-          estado: 'INACTIVO',
-        },
+      const deletedProduct = await this.prisma.$transaction(async (tx) => {
+        await tx.itemCarrito.deleteMany({
+          where: { idProducto: id },
+        });
+        await tx.imagenProducto.deleteMany({
+          where: { idProducto: id },
+        });
+
+        return tx.producto.delete({
+          where: { id },
+        });
       });
 
       return {
         message: 'Producto eliminado correctamente',
         product: deletedProduct,
       };
-    } catch {
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2003'
+      ) {
+        throw new BadRequestException(
+          'No se puede eliminar este producto porque pertenece a uno o más pedidos. Cámbielo a INACTIVO para ocultarlo del catálogo.',
+        );
+      }
+
+      console.error(`Error al eliminar el producto ${id}:`, error);
       throw new BadRequestException(
         'Error al eliminar el producto. Intente nuevamente.',
       );

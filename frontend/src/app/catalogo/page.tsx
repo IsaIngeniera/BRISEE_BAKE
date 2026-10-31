@@ -68,7 +68,7 @@ const catalogCategories = [
     isHealthy: true,
   },
   {
-    name: 'Cookies cookie Dough',
+    name: 'Cookie Dough',
     slug: 'cookie-dough',
     description: 'Deliciosa masa cruda comestible, un antojo seguro y dulce.',
     image: '/images/catalogo/cookie-dough.jpg',

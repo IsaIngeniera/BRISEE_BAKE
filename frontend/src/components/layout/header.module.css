@@ -10,10 +10,26 @@
   top: 0;
   z-index: 100;
   width: 100%;
+
   color: var(--primary-pink);
   background-color: var(--soft-pink);
-  font-family: var(--font-title);
+
+  font-family:
+    var(--font-title),
+    'Baskerville Old Face',
+    Baskerville,
+    'Times New Roman',
+    Georgia,
+    serif;
 }
+
+.header *,
+.header *::before,
+.header *::after {
+  box-sizing: border-box;
+}
+
+/* Barra superior del administrador */
 
 .adminBar {
   width: 100%;
@@ -22,20 +38,24 @@
 }
 
 .adminBarContent {
-  width: min(100%, 1500px);
-  min-height: 48px;
-  margin: 0 auto;
-  padding: 5px 22px;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 20px;
+
+  width: min(100%, 1500px);
+  min-height: 48px;
+
+  margin: 0 auto;
+  padding: 5px 22px;
 }
 
 .adminTitle {
   margin: 0;
+
   color: var(--white);
-  font-family: var(--font-title);
+
+  font-family: inherit;
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 2px;
@@ -43,16 +63,20 @@
 }
 
 .addButton {
-  width: 34px;
-  height: 34px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   justify-self: start;
+
+  width: 34px;
+  height: 34px;
+
   color: var(--white);
   background-color: rgb(255 255 255 / 25%);
+
   border: 1px solid rgb(255 255 255 / 30%);
   border-radius: 50%;
+
   transition:
     background-color 180ms ease,
     transform 180ms ease;
@@ -79,16 +103,21 @@
 .saveButton {
   min-height: 35px;
   padding: 7px 20px;
+
   color: var(--white);
   background-color: transparent;
+
   border: 1px solid rgb(255 255 255 / 65%);
   border-radius: 7px;
+
   cursor: pointer;
-  font-family: var(--font-title);
+
+  font-family: inherit;
   font-size: 1rem;
   font-weight: 600;
   line-height: 1;
   text-decoration: none;
+
   transition:
     color 180ms ease,
     background-color 180ms ease,
@@ -102,64 +131,102 @@
   transform: translateY(-1px);
 }
 
+/* Navegación */
+
 .navigation {
   position: relative;
   width: 100%;
+
   background-color: var(--soft-pink);
   border-bottom: 1px solid var(--light-pink);
+
   box-shadow: 0 3px 14px rgb(214 96 152 / 7%);
 }
 
 .navigationContent {
-  width: min(100%, 1500px);
-  min-height: 104px;
-  margin: 0 auto;
-  padding: 10px 28px;
-  display: grid;
-  grid-template-columns:
-    minmax(240px, 1fr)
-    auto
-    minmax(140px, 1fr);
+  display: flex;
   align-items: center;
-  gap: 35px;
+  gap: 0;
+
+  width: 100%;
+  max-width: none;
+  min-height: 90px;
+
+  margin: 0;
+  padding: 0;
 }
 
+/* Logo */
+
 .logoLink {
-  width: fit-content;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: flex-start;
+
+  flex: 0 0 280px;
+  width: 280px;
+  height: 90px;
+
+  margin: 0;
+  padding: 8px 0;
+
+  background: transparent;
+  border-radius: 0;
 }
 
 .logo {
-  width: 280px;
-  max-width: 100%;
-  height: 82px;
   display: block;
+
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+
+  margin: 0;
+  padding: 0;
+
   object-fit: contain;
   object-position: left center;
+
+  border-radius: 0;
+  transform: none;
 }
+
+/* Enlaces de escritorio */
 
 .desktopNavigation {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(24px, 3vw, 52px);
+
+  flex: 1;
+  min-width: 0;
+
+  gap: clamp(20px, 3vw, 42px);
+
+  margin: 0;
+  padding: 0 24px;
 }
 
 .navigationLink {
   position: relative;
+
   padding: 12px 2px;
+
   color: var(--dark-pink);
   background: transparent;
+
   border: 0;
   cursor: pointer;
-  font-family: var(--font-title);
+
+  font-family: inherit;
   font-size: 1.2rem;
   font-weight: 400;
   line-height: 1;
+
   text-decoration: none;
   white-space: nowrap;
+
   transition:
     color 180ms ease,
     transform 180ms ease;
@@ -170,9 +237,12 @@
   right: 50%;
   bottom: 4px;
   left: 50%;
+
   height: 2px;
+
   content: '';
   background-color: var(--primary-pink);
+
   transition:
     right 180ms ease,
     left 180ms ease;
@@ -189,6 +259,8 @@
   right: 0;
   left: 0;
 }
+
+/* Submenú de administración */
 
 .dropdown {
   position: relative;
@@ -215,23 +287,32 @@
   position: absolute;
   top: calc(100% + 8px);
   left: 50%;
-  width: 230px;
-  padding: 9px;
+
   display: flex;
   flex-direction: column;
+
+  width: 230px;
+  padding: 9px;
+
   background-color: var(--white);
+
   border: 1px solid var(--light-pink);
   border-radius: 15px;
+
   box-shadow: 0 14px 35px rgb(112 54 80 / 15%);
+
   transform: translateX(-50%);
 }
 
 .dropdownLink {
   padding: 12px 14px;
+
   color: var(--dark-pink);
   border-radius: 10px;
+
   font-size: 1rem;
   text-decoration: none;
+
   transition:
     color 180ms ease,
     background-color 180ms ease;
@@ -242,29 +323,66 @@
   background-color: var(--primary-pink);
 }
 
+/* Íconos del header */
+
 .userActions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 16px;
+
+  flex: 0 0 auto;
+  gap: 12px;
+
+  margin: 0;
+  padding-right: 24px;
 }
 
 .iconButton,
 .mobileMenuButton {
-  width: 43px;
-  height: 43px;
+  position: relative;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
+  flex-shrink: 0;
+
+  width: 43px;
+  height: 43px;
+
   color: var(--dark-pink);
   background-color: transparent;
+
   border: 1px solid transparent;
   border-radius: 50%;
+
   cursor: pointer;
+  text-decoration: none;
+
   transition:
     color 180ms ease,
     background-color 180ms ease,
     transform 180ms ease;
+}
+
+.cartBadge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  background-color: var(--dark-pink);
+  border: 2px solid var(--soft-pink);
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .iconButton svg,
@@ -278,17 +396,152 @@
 .mobileMenuButton:hover {
   color: var(--white);
   background-color: var(--primary-pink);
+
   transform: translateY(-2px);
 }
 
-.mobileMenuButton {
-  display: none;
-}
-
+.mobileMenuButton,
 .mobileNavigation {
   display: none;
 }
 
+/* Ayuda y selección de manuales */
+
+.helpDropdown {
+  position: relative;
+}
+
+.helpSummary {
+  list-style: none;
+}
+
+.helpSummary::-webkit-details-marker {
+  display: none;
+}
+
+.helpSummary::marker {
+  content: '';
+}
+
+.helpDropdown[open] > .helpSummary {
+  color: var(--dark-pink);
+  background-color: var(--light-pink);
+}
+
+.helpMenu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 110;
+
+  width: min(310px, calc(100vw - 32px));
+  padding: 12px;
+
+  background-color: var(--white);
+
+  border: 1px solid var(--secondary-pink);
+  border-radius: 15px;
+
+  box-shadow: 0 14px 35px rgb(112 54 80 / 15%);
+}
+
+.helpMenuHeader {
+  padding: 9px 10px 14px;
+  margin-bottom: 5px;
+
+  border-bottom: 1px solid var(--light-pink);
+}
+
+.helpEyebrow {
+  display: block;
+  margin-bottom: 7px;
+
+  color: #a83e72;
+
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.helpHeading {
+  margin: 0;
+
+  color: #a83e72;
+
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.helpItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+
+  padding: 14px 10px;
+
+  color: #a83e72;
+
+  border-radius: 9px;
+  text-decoration: none;
+
+  transition: background-color 180ms ease;
+}
+
+.helpItemIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  width: 36px;
+  height: 36px;
+
+  color: #a83e72;
+  background-color: var(--soft-pink);
+
+  border: 1px solid var(--light-pink);
+  border-radius: 50%;
+}
+
+.helpItemIcon svg {
+  width: 21px;
+  height: 21px;
+  stroke-width: 1.6;
+}
+
+.helpItem strong {
+  display: block;
+
+  font-size: 1.1rem;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.helpItem small {
+  display: block;
+  margin-top: 4px;
+
+  color: #68545c;
+
+  font-size: 0.95rem;
+  line-height: 1.3;
+}
+
+a.helpItem:hover {
+  background-color: var(--soft-pink);
+}
+
+.helpPending {
+  margin-top: 3px;
+  border-top: 1px solid var(--light-pink);
+  border-radius: 0;
+}
+
+/* Accesibilidad */
+
+.logoLink:focus-visible,
 .addButton:focus-visible,
 .previewButton:focus-visible,
 .saveButton:focus-visible,
@@ -296,28 +549,32 @@
 .dropdownLink:focus-visible,
 .iconButton:focus-visible,
 .mobileMenuButton:focus-visible,
-.mobileLink:focus-visible {
+.mobileLink:focus-visible,
+.mobileDropdownLink:focus-visible,
+.helpSummary:focus-visible,
+a.helpItem:focus-visible {
   outline: 3px solid var(--dark-pink);
   outline-offset: 3px;
 }
 
-/* Tablet */
+/* Escritorio mediano */
 
-@media (max-width: 1050px) {
-  .navigationContent {
-    grid-template-columns:
-      minmax(190px, 1fr)
-      auto
-      minmax(110px, 1fr);
-    gap: 20px;
-  }
-
-  .logo {
-    width: 220px;
-  }
-
+@media (max-width: 1250px) and (min-width: 951px) {
   .desktopNavigation {
-    gap: 20px;
+    gap: 14px;
+    padding-inline: 12px;
+  }
+
+  .userActions {
+    gap: 5px;
+    padding-right: 12px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .logoLink {
+    flex-basis: 230px;
+    width: 230px;
   }
 
   .navigationLink {
@@ -325,16 +582,15 @@
   }
 }
 
-/* Mobile */
+/* Tablet y móvil */
 
-@media (max-width: 820px) {
+@media (max-width: 950px) {
   .adminBarContent {
     grid-template-columns: auto 1fr;
   }
 
   .adminTitle {
     justify-self: end;
-    font-size: 1rem;
   }
 
   .adminActions {
@@ -344,14 +600,14 @@
   }
 
   .navigationContent {
-    min-height: 88px;
-    padding: 8px 18px;
-    grid-template-columns: 1fr auto;
+    min-height: 76px;
   }
 
-  .logo {
-    width: 205px;
-    height: 68px;
+  .logoLink {
+    flex: 0 1 220px;
+    width: 220px;
+    min-width: 0;
+    height: 76px;
   }
 
   .desktopNavigation {
@@ -360,6 +616,8 @@
 
   .userActions {
     gap: 5px;
+    margin-left: auto;
+    padding-right: 16px;
   }
 
   .mobileMenuButton {
@@ -367,25 +625,33 @@
   }
 
   .mobileNavigation {
-    padding: 14px 20px 22px;
     display: flex;
     flex-direction: column;
     gap: 5px;
+
+    padding: 14px 20px 22px;
+
     background-color: var(--soft-pink);
     border-top: 1px solid var(--light-pink);
+
     box-shadow: 0 14px 25px rgb(112 54 80 / 10%);
   }
 
   .mobileLink {
     width: 100%;
     padding: 14px 16px;
+
     color: var(--dark-pink);
     background: transparent;
+
     border: 0;
     border-radius: 10px;
+
     cursor: pointer;
-    font-family:var(--font-subtitle);
+
+    font-family: inherit;
     font-size: 1.05rem;
+
     text-align: left;
     text-decoration: none;
   }
@@ -403,17 +669,22 @@
   }
 
   .mobileDropdown {
-    margin-left: 18px;
-    padding-left: 12px;
     display: flex;
     flex-direction: column;
+
+    margin-left: 18px;
+    padding-left: 12px;
+
     border-left: 2px solid var(--secondary-pink);
   }
 
   .mobileDropdownLink {
     padding: 11px 14px;
+
     color: var(--dark-pink);
+
     border-radius: 8px;
+
     font-size: 1rem;
     text-decoration: none;
   }
@@ -423,8 +694,6 @@
     background-color: var(--primary-pink);
   }
 }
-
-/* Small phones */
 
 @media (max-width: 480px) {
   .adminTitle {
@@ -438,9 +707,20 @@
     font-size: 1rem;
   }
 
-  .logo {
-    width: 155px;
-    height: 58px;
+  .navigationContent {
+    min-height: 68px;
+  }
+
+  .logoLink {
+    flex-basis: 170px;
+    width: 170px;
+    height: 68px;
+
+    padding-block: 8px;
+  }
+
+  .userActions {
+    padding-right: 8px;
   }
 
   .iconButton,
@@ -454,6 +734,22 @@
     width: 23px;
     height: 23px;
   }
+}
 
-  
+@media (max-width: 360px) {
+  .logoLink {
+    flex-basis: 130px;
+    width: 130px;
+  }
+
+  .userActions {
+    gap: 2px;
+    padding-right: 5px;
+  }
+
+  .iconButton,
+  .mobileMenuButton {
+    width: 35px;
+    height: 38px;
+  }
 }

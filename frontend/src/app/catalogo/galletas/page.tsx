@@ -13,6 +13,8 @@ import { normalizeText } from '@/utils/normalize-text';
 
 import styles from './galletas.module.css';
 
+export const dynamic = 'force-dynamic';
+
 interface ProductImage {
   id: number;
   urlImagen: string;
