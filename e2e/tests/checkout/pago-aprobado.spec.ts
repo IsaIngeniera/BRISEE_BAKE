@@ -13,21 +13,21 @@
  *   - El carrito se conserva después del pago para permitir revisar el pedido.
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 import {
   cleanDatabase,
   disconnectPrisma,
   seedProduct,
   fechaEnDias,
-} from '../../helpers/db';
+} from "../../helpers/db";
 import {
   buildUserData,
   loginViaAPI,
   registerUserViaAPI,
   setAuthToken,
-} from '../../helpers/auth';
-import { seedCartForUser, completarFlujoEntrega } from '../../helpers/cart';
-import { mockWompi } from '../../helpers/wompi-mock';
+} from "../../helpers/auth";
+import { seedCartForUser, completarFlujoEntrega } from "../../helpers/cart";
+import { mockWompi } from "../../helpers/wompi-mock";
 
 test.beforeEach(async () => {
   await cleanDatabase();
@@ -37,17 +37,17 @@ test.afterAll(async () => {
   await disconnectPrisma();
 });
 
-async function setupCartAndCheckout(page: import('@playwright/test').Page) {
+async function setupCartAndCheckout(page: import("@playwright/test").Page) {
   const user = buildUserData({
     correo: `pago-${Date.now()}@e2e.test.com`,
   });
   await registerUserViaAPI(user);
   const token = await loginViaAPI(user.correo, user.password);
-  const producto = await seedProduct({ nombre: 'Macaron Test', precio: 8000 });
+  const producto = await seedProduct({ nombre: "Macaron Test", precio: 8000 });
 
   await setAuthToken(page, token);
   const payload = JSON.parse(
-    Buffer.from(token.split('.')[1], 'base64url').toString(),
+    Buffer.from(token.split(".")[1], "base64url").toString(),
   ) as { sub: string };
   await seedCartForUser(page, payload.sub, [
     {
@@ -61,80 +61,80 @@ async function setupCartAndCheckout(page: import('@playwright/test').Page) {
   return { user, token, producto, userId: payload.sub };
 }
 
-test.describe('HU-21 Pago aprobado [E2E]', () => {
+test.describe("HU-21 Pago aprobado [E2E]", () => {
   test('APPROVED: el cliente ve la pantalla "¡Pago exitoso!"', async ({
     page,
   }) => {
     await setupCartAndCheckout(page);
-    await mockWompi(page, { status: 'APPROVED' });
+    await mockWompi(page, { status: "APPROVED" });
 
-    await page.goto('/carrito');
+    await page.goto("/carrito");
     await page
-      .getByRole('button', { name: /continuar con la compra/i })
+      .getByRole("button", { name: /continuar con la compra/i })
       .click();
     await completarFlujoEntrega(page, {
-      metodo: 'RETIRO',
+      metodo: "RETIRO",
       fecha: fechaEnDias(5),
     });
 
     // Esperamos la landing de finalizar-compra con el pago aprobado.
     await expect(page).toHaveURL(/\/finalizar-compra/, { timeout: 15_000 });
     await expect(
-      page.getByRole('heading', { name: /¡pago exitoso!/i }),
+      page.getByRole("heading", { name: /¡pago exitoso!/i }),
     ).toBeVisible({ timeout: 15_000 });
   });
 
-  test('después del pago aprobado, el carrito conserva sus productos', async ({
+  test("después del pago aprobado, el carrito vacía automáticamente sus productos", async ({
     page,
   }) => {
     const { userId } = await setupCartAndCheckout(page);
-    await mockWompi(page, { status: 'APPROVED' });
+    await mockWompi(page, { status: "APPROVED" });
 
-    await page.goto('/carrito');
+    await page.goto("/carrito");
     await page
-      .getByRole('button', { name: /continuar con la compra/i })
+      .getByRole("button", { name: /continuar con la compra/i })
       .click();
     await completarFlujoEntrega(page, {
-      metodo: 'RETIRO',
+      metodo: "RETIRO",
       fecha: fechaEnDias(5),
     });
 
-    await expect(page.getByRole('heading', { name: /¡pago exitoso!/i })).toBeVisible({ timeout: 15_000 });
+    await expect(
+      page.getByRole("heading", { name: /¡pago exitoso!/i }),
+    ).toBeVisible({ timeout: 15_000 });
 
-    // El retorno de Wompi no debe borrar el carrito del cliente.
-    const cartState = await page.evaluate((key) => localStorage.getItem(key), `brisee_cart_${userId}`);
-    expect(cartState).not.toBeNull();
-    const storedItems = JSON.parse(cartState ?? '[]') as Array<{
-      productId?: string;
-      cantidad?: number;
-    }>;
-    expect(storedItems).toEqual([
-      expect.objectContaining({
-        productId: expect.any(String),
-        cantidad: 1,
-      }),
-    ]);
+    // Vaciado del carrito: Dado que el pago fue exitoso, cuando el sistema registra la compra, entonces vacía automáticamente los productos del carrito de compras del cliente.
+    const cartState = await page.evaluate(
+      (key) => localStorage.getItem(key),
+      `brisee_cart_${userId}`,
+    );
+    const storedItems = cartState
+      ? (JSON.parse(cartState) as Array<unknown>)
+      : [];
+    expect(storedItems).toHaveLength(0);
   });
 
-  test('la página muestra un link a /cuenta/pedidos tras el pago aprobado', async ({
+  test("la página muestra un link a /cuenta/pedidos tras el pago aprobado", async ({
     page,
   }) => {
     await setupCartAndCheckout(page);
-    await mockWompi(page, { status: 'APPROVED' });
+    await mockWompi(page, { status: "APPROVED" });
 
-    await page.goto('/carrito');
+    await page.goto("/carrito");
     await page
-      .getByRole('button', { name: /continuar con la compra/i })
+      .getByRole("button", { name: /continuar con la compra/i })
       .click();
     await completarFlujoEntrega(page, {
-      metodo: 'RETIRO',
+      metodo: "RETIRO",
       fecha: fechaEnDias(5),
     });
 
-    await expect(page.getByRole('heading', { name: /¡pago exitoso!/i })).toBeVisible({ timeout: 15_000 });
+    await expect(
+      page.getByRole("heading", { name: /¡pago exitoso!/i }),
+    ).toBeVisible({ timeout: 15_000 });
 
     await expect(
-      page.getByRole('link', { name: /ver mis pedidos/i }),
+      page.getByRole("link", { name: /ver mis pedidos/i }),
     ).toBeVisible();
   });
 });
