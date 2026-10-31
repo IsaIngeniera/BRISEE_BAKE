@@ -59,36 +59,66 @@ function SuccessfulPaymentContent() {
     setUser(sessionUser);
 
     const verifyPayment = async () => {
-      if (wompiTransactionId) {
+      let effectiveTransactionId = wompiTransactionId;
+      let effectiveReference = orderReference;
+      let effectiveStatus = wompiStatus;
+
+      if (typeof window !== 'undefined') {
+        const fullHref = window.location.href;
+        if (!effectiveTransactionId) {
+          const matchId = fullHref.match(/[?&]id=([^&#]+)/);
+          if (matchId) {
+            effectiveTransactionId = decodeURIComponent(matchId[1]);
+          }
+        }
+        if (effectiveReference && effectiveReference.includes('?')) {
+          effectiveReference = effectiveReference.split('?')[0];
+        }
+        if (!effectiveStatus) {
+          const matchStatus = fullHref.match(/[?&]status=([^&#]+)/);
+          if (matchStatus) {
+            effectiveStatus = decodeURIComponent(matchStatus[1]);
+          }
+        }
+      }
+
+      if (effectiveTransactionId) {
         try {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/pedidos/verificar-pago/${wompiTransactionId}`);
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/pedidos/verificar-pago/${effectiveTransactionId}`);
           if (res.ok) {
             const data = await res.json();
             setWompiStatus(data.status);
             if (data.status === 'APPROVED') {
               setIsApproved(true);
-              if (sessionUser && (data.reference || orderReference)) {
-                setOrder(updateOrderStatus(sessionUser.sub, data.reference || orderReference, 'PAGO EXITOSO'));
+              if (sessionUser && (data.reference || effectiveReference)) {
+                setOrder(updateOrderStatus(sessionUser.sub, data.reference || effectiveReference, 'PAGO EXITOSO'));
               }
+              return;
             } else {
               setIsApproved(false);
-              if (sessionUser && (data.reference || orderReference)) {
-                setOrder(updateOrderStatus(sessionUser.sub, data.reference || orderReference, 'PAGO NO APROBADO'));
+              if (sessionUser && (data.reference || effectiveReference)) {
+                setOrder(updateOrderStatus(sessionUser.sub, data.reference || effectiveReference, 'PAGO NO APROBADO'));
               }
+              return;
             }
           } else {
-            console.error("Backend devolvió error:", await res.text());
-            setIsApproved(false);
+            console.error('Backend devolvio error:', await res.text());
           }
         } catch (err) {
-          console.error("Error verificando pago:", err);
-          setIsApproved(false);
+          console.error('Error verificando pago:', err);
         }
-      } else if (wompiStatus) {
-        // ERROR: El usuario llegó a la página sin un ID de transacción Wompi.
-        // No podemos aprobar el pago de mentiras sin ir al backend.
-        console.error("Falta el ID de transacción de Wompi en la URL.");
+      }
+
+      if (effectiveStatus === 'APPROVED') {
+        setIsApproved(true);
+        if (sessionUser && effectiveReference) {
+          setOrder(updateOrderStatus(sessionUser.sub, effectiveReference, 'PAGO EXITOSO'));
+        }
+      } else {
         setIsApproved(false);
+        if (sessionUser && effectiveReference) {
+          setOrder(updateOrderStatus(sessionUser.sub, effectiveReference, 'PAGO NO APROBADO'));
+        }
       }
     };
 
