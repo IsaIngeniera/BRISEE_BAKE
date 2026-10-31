@@ -66,6 +66,7 @@ export default function ProductCardActions({
           precio={precio}
           imagenUrl={imagenUrl}
           quantity={quantity}
+          maxQuantity={existencias}
           disabled={isSoldOut || !isQuantityValid}
         />
       )}

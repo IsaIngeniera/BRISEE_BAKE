@@ -1,7 +1,13 @@
 .page {
+  --brand-pink: #e48abd;
+  --brand-pink-hover: #d66098;
+  --border-pink: #ec9dca;
+  --brand-font: var(--font-body);
+
   min-height: calc(100vh - 120px);
   padding: 48px 24px 64px;
-  background-color: var(--page-bg);
+  background-color: #ffffff;
+  font-family: var(--font-body);
 }
 
 .backRow {
@@ -15,6 +21,7 @@
   gap: 8px;
   color: var(--brand-pink);
   text-decoration: none;
+  font-family: var(--font-body);
   font-size: 1.15rem;
 }
 
@@ -28,6 +35,7 @@
   padding: 40px 36px;
   border-radius: 8px;
   background: #ffffff;
+  border: 1px solid var(--border-pink);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
@@ -36,7 +44,9 @@
   font-size: 2.2rem;
   margin: 0 0 12px;
   text-align: center;
-  font-family: var(--font-heading);
+  font-family: var(--font-title);
+  font-weight: 400;
+  text-transform: capitalize;
 }
 
 .description {
@@ -45,6 +55,7 @@
   line-height: 1.5;
   margin: 0 0 28px;
   text-align: center;
+  font-family: var(--font-body);
 }
 
 .error {
@@ -54,6 +65,7 @@
   background-color: #fde8e8;
   color: #9b1c1c;
   font-size: 1rem;
+  font-family: var(--font-body);
 }
 
 .success {
@@ -64,6 +76,7 @@
   color: #03543f;
   font-size: 1.05rem;
   line-height: 1.5;
+  font-family: var(--font-body);
 }
 
 .form {
@@ -77,6 +90,7 @@
   color: #2b2228;
   font-weight: 500;
   font-size: 1.1rem;
+  font-family: var(--font-body);
 }
 
 .inputBox {
@@ -103,7 +117,8 @@
   outline: 0;
   background: transparent;
   color: #2b2228;
-  font: 1.15rem var(--font-body);
+  font-family: var(--font-body);
+  font-size: 1.15rem;
 }
 
 .showPassword {
@@ -120,13 +135,24 @@
   min-height: 52px;
   margin-top: 8px;
   border: 0;
-  border-radius: 4px;
-  background: var(--brand-pink);
-  color: #ffffff;
-  font: 1.25rem var(--font-body);
+  border-radius: 5px;
+  background-color: var(--brand-pink);
+  color: #000000;
+  font-family: var(--font-body);
+  font-size: 1.25rem;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(228, 138, 189, 0.25);
+}
+
+.submit:hover:not(:disabled) {
+  background-color: var(--brand-pink-hover);
+  color: #000000;
+  box-shadow: 0 6px 16px rgba(228, 138, 189, 0.35);
 }
 
 .submit:disabled {
@@ -134,14 +160,12 @@
   cursor: not-allowed;
 }
 
-.submit:hover:not(:disabled) {
-  opacity: 0.95;
-}
-
 .loginLinkBox {
   margin-top: 24px;
   text-align: center;
   font-size: 1.1rem;
+  font-family: var(--font-body);
+  color: #665c63;
 }
 
 .loginLinkBox a {

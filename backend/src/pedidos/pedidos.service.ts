@@ -3,6 +3,7 @@ import {
   BadRequestException,
   NotFoundException,
   InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreatePedidoDto } from './dto/create-pedido.dto';
@@ -47,6 +48,16 @@ export class PedidosService {
     for (const item of createPedidoDto.items) {
       const productoDb = productosDb.find((p) => p.id === item.idProducto);
       if (productoDb) {
+        if (!Number.isInteger(item.cantidad) || item.cantidad < 1) {
+          throw new BadRequestException(
+            'La cantidad de cada producto debe ser un entero positivo.',
+          );
+        }
+        if (item.cantidad > productoDb.existencias) {
+          throw new BadRequestException(
+            `No hay suficientes existencias de ${productoDb.nombre}. Disponibles: ${productoDb.existencias}.`,
+          );
+        }
         total = total.add(productoDb.precio.mul(item.cantidad));
         validItems.push({
           idProducto: item.idProducto,
@@ -106,6 +117,19 @@ export class PedidosService {
       }
     }
 
+    const wompiPublicKey = process.env.WOMPI_PUBLIC_KEY?.trim();
+    if (!wompiPublicKey && process.env.NODE_ENV !== 'test') {
+      throw new BadRequestException(
+        'Wompi no está configurado. Define WOMPI_PUBLIC_KEY con una clave pub_test_* para pruebas.',
+      );
+    }
+    const integritySecret = process.env.WOMPI_INTEGRITY_SECRET?.trim();
+    if (process.env.NODE_ENV === 'production' && !integritySecret) {
+      throw new Error(
+        'WOMPI_INTEGRITY_SECRET must be configured in production',
+      );
+    }
+
     const pedido = await this.prisma.$transaction(async (tx) => {
       const nuevoPedido = await tx.pedido.create({
         data: {
@@ -147,14 +171,7 @@ export class PedidosService {
     const mensaje = `Hola, acabo de realizar el pedido #${shortId}, escribo para coordinar la entrega`;
     const whatsappUrl = `https://wa.me/${this.WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
 
-    const wompiPublicKey =
-      process.env.WOMPI_PUBLIC_KEY || 'pub_test_placeholder';
-    const integritySecret = process.env.WOMPI_INTEGRITY_SECRET || '';
-
-    let frontendBaseUrl =
-      createPedidoDto.returnUrl ||
-      process.env.FRONTEND_URL ||
-      'http://localhost:3000';
+    let frontendBaseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
     frontendBaseUrl = frontendBaseUrl.replace(/\/$/, '');
 
     const amountInCents = Math.round(Number(total) * 100);
@@ -174,7 +191,7 @@ export class PedidosService {
     );
     const redirectStr = `&redirect-url=${encodeURIComponent(finalRedirectUrl)}`;
 
-    const wompiUrl = `https://checkout.wompi.co/p/?public-key=${wompiPublicKey}&currency=COP&amount-in-cents=${amountInCents}&reference=${reference}${signatureStr}${redirectStr}`;
+    const wompiUrl = `https://checkout.wompi.co/p/?public-key=${wompiPublicKey || 'pub_test_placeholder'}&currency=COP&amount-in-cents=${amountInCents}&reference=${reference}${signatureStr}${redirectStr}`;
 
     return {
       message: 'Pedido creado exitosamente',
@@ -189,6 +206,12 @@ export class PedidosService {
       return await this.prisma.pedido.findMany({
         where: { idCliente: userId },
         include: {
+          pago: {
+            select: {
+              estado: true,
+              transaccionId: true,
+            },
+          },
           productos: {
             select: {
               cantidad: true,
@@ -295,12 +318,68 @@ export class PedidosService {
           status: string;
           reference: string;
           amount_in_cents: number;
+          currency?: string;
+          signature?: {
+            checksum?: string;
+            properties?: string[];
+          };
         };
       }
       const data = (await response.json()) as WompiTransactionResponse;
 
       const status = data.data.status;
       const reference = data.data.reference;
+      const integritySecret = process.env.WOMPI_INTEGRITY_SECRET?.trim();
+      if (process.env.NODE_ENV === 'production' && !integritySecret) {
+        throw new Error(
+          'WOMPI_INTEGRITY_SECRET must be configured in production',
+        );
+      }
+      const pagoExistente = await this.prisma.pago.findUnique({
+        where: { idPedido: reference },
+        select: { estado: true, total: true },
+      });
+
+      if (!pagoExistente) {
+        throw new Error('No existe un pago asociado a la transacción');
+      }
+
+      const expectedAmountInCents = Math.round(
+        Number(pagoExistente.total) * 100,
+      );
+      if (
+        status === 'APPROVED' &&
+        (data.data.amount_in_cents !== expectedAmountInCents ||
+          (data.data.currency && data.data.currency !== 'COP'))
+      ) {
+        throw new Error('El monto o la moneda de la transacción no coinciden');
+      }
+
+      if (integritySecret && data.data.signature?.checksum) {
+        const properties = data.data.signature.properties ?? [
+          'amount_in_cents',
+          'reference',
+          'currency',
+        ];
+        const signaturePayload = properties
+          .map((property) => {
+            if (property === 'amount_in_cents')
+              return data.data.amount_in_cents;
+            if (property === 'reference') return data.data.reference;
+            if (property === 'currency') return data.data.currency ?? 'COP';
+            return '';
+          })
+          .join('');
+        const expectedChecksum = crypto
+          .createHash('sha256')
+          .update(`${signaturePayload}${integritySecret}`)
+          .digest('hex');
+        if (expectedChecksum !== data.data.signature.checksum) {
+          throw new Error('La firma de la transacción no es válida');
+        }
+      } else if (process.env.NODE_ENV === 'production') {
+        throw new Error('La transacción no incluye una firma válida');
+      }
 
       let nuevoEstado: 'PENDIENTE' | 'APROBADO' | 'RECHAZADO' | 'CANCELADO' =
         'PENDIENTE';
@@ -312,23 +391,15 @@ export class PedidosService {
         nuevoEstado = 'CANCELADO';
       }
 
-      const pagoExistente = await this.prisma.pago.findUnique({
-        where: { idPedido: reference },
-        select: { estado: true },
-      });
       const wasAlreadyApproved = pagoExistente?.estado === 'APROBADO';
 
-      await this.prisma.pago
-        .update({
-          where: { idPedido: reference },
-          data: {
-            estado: nuevoEstado,
-            transaccionId: transactionId,
-          },
-        })
-        .catch((err) =>
-          console.error('No se pudo actualizar la tabla Pago:', err),
-        );
+      await this.prisma.pago.update({
+        where: { idPedido: reference },
+        data: {
+          estado: nuevoEstado,
+          transaccionId: transactionId,
+        },
+      });
 
       if (nuevoEstado === 'APROBADO' && !wasAlreadyApproved) {
         this.sendAdminNotification(reference).catch(console.error);
@@ -342,6 +413,110 @@ export class PedidosService {
     } catch {
       throw new Error('Error de conexión con Wompi al verificar el pago');
     }
+  }
+
+  async processWompiWebhook(payload: unknown) {
+    const body = payload as {
+      timestamp?: number;
+      data?: {
+        transaction?: {
+          id?: string;
+          reference?: string;
+          status?: string;
+          amount_in_cents?: number;
+          currency?: string;
+        };
+      };
+      signature?: {
+        checksum?: string;
+        properties?: string[];
+      };
+    };
+    const transaction = body.data?.transaction;
+    const eventsSecret = process.env.WOMPI_EVENTS_SECRET?.trim();
+
+    if (
+      process.env.NODE_ENV === 'production' &&
+      (!eventsSecret || !body.timestamp || !body.signature?.checksum)
+    ) {
+      throw new UnauthorizedException('Firma de Wompi ausente');
+    }
+
+    if (eventsSecret && body.timestamp && body.signature?.checksum) {
+      const properties = body.signature.properties ?? [
+        'transaction.id',
+        'transaction.status',
+        'transaction.amount_in_cents',
+      ];
+      const values = properties.map((property) => {
+        if (property === 'transaction.id') return transaction?.id ?? '';
+        if (property === 'transaction.status') return transaction?.status ?? '';
+        if (property === 'transaction.amount_in_cents') {
+          return transaction?.amount_in_cents ?? '';
+        }
+        return '';
+      });
+      const expected = crypto
+        .createHash('sha256')
+        .update(`${values.join('')}${body.timestamp}${eventsSecret}`)
+        .digest('hex');
+      const received = body.signature.checksum;
+      const valid =
+        received.length === expected.length &&
+        crypto.timingSafeEqual(Buffer.from(received), Buffer.from(expected));
+      if (!valid) {
+        throw new UnauthorizedException('Firma de Wompi inválida');
+      }
+    }
+
+    if (
+      !transaction?.id ||
+      !transaction.reference ||
+      typeof transaction.amount_in_cents !== 'number' ||
+      !transaction.status
+    ) {
+      throw new BadRequestException('Transacción de Wompi incompleta');
+    }
+
+    const payment = await this.prisma.pago.findUnique({
+      where: { idPedido: transaction.reference },
+      select: { estado: true, total: true },
+    });
+    if (!payment) {
+      throw new BadRequestException('No existe un pago asociado al pedido');
+    }
+
+    if (
+      transaction.status === 'APPROVED' &&
+      (transaction.amount_in_cents !==
+        Math.round(Number(payment.total) * 100) ||
+        (transaction.currency && transaction.currency !== 'COP'))
+    ) {
+      throw new BadRequestException('El monto o la moneda no coinciden');
+    }
+
+    const statusMap: Record<
+      string,
+      'PENDIENTE' | 'APROBADO' | 'RECHAZADO' | 'CANCELADO'
+    > = {
+      APPROVED: 'APROBADO',
+      DECLINED: 'RECHAZADO',
+      ERROR: 'RECHAZADO',
+      VOIDED: 'CANCELADO',
+    };
+    const estado = statusMap[transaction.status] ?? 'PENDIENTE';
+    const wasAlreadyApproved = payment.estado === 'APROBADO';
+
+    await this.prisma.pago.update({
+      where: { idPedido: transaction.reference },
+      data: { estado, transaccionId: transaction.id },
+    });
+
+    if (estado === 'APROBADO' && !wasAlreadyApproved) {
+      await this.sendAdminNotification(transaction.reference);
+    }
+
+    return { received: true };
   }
 
   private async sendAdminNotification(pedidoId: string) {

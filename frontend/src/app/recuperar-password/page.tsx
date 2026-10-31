@@ -218,7 +218,7 @@ function RecuperarPasswordContent() {
             className={styles.submit}
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Enviando...' : 'Enviar enlace de recuperación'}
+            {isSubmitting ? 'Enviando...' : 'Mandar correo de recuperación'}
           </button>
 
           <div className={styles.loginLinkBox}>

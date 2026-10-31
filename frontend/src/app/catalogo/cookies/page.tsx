@@ -2,6 +2,8 @@ import CookieCategoryPage from '@/components/products/CookieCategoryPage';
 
 import styles from './cookies.module.css';
 
+export const dynamic = 'force-dynamic';
+
 export default function CookiesPage() {
   return (
     <CookieCategoryPage

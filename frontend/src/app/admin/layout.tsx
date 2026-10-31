@@ -1,25 +1,45 @@
 'use client';
 
 import Link from 'next/link';
-import { useSyncExternalStore, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
-import { AUTH_CHANGE_EVENT, getSessionUser } from '@/services/auth';
-
-function subscribe(onChange: () => void): () => void {
-  window.addEventListener(AUTH_CHANGE_EVENT, onChange);
-  window.addEventListener('storage', onChange);
-  return () => {
-    window.removeEventListener(AUTH_CHANGE_EVENT, onChange);
-    window.removeEventListener('storage', onChange);
-  };
-}
-
-function getRole(): 'ADMIN' | 'CLIENTE' | 'VISITANTE' {
-  return getSessionUser()?.rol ?? 'VISITANTE';
-}
+import {
+  AUTH_CHANGE_EVENT,
+  getSessionUser,
+  validateSession,
+} from '@/services/auth';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  const role = useSyncExternalStore(subscribe, getRole, () => 'CARGANDO');
+  const [role, setRole] = useState<
+    'ADMIN' | 'CLIENTE' | 'VISITANTE' | 'CARGANDO'
+  >('CARGANDO');
+
+  useEffect(() => {
+    let active = true;
+
+    const refreshRole = async () => {
+      const localUser = getSessionUser();
+      if (!localUser) {
+        if (active) setRole('VISITANTE');
+        return;
+      }
+
+      const currentUser = await validateSession();
+      if (active) {
+        setRole(currentUser?.rol ?? 'VISITANTE');
+      }
+    };
+
+    void refreshRole();
+    window.addEventListener(AUTH_CHANGE_EVENT, refreshRole);
+    window.addEventListener('storage', refreshRole);
+
+    return () => {
+      active = false;
+      window.removeEventListener(AUTH_CHANGE_EVENT, refreshRole);
+      window.removeEventListener('storage', refreshRole);
+    };
+  }, []);
 
   if (role === 'CARGANDO') return <p role="status">Cargando administración...</p>;
   if (role !== 'ADMIN') {

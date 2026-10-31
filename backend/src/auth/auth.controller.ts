@@ -1,11 +1,13 @@
 import {
   Controller,
   Post,
+  Get,
   Body,
   Patch,
   UseGuards,
   Req,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
@@ -53,10 +55,25 @@ export class AuthController {
     return this.authService.login(loginDto);
   }
 
+  @Get('session')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Validar la sesión y el rol actuales' })
+  getSession(@Req() req: Request & { user?: { sub: string } }) {
+    const userId = req.user?.sub;
+    if (!userId) {
+      throw new UnauthorizedException('Usuario no válido');
+    }
+    return this.authService.getSession(userId);
+  }
+
   @Post('login-admin')
   @ApiOperation({ summary: 'Obtener un Token de Administrador para pruebas' })
   @ApiResponse({ status: 201, description: 'Token generado' })
   async loginAdmin() {
+    if (process.env.NODE_ENV !== 'test') {
+      throw new NotFoundException();
+    }
     return this.authService.loginMockAdmin();
   }
 

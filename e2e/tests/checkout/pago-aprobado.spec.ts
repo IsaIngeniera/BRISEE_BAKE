@@ -3,14 +3,14 @@
  *
  * Según la estrategia:
  *   "La E2E valida la experiencia del cliente: ver la pantalla de
- *    confirmación con el resumen correcto, carrito vacío e historial
+ *    confirmación con el resumen correcto, carrito conservado e historial
  *    actualizado. Se usa un mock de Wompi en E2E para controlar
  *    la respuesta."
  *
  * Validamos:
  *   - Mock de Wompi devuelve APPROVED.
  *   - El cliente ve "¡Pago exitoso!" en /finalizar-compra.
- *   - El carrito queda vacío después del pago.
+ *   - El carrito se conserva después del pago para permitir revisar el pedido.
  */
 
 import { test, expect } from '@playwright/test';
@@ -84,7 +84,7 @@ test.describe('HU-21 Pago aprobado [E2E]', () => {
     ).toBeVisible({ timeout: 15_000 });
   });
 
-  test('después del pago aprobado, el carrito queda vacío', async ({
+  test('después del pago aprobado, el carrito conserva sus productos', async ({
     page,
   }) => {
     const { userId } = await setupCartAndCheckout(page);
@@ -101,9 +101,19 @@ test.describe('HU-21 Pago aprobado [E2E]', () => {
 
     await expect(page.getByRole('heading', { name: /¡pago exitoso!/i })).toBeVisible({ timeout: 15_000 });
 
-    // Verificamos que localStorage del carrito quedó vacío (o removido).
+    // El retorno de Wompi no debe borrar el carrito del cliente.
     const cartState = await page.evaluate((key) => localStorage.getItem(key), `brisee_cart_${userId}`);
-    expect(cartState === null || cartState === '[]').toBe(true);
+    expect(cartState).not.toBeNull();
+    const storedItems = JSON.parse(cartState ?? '[]') as Array<{
+      productId?: string;
+      cantidad?: number;
+    }>;
+    expect(storedItems).toEqual([
+      expect.objectContaining({
+        productId: expect.any(String),
+        cantidad: 1,
+      }),
+    ]);
   });
 
   test('la página muestra un link a /cuenta/pedidos tras el pago aprobado', async ({

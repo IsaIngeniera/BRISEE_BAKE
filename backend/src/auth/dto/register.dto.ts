@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   MaxLength,
   IsDateString,
+  Matches,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -45,5 +46,8 @@ export class RegisterDto {
   @IsString({ message: missingDataMsg })
   @IsNotEmpty({ message: missingDataMsg })
   @MaxLength(20)
+  @Matches(/^\d+$/, {
+    message: 'El número de teléfono solo puede contener números',
+  })
   celular: string;
 }

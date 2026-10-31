@@ -19,12 +19,15 @@
  *
  * Mocks aplicados:
  *   - `fetch` global: simula la respuesta de la API de Wompi.
- *   - `nodemailer.createTransport`: captura los parámetros del correo
- *     sin enviarlo realmente.
+ *   - `Resend`: captura los parámetros del correo sin enviarlo realmente.
  */
 
+jest.mock('resend', () => ({
+  Resend: jest.fn(),
+}));
+
 import request from 'supertest';
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { INestApplication } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Pedido } from '@prisma/client';
@@ -33,19 +36,12 @@ import { createTestApp } from '../helpers/test-app';
 import { cleanDatabase } from '../helpers/test-db';
 import { seedUser, seedProduct } from '../helpers/test-fixtures';
 
-// Mock del transporte de nodemailer. jest.mock se "hoistea" al top del
-// archivo antes de los imports, por eso no se puede referenciar nada
-// externo dentro de la fábrica.
-jest.mock('nodemailer', () => ({
-  createTransport: jest.fn(),
-}));
-
-/**
- * Espera a que las promesas pendientes de la event loop se resuelvan.
- * Lo necesitamos porque `sendAdminNotification` se dispara en modo
- * fire-and-forget desde el service (`.catch(console.error)` sin await).
- */
-const flushPromises = () => new Promise((resolve) => setImmediate(resolve));
+async function waitForMockCall(mock: jest.Mock, expectedCalls: number) {
+  for (let attempt = 0; attempt < 200; attempt += 1) {
+    if (mock.mock.calls.length >= expectedCalls) return;
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+}
 
 describe('Verificar pago [Integración] (HU-21, HU-22, HU-24)', () => {
   let app: INestApplication;
@@ -72,11 +68,16 @@ describe('Verificar pago [Integración] (HU-21, HU-22, HU-24)', () => {
   beforeEach(async () => {
     await cleanDatabase(prisma);
 
-    // Mock del transporte: devuelve un objeto con sendMail como jest.fn.
-    sendMailMock = jest.fn().mockResolvedValue({ messageId: 'mock-id' });
-    (nodemailer.createTransport as jest.Mock).mockReturnValue({
-      sendMail: sendMailMock,
-    });
+    // Mock del cliente Resend: captura los argumentos sin enviar correos.
+    const currentSendMailMock = jest
+      .fn()
+      .mockResolvedValue({ messageId: 'mock-id' });
+    sendMailMock = currentSendMailMock;
+    (Resend as jest.Mock).mockClear().mockImplementation(() => ({
+      emails: {
+        send: currentSendMailMock,
+      },
+    }));
 
     // Spy sobre fetch (lo definimos por test según el escenario).
     fetchSpy = jest.spyOn(global, 'fetch');
@@ -182,8 +183,7 @@ describe('Verificar pago [Integración] (HU-21, HU-22, HU-24)', () => {
       expect(pago!.transaccionId).toBe('trx-approved-123');
 
       // 3. Notificación disparada (fire-and-forget → esperamos un tick)
-      await flushPromises();
-      await flushPromises();
+      await waitForMockCall(sendMailMock, 1);
       expect(sendMailMock).toHaveBeenCalledTimes(1);
     });
 
@@ -192,14 +192,15 @@ describe('Verificar pago [Integración] (HU-21, HU-22, HU-24)', () => {
       mockWompiResponse({
         status: 'APPROVED',
         reference: pedido.id,
-        amountInCents: 2500000,
+        amountInCents: 1600000,
       });
 
       const response = await request(app.getHttpServer())
         .get('/pedidos/verificar-pago/trx-xyz')
         .expect(200);
 
-      expect(response.body.amount).toBe(25000); // 2500000 / 100
+      expect(response.body.amount).toBe(16000); // 1600000 / 100
+      await waitForMockCall(sendMailMock, 1);
     });
   });
 
@@ -222,8 +223,7 @@ describe('Verificar pago [Integración] (HU-21, HU-22, HU-24)', () => {
       expect(pago!.transaccionId).toBe('trx-declined');
 
       // Esperamos un tick para asegurar que el admin NO reciba correo.
-      await flushPromises();
-      await flushPromises();
+      await new Promise((resolve) => setTimeout(resolve, 100));
       expect(sendMailMock).not.toHaveBeenCalled();
     });
 
@@ -240,8 +240,7 @@ describe('Verificar pago [Integración] (HU-21, HU-22, HU-24)', () => {
       });
       expect(pago!.estado).toBe('RECHAZADO');
 
-      await flushPromises();
-      await flushPromises();
+      await new Promise((resolve) => setTimeout(resolve, 100));
       expect(sendMailMock).not.toHaveBeenCalled();
     });
 
@@ -258,8 +257,7 @@ describe('Verificar pago [Integración] (HU-21, HU-22, HU-24)', () => {
       });
       expect(pago!.estado).toBe('CANCELADO');
 
-      await flushPromises();
-      await flushPromises();
+      await new Promise((resolve) => setTimeout(resolve, 100));
       expect(sendMailMock).not.toHaveBeenCalled();
     });
   });
@@ -276,8 +274,7 @@ describe('Verificar pago [Integración] (HU-21, HU-22, HU-24)', () => {
         .get('/pedidos/verificar-pago/trx-mail')
         .expect(200);
 
-      await flushPromises();
-      await flushPromises();
+      await waitForMockCall(sendMailMock, 1);
 
       expect(sendMailMock).toHaveBeenCalledTimes(1);
       const mailArgs = sendMailMock.mock.calls[0][0] as {
@@ -310,7 +307,7 @@ describe('Verificar pago [Integración] (HU-21, HU-22, HU-24)', () => {
       expect(mailArgs.html).toContain('2x');
     });
 
-    it('createTransport debe recibir las credenciales de EMAIL_USER/EMAIL_PASS', async () => {
+    it('debe enviar el correo mediante Resend', async () => {
       const pedido = await seedPedidoPendiente();
       mockWompiResponse({ status: 'APPROVED', reference: pedido.id });
 
@@ -318,18 +315,10 @@ describe('Verificar pago [Integración] (HU-21, HU-22, HU-24)', () => {
         .get('/pedidos/verificar-pago/trx-cfg')
         .expect(200);
 
-      await flushPromises();
-      await flushPromises();
+      await waitForMockCall(sendMailMock, 1);
 
-      expect(nodemailer.createTransport).toHaveBeenCalledWith(
-        expect.objectContaining({
-          service: 'gmail',
-          auth: expect.objectContaining({
-            user: 'test-user@gmail.com',
-            pass: 'test-password',
-          }),
-        }),
-      );
+      expect(Resend).toHaveBeenCalledTimes(1);
+      expect(sendMailMock).toHaveBeenCalledTimes(1);
     });
   });
 });

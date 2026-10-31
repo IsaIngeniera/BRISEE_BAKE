@@ -8,6 +8,7 @@ import {
 
 import Footer from '../components/layout/Footer';
 import Header from '../components/layout/Header';
+import CanonicalHostRedirect from '../components/layout/CanonicalHostRedirect';
 import { CartProvider } from '../context/CartContext';
 
 import './globals.css';
@@ -60,6 +61,7 @@ export default function RootLayout({
   return (
     <html lang="es" className={fontClasses}>
       <body>
+        <CanonicalHostRedirect />
         <CartProvider>
           <Header />
 

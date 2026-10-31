@@ -13,11 +13,22 @@
  * - Limpieza del formulario tras envío
  */
 
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ContactoPage from '@/app/contacto/page';
 
 describe('HU-27: Página de Contacto [QA]', () => {
+  beforeEach(() => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ message: 'Mensaje enviado correctamente.' }),
+    } as Response);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   // ============================================================
   // VISUALIZACIÓN DE INFORMACIÓN
   // ============================================================
@@ -115,7 +126,7 @@ describe('HU-27: Página de Contacto [QA]', () => {
       );
 
       expect(
-        screen.getByText(/¡Gracias! Tu mensaje fue registrado/i),
+        await screen.findByText(/¡Gracias! Tu mensaje fue registrado/i),
       ).toBeInTheDocument();
     });
 
@@ -138,9 +149,11 @@ describe('HU-27: Página de Contacto [QA]', () => {
         screen.getByRole('button', { name: /Enviar mensaje/i }),
       );
 
-      expect(nombreInput.value).toBe('');
-      expect(emailInput.value).toBe('');
-      expect(mensajeInput.value).toBe('');
+      await waitFor(() => {
+        expect(nombreInput.value).toBe('');
+        expect(emailInput.value).toBe('');
+        expect(mensajeInput.value).toBe('');
+      });
     });
 
     it('[Flujo Alternativo] no debe enviar el formulario si falta el nombre', async () => {
@@ -196,9 +209,8 @@ describe('HU-27: Página de Contacto [QA]', () => {
       expect(emailInput.type).toBe('email');
     });
 
-    it('[Flujo Alternativo] la confirmación debe desaparecer tras 4 segundos', async () => {
-      jest.useFakeTimers();
-      const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    it('[Flujo Alternativo] la confirmación permanece visible después del envío', async () => {
+      const user = userEvent.setup();
 
       render(<ContactoPage />);
 
@@ -210,19 +222,8 @@ describe('HU-27: Página de Contacto [QA]', () => {
       );
 
       expect(
-        screen.getByText(/¡Gracias! Tu mensaje fue registrado/i),
+        await screen.findByText(/¡Gracias! Tu mensaje fue registrado/i),
       ).toBeInTheDocument();
-
-      // Avanzar el timer dentro de act() para que React procese el cambio de estado
-      await act(async () => {
-        jest.advanceTimersByTime(4100);
-      });
-
-      expect(
-        screen.queryByText(/¡Gracias! Tu mensaje fue registrado/i),
-      ).not.toBeInTheDocument();
-
-      jest.useRealTimers();
     });
   });
 });

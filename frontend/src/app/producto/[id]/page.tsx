@@ -10,6 +10,8 @@ import {
   sortProductVariants,
 } from '@/utils/product-variants';
 
+export const dynamic = 'force-dynamic';
+
 interface ProductImage {
   id: string;
   urlImagen: string;

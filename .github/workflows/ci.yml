@@ -31,15 +31,32 @@ jobs:
       - name: Build
         run: npm run build --workspace=frontend
 
+      - name: Unit tests
+        run: npm run test --workspace=frontend -- --runInBand
+
   backend:
     name: Backend
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: brisee
+          POSTGRES_PASSWORD: ci-password
+          POSTGRES_DB: brisee_bake_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U brisee -d brisee_bake_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.jsgit
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 24.14.1
@@ -52,14 +69,98 @@ jobs:
       - name: Lint
         run: npm run lint --workspace=backend
         env:
-          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+          DATABASE_URL: "******localhost:5432/dummy"
 
       - name: Build
         run: npm run build --workspace=backend
         env:
-          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+          DATABASE_URL: "******localhost:5432/dummy"
 
-      - name: Tests
+      - name: Unit tests
         run: npm test --workspace=backend
         env:
-          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+          DATABASE_URL: "******localhost:5432/dummy"
+
+      - name: Prepare integration test environment
+        run: |
+          cp backend/.env.test.example backend/.env.test
+          sed -i 's#^DATABASE_URL=.*#DATABASE_URL="postgresql://brisee:ci-password@localhost:5432/brisee_bake_test"#' backend/.env.test
+
+      - name: Integration tests
+        run: npm run test:integration --workspace=backend
+
+  e2e:
+    name: End-to-end
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: brisee
+          POSTGRES_PASSWORD: ci-password
+          POSTGRES_DB: brisee_bake_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U brisee -d brisee_bake_e2e"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.14.1
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install application dependencies
+        run: npm ci
+
+      - name: Install E2E dependencies
+        run: npm ci --prefix e2e
+
+      - name: Prepare E2E environment
+        run: |
+          cp e2e/.env.e2e.example e2e/.env.e2e
+          sed -i 's#^DATABASE_URL=.*#DATABASE_URL="postgresql://brisee:ci-password@localhost:5432/brisee_bake_e2e"#' e2e/.env.e2e
+
+      - name: Prepare Prisma for E2E
+        run: |
+          npx prisma generate --config backend/prisma.config.ts
+          npx prisma migrate deploy --config backend/prisma.config.ts
+        env:
+          DATABASE_URL: postgresql://brisee:ci-password@localhost:5432/brisee_bake_e2e
+
+      - name: Install Chromium
+        run: npx --prefix e2e playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        run: npm test --prefix e2e
+        env:
+          CI: true
+
+  dependency-audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.14.1
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high

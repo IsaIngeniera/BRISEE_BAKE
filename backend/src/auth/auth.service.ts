@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   UnauthorizedException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma.service';
@@ -61,34 +62,22 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    let user = await this.prisma.usuario.findUnique({
+    const user = await this.prisma.usuario.findUnique({
       where: { correo: loginDto.correo },
     });
 
     if (!user) {
-      // AUTO-REPAIR ADMIN IF IT DOESN'T EXIST
-      if (
-        loginDto.correo === 'admin@briseebake.com' &&
-        loginDto.password === 'admin123'
-      ) {
-        const hashedPassword = await bcrypt.hash('admin123', 10);
-        user = await this.prisma.usuario.create({
-          data: {
-            nombre: 'Admin',
-            apellido: 'Principal',
-            correo: 'admin@briseebake.com',
-            password: hashedPassword,
-            rol: Rol.ADMIN,
-            celular: '3000000000',
-            estado: EstadoUsuario.ACTIVO,
-            fechaNacimiento: new Date('1990-01-01'),
-          },
-        });
-      } else {
-        throw new UnauthorizedException(
-          'Nombre de Usuario y/o contraseñas incorrectas',
-        );
-      }
+      throw new UnauthorizedException(
+        'Nombre de Usuario y/o contraseñas incorrectas',
+      );
+    }
+
+    if (user.estado !== EstadoUsuario.ACTIVO) {
+      throw new UnauthorizedException(
+        user.estado === EstadoUsuario.BLOQUEADO
+          ? 'Tu cuenta se encuentra bloqueada. Contacta al administrador'
+          : 'Tu cuenta se encuentra inactiva',
+      );
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -97,21 +86,9 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      // AUTO-REPAIR ADMIN PASSWORD IF WRONG
-      if (
-        loginDto.correo === 'admin@briseebake.com' &&
-        loginDto.password === 'admin123'
-      ) {
-        const hashedPassword = await bcrypt.hash('admin123', 10);
-        user = await this.prisma.usuario.update({
-          where: { correo: 'admin@briseebake.com' },
-          data: { password: hashedPassword, rol: Rol.ADMIN },
-        });
-      } else {
-        throw new UnauthorizedException(
-          'Nombre de Usuario y/o contraseñas incorrectas',
-        );
-      }
+      throw new UnauthorizedException(
+        'Nombre de Usuario y/o contraseñas incorrectas',
+      );
     }
 
     const payload = {
@@ -125,7 +102,29 @@ export class AuthService {
     };
   }
 
+  async getSession(userId: string) {
+    const user = await this.prisma.usuario.findUnique({
+      where: { id: userId },
+      select: { id: true, correo: true, rol: true, estado: true },
+    });
+
+    if (!user || user.estado !== EstadoUsuario.ACTIVO) {
+      throw new UnauthorizedException(
+        'La sesión ya no está activa. Inicie sesión nuevamente',
+      );
+    }
+
+    return {
+      sub: user.id,
+      correo: user.correo,
+      rol: user.rol,
+    };
+  }
+
   async loginMockAdmin() {
+    if (process.env.NODE_ENV !== 'test') {
+      throw new UnauthorizedException();
+    }
     // 1. Check if mock admin exists
     let admin = await this.prisma.usuario.findUnique({
       where: { correo: 'admin@briseebake.com' },
@@ -273,7 +272,7 @@ export class AuthService {
       };
     } catch {
       // 3. Fallback para entornos de pruebas o tokens simulados de desarrollo
-      if (process.env.NODE_ENV === 'test' || !clientId) {
+      if (process.env.NODE_ENV === 'test') {
         try {
           type DecodedGoogleToken = {
             email?: string;
@@ -533,7 +532,12 @@ export class AuthService {
       }
     }
 
-    // 2. Fallback de desarrollo y testing local
+    if (process.env.NODE_ENV === 'production') {
+      throw new InternalServerErrorException(
+        'El servicio de correo no está disponible',
+      );
+    }
+
     console.log(
       `[AUTH RECOVERY] Enlace de recuperación para ${to}: ${resetLink}`,
     );

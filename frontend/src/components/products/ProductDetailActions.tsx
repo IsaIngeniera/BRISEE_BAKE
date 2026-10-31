@@ -123,6 +123,7 @@ export default function ProductDetailActions({
         imagenUrl={selectedProduct.imagenUrl}
         tematica={normalizedTheme || undefined}
         quantity={quantity}
+        maxQuantity={selectedProduct.existencias}
         disabled={
           isSoldOut ||
           !isQuantityValid ||

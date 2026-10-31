@@ -180,6 +180,9 @@ export default function CarritoPage() {
     useState(false);
   const [confirmedOrder, setConfirmedOrder] =
     useState<ConfirmedOrder | null>(null);
+  const [invalidQuantityIds, setInvalidQuantityIds] = useState<Set<string>>(
+    new Set(),
+  );
 
   const {
     items,
@@ -212,9 +215,35 @@ export default function CarritoPage() {
     (sum, item) => sum + Number(item.precio) * item.cantidad,
     0,
   );
+  const hasInvalidQuantities =
+    invalidQuantityIds.size > 0 ||
+    items.some(
+      (item) =>
+        !Number.isSafeInteger(item.cantidad) ||
+        item.cantidad < 1 ||
+        item.existencias === undefined ||
+        item.cantidad > item.existencias,
+    );
 
   function openDeliveryMethodSelection() {
     if (isCheckingOut || confirmedOrder) return;
+
+    const hasCurrentInvalidQuantities =
+      invalidQuantityIds.size > 0 ||
+      items.some(
+        (item) =>
+          !Number.isSafeInteger(item.cantidad) ||
+          item.cantidad < 1 ||
+          item.existencias === undefined ||
+          item.cantidad > item.existencias,
+      );
+
+    if (hasCurrentInvalidQuantities) {
+      setCheckoutError(
+        'Corrige las cantidades inválidas antes de continuar con la compra.',
+      );
+      return;
+    }
 
     setCheckoutError('');
     setCheckoutStep('METHOD');
@@ -247,6 +276,13 @@ export default function CarritoPage() {
   async function handleCheckout() {
     if (isCheckingOut || confirmedOrder) return;
 
+    if (hasInvalidQuantities) {
+      setCheckoutError(
+        'Corrige las cantidades inválidas antes de continuar con la compra.',
+      );
+      return;
+    }
+
     if (!deliveryMethod || !deliveryDate) {
       setIsDeliveryModalOpen(true);
       return;
@@ -255,10 +291,32 @@ export default function CarritoPage() {
     setCheckoutError('');
     setIsCheckingOut(true);
 
-    const purchasedItems = items.map((item) => ({ ...item }));
-    const purchasedTotal = total;
-
     try {
+      const synchronizedItems = await refreshCart();
+
+      if (synchronizedItems.length === 0) {
+        throw new Error('El carrito está vacío o sus productos ya no están disponibles.');
+      }
+
+      const hasUnavailableQuantity = synchronizedItems.some(
+        (item) =>
+          !Number.isSafeInteger(item.cantidad) ||
+          item.cantidad < 1 ||
+          (item.existencias !== undefined &&
+            item.cantidad > item.existencias),
+      );
+
+      if (hasUnavailableQuantity) {
+        throw new Error(
+          'Actualiza las cantidades del carrito antes de continuar con la compra.',
+        );
+      }
+
+      const purchasedItems = synchronizedItems.map((item) => ({ ...item }));
+      const purchasedTotal = purchasedItems.reduce(
+        (sum, item) => sum + Number(item.precio) * item.cantidad,
+        0,
+      );
       const user = getSessionUser();
       const token =
         sessionStorage.getItem(AUTH_TOKEN_KEY) ||
@@ -471,6 +529,18 @@ export default function CarritoPage() {
                 key={item.productId}
                 item={item}
                 onQuantityChange={updateQuantity}
+                onQuantityValidityChange={(productId, isValid) => {
+                  setInvalidQuantityIds((current) => {
+                    const next = new Set(current);
+                    const key = String(productId);
+                    if (isValid) {
+                      next.delete(key);
+                    } else {
+                      next.add(key);
+                    }
+                    return next;
+                  });
+                }}
                 onRemove={removeFromCart}
               />
             ))}
@@ -492,6 +562,21 @@ export default function CarritoPage() {
             )}
 
             {hasSession === null ? null : hasSession ? (
+              hasInvalidQuantities ? (
+                <div
+                  className={styles.checkoutButton}
+                  aria-disabled="true"
+                  role="button"
+                  tabIndex={-1}
+                  onClick={() => {
+                    setCheckoutError(
+                      'Corrige las cantidades inválidas antes de continuar con la compra.',
+                    );
+                  }}
+                >
+                  Continuar con la compra
+                </div>
+              ) : (
               <button
                 type="button"
                 className={styles.checkoutButton}
@@ -502,6 +587,7 @@ export default function CarritoPage() {
                   ? 'Procesando...'
                   : 'Continuar con la compra'}
               </button>
+              )
             ) : (
               <Link
                 href="/registro?from=carrito"
