@@ -54,9 +54,9 @@ function getWhatsAppUrl(
       const apellido =
         typeof saved.apellido === "string" ? saved.apellido.trim() : "";
       const fullName = [nombre, apellido].filter(Boolean).join(" ");
-      return fullName || user.nombre || "";
+      return fullName;
     } catch {
-      return user?.nombre || "";
+      return "";
     }
   })();
 
