@@ -84,37 +84,44 @@ test.describe("HU-21 Pago aprobado [E2E]", () => {
     ).toBeVisible({ timeout: 15_000 });
   });
 
-  test("después del pago aprobado, el carrito vacía automáticamente sus productos", async ({
+  test('después del pago aprobado, el carrito conserva sus productos', async ({
     page,
   }) => {
     const { userId } = await setupCartAndCheckout(page);
-    await mockWompi(page, { status: "APPROVED" });
+    await mockWompi(page, { status: 'APPROVED' });
 
-    await page.goto("/carrito");
+    await page.goto('/carrito');
     await page
-      .getByRole("button", { name: /continuar con la compra/i })
+      .getByRole('button', { name: /continuar con la compra/i })
       .click();
     await completarFlujoEntrega(page, {
-      metodo: "RETIRO",
+      metodo: 'RETIRO',
       fecha: fechaEnDias(5),
     });
 
     await expect(
-      page.getByRole("heading", { name: /¡pago exitoso!/i }),
+      page.getByRole('heading', { name: /¡pago exitoso!/i }),
     ).toBeVisible({ timeout: 15_000 });
 
-    // Vaciado del carrito: Dado que el pago fue exitoso, cuando el sistema registra la compra, entonces vacía automáticamente los productos del carrito de compras del cliente.
+    // El retorno de Wompi no debe borrar el carrito del cliente.
     const cartState = await page.evaluate(
       (key) => localStorage.getItem(key),
       `brisee_cart_${userId}`,
     );
-    const storedItems = cartState
-      ? (JSON.parse(cartState) as Array<unknown>)
-      : [];
-    expect(storedItems).toHaveLength(0);
+    expect(cartState).not.toBeNull();
+    const storedItems = JSON.parse(cartState ?? '[]') as Array<{
+      productId?: string;
+      cantidad?: number;
+    }>;
+    expect(storedItems).toEqual([
+      expect.objectContaining({
+        productId: expect.any(String),
+        cantidad: 1,
+      }),
+    ]);
   });
 
-  test("la página muestra un link a /cuenta/pedidos tras el pago aprobado", async ({
+  test('la página muestra un link a /cuenta/pedidos tras el pago aprobado', async ({
     page,
   }) => {
     await setupCartAndCheckout(page);
