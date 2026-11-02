@@ -1,17 +1,14 @@
-import type { Metadata } from 'next';
-import type { ReactElement, ReactNode } from 'react';
-import {
-  Libre_Baskerville,
-  Chivo,
-  Plus_Jakarta_Sans,
-} from 'next/font/google';
+import Script from "next/script";
+import type { Metadata } from "next";
+import type { ReactElement, ReactNode } from "react";
+import { Libre_Baskerville, Chivo, Plus_Jakarta_Sans } from "next/font/google";
 
-import Footer from '../components/layout/Footer';
-import Header from '../components/layout/Header';
-import CanonicalHostRedirect from '../components/layout/CanonicalHostRedirect';
-import { CartProvider } from '../context/CartContext';
+import Footer from "../components/layout/Footer";
+import Header from "../components/layout/Header";
+import CanonicalHostRedirect from "../components/layout/CanonicalHostRedirect";
+import { CartProvider } from "../context/CartContext";
 
-import './globals.css';
+import "./globals.css";
 
 /* ── Fuentes de respaldo desde Google Fonts ─────────────────────
    Se inyectan como variables CSS y sirven de fallback cuando las
@@ -19,30 +16,30 @@ import './globals.css';
    Canva Sans) no están instaladas en el dispositivo del usuario.
 ─────────────────────────────────────────────────────────────── */
 const libreBaskerville = Libre_Baskerville({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-  style: ['normal', 'italic'],
-  variable: '--gf-baskerville', // respaldo para Baskerville Display PT
-  display: 'swap',
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+  variable: "--gf-baskerville", // respaldo para Baskerville Display PT
+  display: "swap",
 });
 
 const chivo = Chivo({
-  subsets: ['latin'],
-  weight: ['100', '300', '400', '500', '700', '900'],
-  variable: '--gf-chivo', // respaldo para Antique Olive
-  display: 'swap',
+  subsets: ["latin"],
+  weight: ["100", "300", "400", "500", "700", "900"],
+  variable: "--gf-chivo", // respaldo para Antique Olive
+  display: "swap",
 });
 
 const plusJakartaSans = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  weight: ['200', '300', '400', '500', '600', '700', '800'],
-  variable: '--gf-jakarta', // respaldo para Canva Sans
-  display: 'swap',
+  subsets: ["latin"],
+  weight: ["200", "300", "400", "500", "600", "700", "800"],
+  variable: "--gf-jakarta", // respaldo para Canva Sans
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: 'Brisée Bake',
-  description: 'Pastelería Brisée Bake',
+  title: "Brisée Bake",
+  description: "Pastelería Brisée Bake",
 };
 
 interface RootLayoutProps {
@@ -56,11 +53,20 @@ export default function RootLayout({
     libreBaskerville.variable,
     chivo.variable,
     plusJakartaSans.variable,
-  ].join(' ');
+  ].join(" ");
 
   return (
     <html lang="es" className={fontClasses}>
       <body>
+        <Script id="microsoft-clarity" strategy="afterInteractive">
+          {`
+            (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "z7f1r6goaa");
+          `}
+        </Script>
         <CanonicalHostRedirect />
         <CartProvider>
           <Header />
