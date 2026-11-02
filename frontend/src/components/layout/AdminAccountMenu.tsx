@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { LogOut, UserRound, UsersRound } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { LogOut, UserRound, UsersRound } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
-import { clearSession } from '@/services/auth';
+import { clearSession } from "@/services/auth";
 
-import styles from './admin-account-menu.module.css';
+import styles from "./admin-account-menu.module.css";
 
 export default function AdminAccountMenu() {
   const router = useRouter();
@@ -24,24 +24,24 @@ export default function AdminAccountMenu() {
     }
 
     function handleEscape(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         setIsOpen(false);
       }
     }
 
-    document.addEventListener('mousedown', handleOutsideClick);
-    document.addEventListener('keydown', handleEscape);
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("keydown", handleEscape);
 
     return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [isOpen]);
 
   function handleLogout() {
     clearSession();
     setIsOpen(false);
-    router.replace('/');
+    router.replace("/");
   }
 
   return (
@@ -66,7 +66,7 @@ export default function AdminAccountMenu() {
             onClick={() => setIsOpen(false)}
           >
             <UsersRound size={18} aria-hidden="true" />
-            <span>Administrar clientes</span>
+            <span>Administrar usuarios</span>
           </Link>
 
           <button

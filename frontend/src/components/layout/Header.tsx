@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   useEffect,
   useState,
   useSyncExternalStore,
   type ReactElement,
-} from 'react';
+} from "react";
 
 import {
   ChevronDown,
@@ -17,91 +17,72 @@ import {
   ShoppingCart,
   UserRound,
   X,
-} from 'lucide-react';
+} from "lucide-react";
 
-import {
-  AUTH_CHANGE_EVENT,
-  getSessionUser,
-} from '@/services/auth';
-import { useCart } from '@/hooks/useCart';
+import { AUTH_CHANGE_EVENT, getSessionUser } from "@/services/auth";
+import { useCart } from "@/hooks/useCart";
 
-import ManualHelp from './ManualHelp';
-import styles from './header.module.css';
+import ManualHelp from "./ManualHelp";
+import styles from "./header.module.css";
 
 interface NavigationItem {
   readonly label: string;
   readonly href: string;
 }
 
-type ViewMode = 'CLIENT' | 'ADMIN';
+type ViewMode = "CLIENT" | "ADMIN";
 
 const NAVIGATION_LINKS: readonly NavigationItem[] = [
   {
-    label: 'Bienvenido',
-    href: '/',
+    label: "Bienvenido",
+    href: "/",
   },
   {
-    label: 'Catálogo',
-    href: '/catalogo',
+    label: "Catálogo",
+    href: "/catalogo",
   },
   {
-    label: 'Contactos',
-    href: '/contacto',
+    label: "Contactos",
+    href: "/contacto",
   },
 ];
 
 const ADMIN_LINKS: readonly NavigationItem[] = [
   {
-    label: 'Administrar productos',
-    href: '/admin/productos',
+    label: "Administrar productos",
+    href: "/admin/productos",
   },
   {
-    label: 'Crear producto',
-    href: '/admin/productos/crear',
+    label: "Crear producto",
+    href: "/admin/productos/crear",
   },
   {
-    label: 'Administrar pedidos',
-    href: '/admin/pedidos',
+    label: "Administrar pedidos",
+    href: "/admin/pedidos",
   },
   {
-    label: 'Administrar clientes',
-    href: '/admin/clientes',
+    label: "Administrar usuarios",
+    href: "/admin/clientes",
   },
 ];
 
 function getViewModeSnapshot(): ViewMode {
-  return getSessionUser()?.rol === 'ADMIN'
-    ? 'ADMIN'
-    : 'CLIENT';
+  return getSessionUser()?.rol === "ADMIN" ? "ADMIN" : "CLIENT";
 }
 
 function getServerViewModeSnapshot(): ViewMode {
-  return 'CLIENT';
+  return "CLIENT";
 }
 
-function subscribeToViewMode(
-  notifyViewModeChange: () => void,
-): () => void {
-  window.addEventListener(
-    'storage',
-    notifyViewModeChange,
-  );
+function subscribeToViewMode(notifyViewModeChange: () => void): () => void {
+  window.addEventListener("storage", notifyViewModeChange);
 
-  window.addEventListener(
-    AUTH_CHANGE_EVENT,
-    notifyViewModeChange,
-  );
+  window.addEventListener(AUTH_CHANGE_EVENT, notifyViewModeChange);
 
   return () => {
-    window.removeEventListener(
-      'storage',
-      notifyViewModeChange,
-    );
+    window.removeEventListener("storage", notifyViewModeChange);
 
-    window.removeEventListener(
-      AUTH_CHANGE_EVENT,
-      notifyViewModeChange,
-    );
+    window.removeEventListener(AUTH_CHANGE_EVENT, notifyViewModeChange);
   };
 }
 
@@ -109,11 +90,9 @@ export default function Header(): ReactElement {
   const { totalItems } = useCart();
   const pathname = usePathname();
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] =
-    useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const [isAdminMenuOpen, setIsAdminMenuOpen] =
-    useState(false);
+  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
 
   const viewMode = useSyncExternalStore(
     subscribeToViewMode,
@@ -121,13 +100,10 @@ export default function Header(): ReactElement {
     getServerViewModeSnapshot,
   );
 
-  const isAdmin = viewMode === 'ADMIN';
+  const isAdmin = viewMode === "ADMIN";
 
   useEffect(() => {
-    document.documentElement.setAttribute(
-      'data-view-mode',
-      viewMode,
-    );
+    document.documentElement.setAttribute("data-view-mode", viewMode);
   }, [viewMode]);
 
   function closeMenus(): void {
@@ -136,28 +112,23 @@ export default function Header(): ReactElement {
   }
 
   function handleSaveChanges(): void {
-    window.dispatchEvent(
-      new CustomEvent('brisee:save-changes'),
-    );
+    window.dispatchEvent(new CustomEvent("brisee:save-changes"));
 
     window.alert(
-      'El botón está preparado. Se conectará al formulario de la página administrativa.',
+      "El botón está preparado. Se conectará al formulario de la página administrativa.",
     );
   }
 
   function isActiveLink(href: string): boolean {
-    if (href === '/') {
-      return pathname === '/';
+    if (href === "/") {
+      return pathname === "/";
     }
 
-    return (
-      pathname === href ||
-      pathname.startsWith(`${href}/`)
-    );
+    return pathname === href || pathname.startsWith(`${href}/`);
   }
 
-  const isAdminSectionActive = ADMIN_LINKS.some(
-    (item) => isActiveLink(item.href),
+  const isAdminSectionActive = ADMIN_LINKS.some((item) =>
+    isActiveLink(item.href),
   );
 
   return (
@@ -175,9 +146,7 @@ export default function Header(): ReactElement {
               <Plus aria-hidden="true" />
             </Link>
 
-            <p className={styles.adminTitle}>
-              BRISÉE BAKE ADMIN
-            </p>
+            <p className={styles.adminTitle}>BRISÉE BAKE ADMIN</p>
 
             <div className={styles.adminActions}>
               <Link
@@ -228,16 +197,10 @@ export default function Header(): ReactElement {
                 key={item.href}
                 href={item.href}
                 className={`${styles.navigationLink} ${
-                  isActiveLink(item.href)
-                    ? styles.activeLink
-                    : ''
+                  isActiveLink(item.href) ? styles.activeLink : ""
                 }`}
                 onClick={closeMenus}
-                aria-current={
-                  pathname === item.href
-                    ? 'page'
-                    : undefined
-                }
+                aria-current={pathname === item.href ? "page" : undefined}
               >
                 {item.label}
               </Link>
@@ -249,27 +212,18 @@ export default function Header(): ReactElement {
                   type="button"
                   className={`${styles.navigationLink} ${
                     styles.dropdownButton
-                  } ${
-                    isAdminSectionActive
-                      ? styles.activeLink
-                      : ''
-                  }`}
+                  } ${isAdminSectionActive ? styles.activeLink : ""}`}
                   onClick={() => {
-                    setIsAdminMenuOpen(
-                      (isOpen) => !isOpen,
-                    );
+                    setIsAdminMenuOpen((isOpen) => !isOpen);
                   }}
                   aria-expanded={isAdminMenuOpen}
                   aria-controls="admin-navigation-menu"
                 >
                   Administración
-
                   <ChevronDown
                     aria-hidden="true"
                     className={
-                      isAdminMenuOpen
-                        ? styles.rotatedChevron
-                        : styles.chevron
+                      isAdminMenuOpen ? styles.rotatedChevron : styles.chevron
                     }
                   />
                 </button>
@@ -296,10 +250,7 @@ export default function Header(): ReactElement {
           </nav>
 
           <div className={styles.userActions}>
-            <ManualHelp
-              isAdmin={isAdmin}
-              onNavigate={closeMenus}
-            />
+            <ManualHelp isAdmin={isAdmin} onNavigate={closeMenus} />
 
             {isAdmin ? (
               <button
@@ -344,14 +295,12 @@ export default function Header(): ReactElement {
               type="button"
               className={styles.mobileMenuButton}
               onClick={() => {
-                setIsMobileMenuOpen(
-                  (isOpen) => !isOpen,
-                );
+                setIsMobileMenuOpen((isOpen) => !isOpen);
               }}
               aria-label={
                 isMobileMenuOpen
-                  ? 'Cerrar menú de navegación'
-                  : 'Abrir menú de navegación'
+                  ? "Cerrar menú de navegación"
+                  : "Abrir menú de navegación"
               }
               aria-expanded={isMobileMenuOpen}
               aria-controls="mobile-navigation-menu"
@@ -376,16 +325,10 @@ export default function Header(): ReactElement {
                 key={item.href}
                 href={item.href}
                 className={`${styles.mobileLink} ${
-                  isActiveLink(item.href)
-                    ? styles.mobileActiveLink
-                    : ''
+                  isActiveLink(item.href) ? styles.mobileActiveLink : ""
                 }`}
                 onClick={closeMenus}
-                aria-current={
-                  pathname === item.href
-                    ? 'page'
-                    : undefined
-                }
+                aria-current={pathname === item.href ? "page" : undefined}
               >
                 {item.label}
               </Link>
@@ -397,37 +340,27 @@ export default function Header(): ReactElement {
                   type="button"
                   className={`${styles.mobileLink} ${styles.mobileDropdownButton}`}
                   onClick={() => {
-                    setIsAdminMenuOpen(
-                      (isOpen) => !isOpen,
-                    );
+                    setIsAdminMenuOpen((isOpen) => !isOpen);
                   }}
                   aria-expanded={isAdminMenuOpen}
                   aria-controls="mobile-admin-menu"
                 >
                   Administración
-
                   <ChevronDown
                     aria-hidden="true"
                     className={
-                      isAdminMenuOpen
-                        ? styles.rotatedChevron
-                        : styles.chevron
+                      isAdminMenuOpen ? styles.rotatedChevron : styles.chevron
                     }
                   />
                 </button>
 
                 {isAdminMenuOpen && (
-                  <div
-                    id="mobile-admin-menu"
-                    className={styles.mobileDropdown}
-                  >
+                  <div id="mobile-admin-menu" className={styles.mobileDropdown}>
                     {ADMIN_LINKS.map((item) => (
                       <Link
                         key={item.href}
                         href={item.href}
-                        className={
-                          styles.mobileDropdownLink
-                        }
+                        className={styles.mobileDropdownLink}
                         onClick={closeMenus}
                       >
                         {item.label}
